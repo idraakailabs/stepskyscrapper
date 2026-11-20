@@ -5,7 +5,7 @@
 > Product: [PRODUCT.md](PRODUCT.md) · Design deviations: [design-deviations.md](design-deviations.md) ·
 > Release checklist: [play-console-checklist.md](play-console-checklist.md).
 >
-> **Baseline:** version 1.0.0, working tree of 2026-11-20 (no version control yet). **Last reviewed:** 2026-11-20.
+> **Baseline:** version 1.0.0, commit `e5c003b` on `main`. **Last reviewed:** 2026-11-20.
 
 ---
 
@@ -108,7 +108,8 @@ Live values (Firebase, AdMob, Play Console) weren't available; they are unverifi
 - Signing: from `keystore.properties` if present, otherwise the debug key.
 - Baseline profile: hand-seeded `app/src/main/baseline-prof.txt`; generator in `:baselineprofile` needs a
   device ([TECH-006](ROADMAP.md#tech-006)).
-- No CI configuration and no version control yet ([TECH-001](ROADMAP.md#tech-001)).
+- Git: `main` at `e5c003b`, remote `origin` = `github.com/idraakailabs/stepskyscrapper` (push pending,
+  [TECH-001](ROADMAP.md#tech-001)). `.gitattributes` pins LF line endings. No CI configuration yet.
 
 ### Verification commands
 

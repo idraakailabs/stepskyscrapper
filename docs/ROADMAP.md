@@ -11,9 +11,9 @@
 
 | | |
 |---|---|
-| **Live baseline** | Phase 1, version 1.0.0, working tree of 2026-11-20 (not published, no version control) |
+| **Live baseline** | Phase 1, version 1.0.0, commit `e5c003b` on `main` (not published) |
 | **Active phase** | Phase 2, Release blockers (not started) |
-| **Recommended next task** | [TECH-001](#tech-001): put the project under Git. It is minutes of work with no external dependency, and every later task needs commits to record resolutions. The P0 items in this phase all need console access you hold (Firebase, AdMob, Play). |
+| **Recommended next task** | [TECH-001](#tech-001) is blocked only on GitHub write access; once the push succeeds, start [TECH-005](#tech-005) (release signing, XS) and then [TECH-002](#tech-002) (Firebase). |
 
 Update this table whenever a task starts, finishes or the active phase changes.
 
@@ -42,8 +42,8 @@ Architecture: [TECHNICAL.md](TECHNICAL.md). Known defects: [BUGS.md](BUGS.md). D
 - Health Connect + sensor fallback; deterministic, repeat-safe sync; all data on the device.
 - Clean modular architecture (MVI, Hilt, Room, DataStore, WorkManager); 84 passing tests; green
   `build test lint` and an R8 release APK.
-- Gaps: Firebase/AdMob/Play not configured, debug-signed release, no version control or CI, six small design
-  gaps (inventory items marked `[~]`).
+- Gaps: Firebase/AdMob/Play not configured, debug-signed release, no CI, the first push to GitHub pending,
+  six small design gaps (inventory items marked `[~]`).
 
 ---
 
@@ -55,7 +55,7 @@ testing track with crash reports, analytics, real ads and working purchases.
 
 | ID | Title | Type | Priority | Status | Depends on |
 |---|---|---|---|---|---|
-| [TECH-001](#tech-001) | Put the project under version control | Technical task | P1 | Planned | — |
+| [TECH-001](#tech-001) | Put the project under version control | Technical task | P1 | Blocked | GitHub write access |
 | [TECH-002](#tech-002) | Configure Firebase (Analytics, Crashlytics, Remote Config) | Technical task | P0 | Planned | Firebase console |
 | [TECH-003](#tech-003) | Real AdMob ids and UMP consent message | Technical task | P0 | Planned | AdMob console |
 | [TECH-004](#tech-004) | Create Play billing products and test purchases | Technical task | P0 | Planned | Play Console |
@@ -126,8 +126,8 @@ Bug cards are in [BUGS.md](BUGS.md).
 
 <a id="tech-001"></a>
 ### TECH-001 — Put the project under version control
-- **Type:** Technical task · **Priority:** P1 · **Status:** Planned · **Effort:** XS
-- **Problem (verified):** `git rev-parse` fails in the project root; there is no history, no way to cite a
+- **Type:** Technical task · **Priority:** P1 · **Status:** Blocked (GitHub write access) · **Effort:** XS
+- **Problem (verified):** `git rev-parse` failed in the project root; there is no history, no way to cite a
   baseline commit, and the doc update workflow can't diff changes.
 - **Solution:** `git init`, review `.gitignore` (it already excludes `google-services.json`, keystores and
   `local.properties`), commit the current tree, push to a private remote.
@@ -137,6 +137,12 @@ Bug cards are in [BUGS.md](BUGS.md).
   1. `git log` shows an initial commit; `git status` is clean.
   2. `google-services.json`, `keystore.properties` and `local.properties` aren't tracked (`git ls-files`).
   3. The doc baselines are updated to that commit hash.
+  4. `main` is pushed to `origin` and tracks `origin/main`.
+- **Progress (2026-11-20):** criteria 1–3 verified: `main` at `e5c003b`, working tree clean, `git ls-files`
+  contains no secrets or build output, `.gitattributes` pins LF endings, docs cite the commit. Criterion 4
+  failed: `git push` returned 403 because the signed-in GitHub account (`zahab-ahmad-jeenyme`, the only one in
+  `gh auth status`) has no write access to `idraakailabs/stepskyscrapper`. Unblock by granting that account
+  write access or signing in with an account that has it, then run `git push -u origin main`.
 
 <a id="tech-002"></a>
 ### TECH-002 — Configure Firebase (Analytics, Crashlytics, Remote Config)

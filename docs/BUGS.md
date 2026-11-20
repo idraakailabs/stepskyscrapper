@@ -3,7 +3,7 @@
 > **Scope:** defects in the current product, with evidence, impact, the proposed fix and acceptance
 > criteria. Scheduling: [ROADMAP.md](ROADMAP.md) · Context: [TECHNICAL.md](TECHNICAL.md).
 >
-> **Baseline:** version 1.0.0, working tree of 2026-11-20 (no version control yet). **Last reviewed:** 2026-11-20.
+> **Baseline:** version 1.0.0, commit `e5c003b` on `main`. **Last reviewed:** 2026-11-20.
 
 ## How to read this file
 
