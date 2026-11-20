@@ -5,7 +5,7 @@
 > [BUGS.md](BUGS.md); this file only schedules them. Rationale: [PRODUCT.md](PRODUCT.md) · Context:
 > [TECHNICAL.md](TECHNICAL.md).
 >
-> **Last updated:** 2026-11-20
+> **Last updated:** 2026-11-21
 
 ## Current position
 
@@ -13,6 +13,7 @@
 |---|---|
 | **Live baseline** | Phase 1, version 1.0.0, commit `e5c003b` on `main` (not published) |
 | **Active phase** | Phase 2, Release blockers (not started) |
+| **In progress** | [TECH-012](#tech-012) design parity pass on a Pixel 6a (onboarding 1a–1e done; resume at 1f) |
 | **Recommended next task** | Finish [TECH-005](#tech-005) by creating the upload key and uploading to internal testing (needs you), then [TECH-002](#tech-002) (Firebase). |
 
 Update this table whenever a task starts, finishes or the active phase changes.
@@ -70,6 +71,8 @@ measured, regressions caught automatically.
 | ID | Title | Type | Priority | Status | Depends on |
 |---|---|---|---|---|---|
 | [TECH-007](#tech-007) | Release-build smoke test of every screen on devices | Technical task | P1 | Planned | TECH-002…005 |
+| [TECH-012](#tech-012) | Design parity pass on a physical phone | Technical task | P1 | In Progress | — |
+| [BUG-009](BUGS.md#bug-009) | Onboarding skips "Add widget" (1f) | Confirmed bug | P2 | Fixed – unverified | — |
 | [TECH-006](#tech-006) | Generate the baseline profile and measure startup | Technical task | P1 | Planned | Device |
 | [BUG-001](BUGS.md#bug-001) | Notifications "on" but never delivered on Android 13+ | Confirmed bug | P2 | Open | — |
 | [BUG-003](BUGS.md#bug-003) | "Save image" gives no feedback | Confirmed bug | P2 | Open | — |
@@ -111,7 +114,7 @@ Goal: finish the remaining design details. Each item is optional.
 | [PROD-004](#prod-004) | "Equip" shortcut and Customise sticky thumbnail | Product improvement | P3 | Planned | — |
 | [PROD-005](#prod-005) | Localise cosmetic and achievement names | Technical task | P3 | Planned | — |
 | [BUG-005](BUGS.md#bug-005) | Skyline ignores the highlight argument | Confirmed bug | P3 | Open | — |
-| [BUG-006](BUGS.md#bug-006) | Payoff partial floor at 0 steps | Confirmed bug | P3 | Open | — |
+| [BUG-006](BUGS.md#bug-006) | Payoff partial floor at 0 steps | Confirmed bug | P3 | Fixed – unverified | — |
 
 ## Not planned
 
@@ -223,6 +226,21 @@ Bug cards are in [BUGS.md](BUGS.md).
   2. Cold-startup median with the profile is reported and at least 10% better than `CompilationMode.None`.
 
 <a id="tech-007"></a>
+### TECH-012 — Design parity pass on a physical phone
+- **Type:** Technical task · **Priority:** P1 · **Status:** In Progress · **Effort:** M
+- **Problem (verified):** parity with the Claude Design had only been checked with Robolectric screenshots and an
+  emulator.
+- **Solution:** walk every item in [design-inventory.md §4](design-inventory.md) on a Pixel 6a (debug build),
+  compare each with the rendered design frame at the same dp scale, fix differences or record deviations. States
+  that need data are seeded by editing the debug app's Room database over `adb run-as` (no app code); times of
+  day use the debug-only clock shift (`app/src/debug/.../DebugClock.kt`).
+- **Progress (2026-11-21):** 1a–1e checked. Fixed: number + unit baseline (1c, Build card), option-card line
+  heights (1e, paywall plans), BUG-006, BUG-009. Device disconnected before 1f onward; continue from 1f.
+- **Acceptance criteria:**
+  1. Every inventory item has a design/device screenshot pair from the phone.
+  2. Differences fixed or listed in [design-deviations.md](design-deviations.md).
+  3. `build test lint` green; Roborazzi baselines re-recorded where UI changed.
+
 ### TECH-007 — Release-build smoke test of every screen on devices
 - **Type:** Technical task · **Priority:** P1 · **Status:** Planned · **Effort:** S
 - **Problem (verified):** the R8 release build was exercised only through onboarding, Build and Me on one

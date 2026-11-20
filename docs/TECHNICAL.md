@@ -114,6 +114,17 @@ Live values (Firebase, AdMob, Play Console) weren't available; they are unverifi
   device ([TECH-006](ROADMAP.md#tech-006)).
 - Git: `main`, remote `origin` = `github.com/idraakailabs/stepskyscrapper`; baseline commit `e5c003b`. `.gitattributes` pins LF line endings. No CI configuration yet.
 
+### Debug-only device tools
+
+- **Clock shift** (debug builds only): `SystemAppClock` adds an optional `DebugClockShift`, bound only in
+  `app/src/debug` (`@BindsOptionalOf` in `DataModule`; release binds nothing). Set a time of day to check the
+  dawn / dusk / night skies without changing the phone's clock:
+  `adb shell am broadcast -n ai.idraak.stepskyscraper.debug/ai.idraak.stepskyscraper.debug.DebugClockReceiver --es time 18:30`
+  (`--es time off` to clear).
+- **Seeding data:** pull `databases/step_skyscraper.db` with `adb exec-out run-as ai.idraak.stepskyscraper.debug cat …`,
+  edit it with SQLite, push it back with `run-as` while the app is stopped. A sync never lowers a stored day
+  total, so seeded totals survive the next Health Connect read.
+
 ### Verification commands
 
 Run on 2026-11-20 with JDK 21: `build test lint` passed; the release APK (6.3 MB) launched on an Android 16

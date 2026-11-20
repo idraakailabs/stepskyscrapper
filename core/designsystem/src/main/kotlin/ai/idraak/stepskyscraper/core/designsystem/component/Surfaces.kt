@@ -107,8 +107,9 @@ fun SsRadioCard(
     radius: Dp = SsRadius.card,
     padding: PaddingValues = PaddingValues(horizontal = 18.dp, vertical = SsSpacing.l),
     subtitleColor: Color = SsTheme.colors.onSurfaceVariant,
-    titleStyle: androidx.compose.ui.text.TextStyle = SsTheme.type.bodyStrong,
-    subtitleStyle: androidx.compose.ui.text.TextStyle = SsTheme.type.bodyXS,
+    titleStyle: androidx.compose.ui.text.TextStyle = SsTheme.type.optionTitle,
+    subtitleStyle: androidx.compose.ui.text.TextStyle = SsTheme.type.optionSubtitle,
+    textGap: Dp = SsSpacing.xxs,
 ) {
     val c = SsTheme.colors
     val shape = RoundedCornerShape(radius)
@@ -136,9 +137,9 @@ fun SsRadioCard(
             filled =
             selected && leading == null,
         )
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(textGap)) {
             Text(title, style = titleStyle, color = c.onSurface)
-            Text(subtitle, style = subtitleStyle, color = subtitleColor)
+            if (subtitle.isNotEmpty()) Text(subtitle, style = subtitleStyle, color = subtitleColor)
         }
         trailing?.invoke()
     }

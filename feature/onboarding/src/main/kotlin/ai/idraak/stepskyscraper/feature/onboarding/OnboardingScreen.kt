@@ -253,7 +253,8 @@ private fun PayoffStep(state: OnboardingUiState, onIntent: (OnboardingIntent) ->
                 style = SsTheme.type.labelM,
                 color = SkyTokens.chrome(ai.idraak.stepskyscraper.core.designsystem.theme.SkyTone.Day).subtitle,
             )
-            Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(SsSpacing.s)) {
+            // Design: `align-items: baseline` — the unit sits on the number's baseline.
+            Row(horizontalArrangement = Arrangement.spacedBy(SsSpacing.s)) {
                 if (state.payoffLoading) {
                     Text(stringResource(R.string.onb_payoff_loading), style = SsTheme.type.title, color = c.onSurface)
                 } else {
@@ -261,13 +262,14 @@ private fun PayoffStep(state: OnboardingUiState, onIntent: (OnboardingIntent) ->
                         target = state.todaySteps,
                         style = SsTheme.type.numberXL,
                         color = c.onSurface,
+                        modifier = Modifier.alignByBaseline(),
                         onTick = { if (it % 1_000 == 0 && it > 0) haptics.performHapticFeedback(HapticFeedbackType.SegmentTick) },
                     )
                     Text(
                         stringResource(R.string.onb_payoff_steps_today),
                         style = SsTheme.type.unit,
                         color = c.onSurface,
-                        modifier = Modifier.padding(bottom = 6.dp),
+                        modifier = Modifier.alignByBaseline(),
                     )
                 }
             }
@@ -286,7 +288,7 @@ private fun PayoffStep(state: OnboardingUiState, onIntent: (OnboardingIntent) ->
                         facade = Facade.Deco,
                         floors = state.floorsToday.coerceAtMost(11),
                         target = 12,
-                        progress = (state.segmentsFilled / 10f).coerceAtLeast(0.2f).takeIf { state.todaySteps % 1_000 > 0 } ?: 0.2f,
+                        progress = state.floorProgress,
                         time = TowerTime.Day,
                     ),
                     pluralStringResource(R.plurals.onb_payoff_title, state.floorsToday, state.floorsToday),
@@ -484,7 +486,7 @@ private fun WidgetStep(state: OnboardingUiState, onIntent: (OnboardingIntent) ->
         ) {
             Text(
                 stringResource(R.string.onb_widget_mock),
-                style = SsTheme.type.micro,
+                style = SsTheme.type.mockLabel,
                 color = SkyTokens.WallpaperMockLabel,
                 modifier = Modifier.align(Alignment.TopStart).padding(start = 14.dp, top = SsSpacing.m),
             )
@@ -539,11 +541,11 @@ private fun WidgetMock(state: OnboardingUiState) {
         }
         Column(Modifier.weight(1f).padding(14.dp), verticalArrangement = Arrangement.SpaceBetween) {
             Column {
-                Text(state.name.uppercase(), style = SsTheme.type.microBold, color = c.onSurfaceVariant, maxLines = 1)
-                Text(Formats.steps(400), style = SsTheme.type.numberWidget, color = c.onSurface)
+                Text(state.name.uppercase(), style = SsTheme.type.microStrong, color = c.onSurfaceVariant, maxLines = 1)
+                Text(Formats.steps(400), style = SsTheme.type.numberWidgetMock, color = c.onSurface)
                 Text(
                     stringResource(ai.idraak.stepskyscraper.core.ui.R.string.to_next_floor),
-                    style = SsTheme.type.captionRegular,
+                    style = SsTheme.type.planSubtitle,
                     color = c.bodySecondary,
                 )
             }

@@ -30,9 +30,10 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-003](#bug-003) | "Save image" gives no feedback and silently fails on Android 8–9 | P2 | Confirmed (code) | Open |
 | [BUG-004](#bug-004) | Week card opens Goals instead of a weekly detail with "Pause goals" | P2 | Confirmed (code) | Open |
 | [BUG-005](#bug-005) | Skyline ignores the tower to highlight after the ceremony | P3 | Confirmed (code) | Open |
-| [BUG-006](#bug-006) | Onboarding payoff shows a 20% partial floor at 0 steps and rounds to segments | P3 | Confirmed (code) | Open |
+| [BUG-006](#bug-006) | Onboarding payoff shows a 20% partial floor at 0 steps and rounds to segments | P3 | Confirmed (code) | Fixed – unverified |
 | [BUG-007](#bug-007) | Ad consent form may appear just by opening Skyline | P3 | Suspected | Open |
 | [BUG-008](#bug-008) | The Build feature module was missing from the Git repository | P0 | Confirmed (reproduced) | Done |
+| [BUG-009](#bug-009) | Onboarding skips "Add widget" (1f) and jumps to Build | P2 | Confirmed (reproduced) | Fixed – unverified |
 
 ---
 
@@ -128,7 +129,10 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Proposed fix:** use `stepsIntoFloor / 1000f`, and 0 when there are no steps into the floor.
 - **Acceptance criteria:**
   1. Screenshot test of 1c with 0 steps shows no partial floor; with 4,200 steps the partial floor is 20%.
-- **Resolution:** — · **Verification:** —
+- **Resolution:** the payoff tower uses `OnboardingUiState.floorProgress` (`stepsIntoFloor / 1000`, 0 when none)
+  instead of the rounded, 20%-minimum segment value. · **Verification:** unit test
+  `OnboardingTest.payoffPartialFloorFollowsStepsIntoTheFloor` (0 → 0, 4,200 → 0.2, 4,250 → 0.25). Device check of
+  1c at 0 steps still outstanding (Pixel disconnected during the 2026-11-21 parity pass).
 
 <a id="bug-007"></a>
 ## BUG-007 — Ad consent form may appear just by opening Skyline
@@ -167,3 +171,20 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   (commit `55df97b`). · **Verification:** 1. `git ls-tree -r origin/main` lists 13 `feature/build/src` files.
   2. A fresh `git clone` of `main` built `:app:assembleDebug` successfully. 3. `git ls-tree` shows no tracked
   `build/intermediates|generated|outputs|tmp` paths.
+
+<a id="bug-009"></a>
+## BUG-009 — Onboarding skips "Add widget" (1f) and jumps to Build
+
+- **Priority:** P2 · **Classification:** Confirmed (reproduced) · **Status:** Fixed – unverified
+- **Evidence:** on the Pixel 6a (debug build, 2026-11-21) tapping "Set 49 floors a week" on 1e opened Build
+  directly; 1f never appeared. `StartBuildingUseCase` marks onboarding complete before the widget step, the
+  settings flow re-emits, and `AppNavHost` computed `startDestination = if (onboardingComplete) BuildRoute else
+  OnboardingRoute` on every recomposition, so the nav graph was rebuilt with Build as the start.
+- **Files:** `app/.../navigation/AppNavigation.kt`.
+- **Impact:** the widget prompt (and its first-floor replay on Build) is never shown; widget adoption suffers.
+- **Fix:** the start destination is fixed for the life of the screen (`rememberSaveable { onboardingComplete }`).
+- **Acceptance criteria:**
+  1. Fresh install on a device: 1e CTA → 1f "Add widget"; both "Add widget" and "Maybe later" → Build.
+  2. Relaunching after onboarding opens Build directly.
+- **Resolution:** `AppNavHost` remembers the start destination (this branch). · **Verification:** pending the
+  device re-check (Pixel disconnected before the fixed build could be exercised).

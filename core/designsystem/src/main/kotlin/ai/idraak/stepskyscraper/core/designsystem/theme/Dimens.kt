@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.dp
 
 /** Spacing scale 4 · 8 · 12 · 16 · 24 · 32 · 48 and the layout constants from the design. */
 object SsSpacing {
+    val none = 0.dp
     val xxs = 2.dp
     val xs = 4.dp
     val s = 8.dp

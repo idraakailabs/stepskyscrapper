@@ -314,8 +314,8 @@ private fun Plans(state: PaywallUiState, onIntent: (PaywallIntent) -> Unit) {
     val monthly = state.offer(PassPlan.Monthly)
     val lifetime = state.offer(PassPlan.Lifetime)
     val pad = PaddingValues(horizontal = SsSpacing.l, vertical = SsSpacing.m)
-    val title = SsTheme.type.bodyMStrong
-    val sub = SsTheme.type.captionRegular
+    val title = SsTheme.type.planTitle
+    val sub = SsTheme.type.planSubtitle
     annual?.let { a ->
         val save = PaywallReducer.savingPercent(monthly, a)
         SsRadioCard(
@@ -328,7 +328,7 @@ private fun Plans(state: PaywallUiState, onIntent: (PaywallIntent) -> Unit) {
                 stringResource(R.string.pw_yearly_sub, PaywallReducer.perMonth(a))
             },
             state.selected == PassPlan.Annual, { onIntent(PaywallIntent.Select(PassPlan.Annual)) },
-            radius = SsRadius.option, padding = pad, titleStyle = title, subtitleStyle = sub, subtitleColor = SsTheme.colors.bodySecondary,
+            radius = SsRadius.option, padding = pad, titleStyle = title, subtitleStyle = sub, textGap = SsSpacing.none, subtitleColor = SsTheme.colors.bodySecondary,
             trailing = save?.let { { SsBadge(stringResource(R.string.pw_save, it)) } },
         )
     }
@@ -336,14 +336,14 @@ private fun Plans(state: PaywallUiState, onIntent: (PaywallIntent) -> Unit) {
         SsRadioCard(
             stringResource(R.string.pw_monthly, m.formattedPrice), stringResource(R.string.pw_monthly_sub),
             state.selected == PassPlan.Monthly, { onIntent(PaywallIntent.Select(PassPlan.Monthly)) },
-            radius = SsRadius.option, padding = pad, titleStyle = title, subtitleStyle = sub, subtitleColor = SsTheme.colors.bodySecondary,
+            radius = SsRadius.option, padding = pad, titleStyle = title, subtitleStyle = sub, textGap = SsSpacing.none, subtitleColor = SsTheme.colors.bodySecondary,
         )
     }
     lifetime?.let { l ->
         SsRadioCard(
             stringResource(R.string.pw_lifetime, l.formattedPrice), stringResource(R.string.pw_lifetime_sub),
             state.selected == PassPlan.Lifetime, { onIntent(PaywallIntent.Select(PassPlan.Lifetime)) },
-            radius = SsRadius.option, padding = pad, titleStyle = title, subtitleStyle = sub, subtitleColor = SsTheme.colors.bodySecondary,
+            radius = SsRadius.option, padding = pad, titleStyle = title, subtitleStyle = sub, textGap = SsSpacing.none, subtitleColor = SsTheme.colors.bodySecondary,
         )
     }
 }

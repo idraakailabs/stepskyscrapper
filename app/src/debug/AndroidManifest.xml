@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Debug only: time-of-day override for device checks (see DebugClock.kt). -->
+        <receiver
+            android:name=".debug.DebugClockReceiver"
+            android:exported="true" />
+    </application>
+</manifest>

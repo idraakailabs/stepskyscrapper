@@ -48,6 +48,15 @@ class OnboardingTest {
     }
 
     @Test
+    fun payoffPartialFloorFollowsStepsIntoTheFloor() {
+        // BUG-006: no partial floor at 0 steps into the floor; 4,200 steps → 20%.
+        assertThat(OnboardingUiState(todaySteps = 0).floorProgress).isEqualTo(0f)
+        assertThat(OnboardingUiState(todaySteps = 3_000).floorProgress).isEqualTo(0f)
+        assertThat(OnboardingUiState(todaySteps = 4_200).floorProgress).isWithin(1e-6f).of(0.2f)
+        assertThat(OnboardingUiState(todaySteps = 4_250).floorProgress).isWithin(1e-6f).of(0.25f)
+    }
+
+    @Test
     fun fullFlowBuildsFirstTowerFromTodaysSteps() = runTest {
         val g = TestGraph()
         g.source.status = StepSourceStatus.HealthConnectPermissionMissing

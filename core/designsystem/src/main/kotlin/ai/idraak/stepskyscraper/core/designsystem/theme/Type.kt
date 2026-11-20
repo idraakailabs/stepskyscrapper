@@ -65,6 +65,7 @@ data class SsTypography(
     val numberStat: TextStyle = style(36, 39.6f, FontWeight.SemiBold, -0.8f, DmSansDisplay, tabular = true),
     val numberM: TextStyle = style(32, 38f, FontWeight.SemiBold, -0.6f, tabular = true),
     val numberWidget: TextStyle = style(30, 33f, FontWeight.SemiBold, -0.6f, tabular = true),
+    val numberWidgetMock: TextStyle = style(26, 28.6f, FontWeight.SemiBold, tabular = true),
     val numberS: TextStyle = style(24, 36f, FontWeight.SemiBold, tabular = true),
     val numberTile: TextStyle = style(24, 30f, FontWeight.SemiBold, tabular = true),
     val numberXS: TextStyle = style(22, 26f, FontWeight.SemiBold, -0.3f, tabular = true),
@@ -99,6 +100,12 @@ data class SsTypography(
     val label: TextStyle = style(14, 19.6f, FontWeight.SemiBold),
     val chip: TextStyle = style(14, 19.6f, FontWeight.Medium),
     val bodyXS: TextStyle = style(13, 18.85f, FontWeight.Normal),
+
+    // Option / plan cards: the design leaves these at CSS `line-height: normal` (DM Sans ascent + descent = 1.302em).
+    val optionTitle: TextStyle = style(16, 20.8f, FontWeight.Bold),
+    val optionSubtitle: TextStyle = style(13, 16.9f, FontWeight.Normal),
+    val planTitle: TextStyle = style(15, 19.5f, FontWeight.Bold),
+    val planSubtitle: TextStyle = style(12, 15.6f, FontWeight.Normal),
     val labelS: TextStyle = style(13, 18f, FontWeight.SemiBold),
     val labelSBold: TextStyle = style(13, 18f, FontWeight.Bold),
     val caption: TextStyle = style(12, 16f, FontWeight.Medium),
@@ -111,6 +118,8 @@ data class SsTypography(
     val micro: TextStyle = style(11, 14f, FontWeight.Medium),
     val microStrong: TextStyle = style(11, 14f, FontWeight.SemiBold),
     val microBold: TextStyle = style(11, 14f, FontWeight.Bold, 0.4f),
+    /** "home screen" label on the 1f wallpaper mock (design: DM Mono 11px; the system monospace stands in). */
+    val mockLabel: TextStyle = style(11, 14.3f, FontWeight.Normal, family = FontFamily.Monospace),
     val legal: TextStyle = style(11, 15.95f, FontWeight.Normal),
     val nav: TextStyle = style(12, 16f, FontWeight.Medium, 0.2f),
     val navActive: TextStyle = style(12, 16f, FontWeight.Bold, 0.2f),

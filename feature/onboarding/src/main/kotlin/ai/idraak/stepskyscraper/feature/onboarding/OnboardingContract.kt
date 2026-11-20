@@ -31,6 +31,9 @@ data class OnboardingUiState(
     val floorsToday: Int get() = todaySteps / FloorMath.STEPS_PER_FLOOR
     val stepsToNext: Int get() = FloorMath.STEPS_PER_FLOOR - todaySteps % FloorMath.STEPS_PER_FLOOR
     val segmentsFilled: Int get() = todaySteps % FloorMath.STEPS_PER_FLOOR / FloorMath.STEPS_PER_SEGMENT
+
+    /** Share of the next floor already walked (0 when no steps into it), drawn as the tower's partial floor. */
+    val floorProgress: Float get() = todaySteps % FloorMath.STEPS_PER_FLOOR / FloorMath.STEPS_PER_FLOOR.toFloat()
     val dailyTarget: Int get() = if (selected == TargetPreset.Custom) customSteps else selected.dailySteps
     val weeklyFloors: Int get() = dailyTarget / FloorMath.STEPS_PER_FLOOR * 7
     val pageIndex: Int get() = when (step) {

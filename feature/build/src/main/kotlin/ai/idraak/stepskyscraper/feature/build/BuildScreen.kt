@@ -284,9 +284,10 @@ private fun NextFloorCard(content: BuildContent, syncing: Boolean) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Top) {
             Column {
                 Text(stringResource(R.string.build_next_floor_in), style = SsTheme.type.label, color = c.onSurfaceVariant)
-                Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(SsSpacing.s)) {
-                    RollingNumber(content.today.stepsToNextFloor, SsTheme.type.numberHero, numberColor)
-                    Text(stringResource(R.string.build_steps_unit), style = SsTheme.type.unit, color = numberColor, modifier = Modifier.padding(bottom = 8.dp))
+                // Design: `align-items: baseline` — the unit sits on the number's baseline.
+                Row(horizontalArrangement = Arrangement.spacedBy(SsSpacing.s)) {
+                    RollingNumber(content.today.stepsToNextFloor, SsTheme.type.numberHero, numberColor, Modifier.alignByBaseline())
+                    Text(stringResource(R.string.build_steps_unit), style = SsTheme.type.unit, color = numberColor, modifier = Modifier.alignByBaseline())
                 }
             }
             when {

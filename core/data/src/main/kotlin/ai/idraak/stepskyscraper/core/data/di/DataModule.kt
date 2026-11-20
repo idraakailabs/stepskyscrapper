@@ -22,19 +22,33 @@ import ai.idraak.stepskyscraper.core.domain.repository.TowerRepository
 import ai.idraak.stepskyscraper.core.domain.repository.UnlockRepository
 import ai.idraak.stepskyscraper.core.domain.repository.WalletRepository
 import dagger.Binds
+import dagger.BindsOptionalOf
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import dagger.multibindings.Multibinds
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
+import java.util.Optional
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Debug-only clock shift, used to check the dawn / dusk / night skies on a device without changing its
+ * system time. Bound only in `app/src/debug`; release builds bind nothing, so the clock is the system clock.
+ */
+fun interface DebugClockShift {
+    fun shift(): Duration
+}
+
 @Singleton
-class SystemAppClock @Inject constructor() : AppClock {
-    override fun now(): Instant = Instant.now()
+class SystemAppClock @Inject constructor(private val debugShift: Optional<DebugClockShift>) : AppClock {
+    override fun now(): Instant {
+        val now = Instant.now()
+        return if (debugShift.isPresent) now.plus(debugShift.get().shift()) else now
+    }
 
     override fun zone(): ZoneId = ZoneId.systemDefault()
 }
@@ -44,6 +58,8 @@ class SystemAppClock @Inject constructor() : AppClock {
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
     @Binds abstract fun clock(impl: SystemAppClock): AppClock
+
+    @BindsOptionalOf abstract fun debugClockShift(): DebugClockShift
 
     @Binds abstract fun steps(impl: RoomStepsRepository): StepsRepository
 

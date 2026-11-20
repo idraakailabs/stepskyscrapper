@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -103,9 +104,12 @@ private fun NavHostController.goToTab(route: Any) = navigate(route) {
 private fun AppNavHost(nav: NavHostController, onboardingComplete: Boolean) {
     val reduce = SsTheme.reduceMotion
     val fade = tween<Float>(if (reduce) SsMotion.CROSSFADE_MS else 220)
+    // Fixed for the life of the screen: onboarding marks itself complete before its last step (Add widget),
+    // and a changing start destination would rebuild the graph and skip that step (BUG-009).
+    val startOnBuild = rememberSaveable { onboardingComplete }
     NavHost(
         navController = nav,
-        startDestination = if (onboardingComplete) BuildRoute else OnboardingRoute,
+        startDestination = if (startOnBuild) BuildRoute else OnboardingRoute,
         enterTransition = { fadeIn(fade) },
         exitTransition = { fadeOut(fade) },
     ) {
