@@ -1,6 +1,8 @@
 [versions]
 # Toolchain (latest stable, verified 2026-11-20 against Google Maven / Maven Central / Gradle Plugin Portal)
-agp = "9.5.1"
+# AGP is pinned to the newest version current Android Studio supports (9.2.1); 9.5.1 builds from the
+# command line but Studio refuses to sync it.
+agp = "9.2.1"
 kotlin = "2.4.21"
 ksp = "2.3.14"
 compileSdk = "37"

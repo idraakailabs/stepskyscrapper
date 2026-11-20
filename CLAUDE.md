@@ -78,7 +78,8 @@ This is a permanent project rule for every session.
 
 ## Useful facts
 
-- Build needs JDK 17+ (21 used) and Android SDK platform **37.2** (Compose 1.13 requires compileSdk ≥ 37.1).
+- AGP is pinned to **9.2.1**, the newest version Android Studio accepts; don't upgrade it past what Studio
+  supports. Build needs JDK 17+ (21 used) and Android SDK platform **37.2** (Compose 1.13 requires compileSdk ≥ 37.1).
 - Without `app/google-services.json`, Firebase is skipped: analytics are dropped and the bundled ladder is used.
 - AdMob ids default to Google's sample ids (`gradle.properties`); release signing falls back to the debug key
   until `keystore.properties` exists ([TECH-005](docs/ROADMAP.md#tech-005)).

@@ -13,7 +13,7 @@
 
 | Concern | Choice (version, and where it's declared) |
 |---|---|
-| Language / framework | Kotlin 2.4.21 (AGP 9.5.1 built-in Kotlin), Jetpack Compose BOM 2026.11.01, Material 3 with a custom theme — `gradle/libs.versions.toml` |
+| Language / framework | Kotlin 2.4.21 (AGP 9.2.1 built-in Kotlin; pinned to the newest version Android Studio supports), Jetpack Compose BOM 2026.11.01, Material 3 with a custom theme — `gradle/libs.versions.toml` |
 | Platform targets | minSdk 26, compileSdk 37.2, targetSdk 37 |
 | DI / composition | Hilt 2.60.1 (KSP 2.3.14) |
 | Navigation | Navigation Compose 2.10.2, type-safe `@Serializable` routes, wired in `app/.../navigation/AppNavigation.kt` |
