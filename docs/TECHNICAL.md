@@ -108,8 +108,7 @@ Live values (Firebase, AdMob, Play Console) weren't available; they are unverifi
 - Signing: from `keystore.properties` if present, otherwise the debug key.
 - Baseline profile: hand-seeded `app/src/main/baseline-prof.txt`; generator in `:baselineprofile` needs a
   device ([TECH-006](ROADMAP.md#tech-006)).
-- Git: `main` at `e5c003b`, remote `origin` = `github.com/idraakailabs/stepskyscrapper` (push pending,
-  [TECH-001](ROADMAP.md#tech-001)). `.gitattributes` pins LF line endings. No CI configuration yet.
+- Git: `main`, remote `origin` = `github.com/idraakailabs/stepskyscrapper`; baseline commit `e5c003b`. `.gitattributes` pins LF line endings. No CI configuration yet.
 
 ### Verification commands
 

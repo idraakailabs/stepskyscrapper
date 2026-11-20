@@ -137,11 +137,12 @@ Bug cards are in [BUGS.md](BUGS.md).
   2. `google-services.json`, `keystore.properties` and `local.properties` aren't tracked (`git ls-files`).
   3. The doc baselines are updated to that commit hash.
   4. `main` is pushed to `origin` and tracks `origin/main`.
-- **Progress (2026-11-20):** criteria 1–3 verified: `main` at `e5c003b`, working tree clean, `git ls-files`
-  contains no secrets or build output, `.gitattributes` pins LF endings, docs cite the commit. Criterion 4
-  failed: `git push` returned 403 because the signed-in GitHub account (`zahab-ahmad-jeenyme`, the only one in
-  `gh auth status`) has no write access to `idraakailabs/stepskyscrapper`. Unblock by granting that account
-  write access or signing in with an account that has it, then run `git push -u origin main`.
+- **Resolution (2026-11-20):** Git initialised; initial commit `e5c003b` (author zabiirana27@gmail.com);
+  `.gitattributes` pins LF line endings; remote `origin` = `github.com/idraakailabs/stepskyscrapper`.
+- **Verification:** 1. `git log` shows the initial commit and `git status` is clean. 2. `git ls-files` contains
+  no `google-services.json`, keystore, `local.properties` or build output. 3. Docs cite `e5c003b`. 4. `git push
+  -u origin main` succeeded after signing the GitHub CLI in as `MuhammadZahab` (push permission confirmed via
+  the API); `git status -sb` shows `main...origin/main`.
 
 <a id="tech-002"></a>
 ### TECH-002 — Configure Firebase (Analytics, Crashlytics, Remote Config)

@@ -5,8 +5,8 @@
 > [ROADMAP.md](ROADMAP.md). Design source of truth: [design-inventory.md](design-inventory.md) and
 > [design-deviations.md](design-deviations.md).
 >
-> **Baseline:** version 1.0.0 (versionCode 1), commit `e5c003b` on `main` (local; not yet pushed, see
-> [TECH-001](ROADMAP.md#tech-001)). Not published.
+> **Baseline:** version 1.0.0 (versionCode 1), commit `e5c003b` on `main`
+> ([github.com/idraakailabs/stepskyscrapper](https://github.com/idraakailabs/stepskyscrapper)). Not published.
 > **Last reviewed:** 2026-11-20.
 
 ---

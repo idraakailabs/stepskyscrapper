@@ -82,6 +82,6 @@ This is a permanent project rule for every session.
 - Without `app/google-services.json`, Firebase is skipped: analytics are dropped and the bundled ladder is used.
 - AdMob ids default to Google's sample ids (`gradle.properties`); release signing falls back to the debug key
   until `keystore.properties` exists ([TECH-005](docs/ROADMAP.md#tech-005)).
-- Git: `main`, remote `origin` = `https://github.com/idraakailabs/stepskyscrapper.git`; the first push is pending
-  write access ([TECH-001](docs/ROADMAP.md#tech-001)). Line endings are LF (`.gitattributes`).
+- Git: `main`, remote `origin` = `https://github.com/idraakailabs/stepskyscrapper.git`. Line endings are LF
+  (`.gitattributes`). Commit email for this repo: zabiirana27@gmail.com (local git config).
 - Component gallery: Settings › "Component gallery (debug)" in debug builds.
