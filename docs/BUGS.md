@@ -32,7 +32,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-005](#bug-005) | Skyline ignores the tower to highlight after the ceremony | P3 | Confirmed (code) | Open |
 | [BUG-006](#bug-006) | Onboarding payoff shows a 20% partial floor at 0 steps and rounds to segments | P3 | Confirmed (code) | Open |
 | [BUG-007](#bug-007) | Ad consent form may appear just by opening Skyline | P3 | Suspected | Open |
-| [BUG-008](#bug-008) | The Build feature module was missing from the Git repository | P0 | Confirmed (reproduced) | Fixed – unverified |
+| [BUG-008](#bug-008) | The Build feature module was missing from the Git repository | P0 | Confirmed (reproduced) | Done |
 
 ---
 
@@ -149,7 +149,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 <a id="bug-008"></a>
 ## BUG-008 — The Build feature module was missing from the Git repository
 
-- **Priority:** P0 · **Classification:** Confirmed (reproduced) · **Status:** Fixed – unverified
+- **Priority:** P0 · **Classification:** Confirmed (reproduced) · **Status:** Done
 - **Evidence:** `.gitignore` had a blanket `build/` rule, which also matched the `:feature:build` module folder
   (`feature/build/`) and the Kotlin package folder `…/feature/build/`. `git check-ignore -v` reported
   `.gitignore:6:build/` for `feature/build/src/main/kotlin/…/BuildScreen.kt`; commits `e5c003b`…`df71b8f` on
@@ -164,4 +164,6 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   2. A fresh clone of `main` passes `./gradlew build`.
   3. No Gradle output (`*/build/intermediates`, `generated`, `outputs`) is tracked.
 - **Resolution:** `.gitignore` now lists the Gradle output folders explicitly; `feature/build` sources added
-  (commit below this entry's change). · **Verification:** —
+  (commit `55df97b`). · **Verification:** 1. `git ls-tree -r origin/main` lists 13 `feature/build/src` files.
+  2. A fresh `git clone` of `main` built `:app:assembleDebug` successfully. 3. `git ls-tree` shows no tracked
+  `build/intermediates|generated|outputs|tmp` paths.
