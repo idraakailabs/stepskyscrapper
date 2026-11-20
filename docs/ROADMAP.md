@@ -13,7 +13,7 @@
 |---|---|
 | **Live baseline** | Phase 1, version 1.0.0, commit `e5c003b` on `main` (not published) |
 | **Active phase** | Phase 2, Release blockers (not started) |
-| **Recommended next task** | [TECH-005](#tech-005): release signing. Smallest P0 (XS); a signed build is needed before Play products ([TECH-004](#tech-004)) can be created on a testing track. Then [TECH-002](#tech-002) (Firebase). |
+| **Recommended next task** | Finish [TECH-005](#tech-005) by creating the upload key and uploading to internal testing (needs you), then [TECH-002](#tech-002) (Firebase). |
 
 Update this table whenever a task starts, finishes or the active phase changes.
 
@@ -58,7 +58,7 @@ testing track with crash reports, analytics, real ads and working purchases.
 | [TECH-002](#tech-002) | Configure Firebase (Analytics, Crashlytics, Remote Config) | Technical task | P0 | Planned | Firebase console |
 | [TECH-003](#tech-003) | Real AdMob ids and UMP consent message | Technical task | P0 | Planned | AdMob console |
 | [TECH-004](#tech-004) | Create Play billing products and test purchases | Technical task | P0 | Planned | Play Console |
-| [TECH-005](#tech-005) | Release signing | Technical task | P0 | Planned | Upload key |
+| [TECH-005](#tech-005) | Release signing | Technical task | P0 | In Progress | Upload key |
 | [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | Planned | Hosted policy, Play Console |
 
 ## Phase 3 — Reliability and release quality
@@ -189,7 +189,7 @@ Bug cards are in [BUGS.md](BUGS.md).
 
 <a id="tech-005"></a>
 ### TECH-005 — Release signing
-- **Type:** Technical task · **Priority:** P0 · **Status:** Planned · **Effort:** XS
+- **Type:** Technical task · **Priority:** P0 · **Status:** In Progress (waiting for the upload key) · **Effort:** XS
 - **Problem (verified):** `signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")`
   (`app/build.gradle.kts:55`): without `keystore.properties` the release build is signed with the debug key.
 - **Solution:** create an upload key, enrol in Play App Signing, add `keystore.properties` locally and as CI
@@ -199,6 +199,14 @@ Bug cards are in [BUGS.md](BUGS.md).
 - **Acceptance criteria:**
   1. `./gradlew :app:bundleRelease` without `keystore.properties` fails with a clear message.
   2. With it, the AAB is accepted by the Play internal testing track.
+- **Progress (2026-11-20):** build side done in `app/build.gradle.kts`: the upload key comes from
+  `keystore.properties` or the `STEPSKY_*` environment variables (template: `keystore.properties.example`);
+  there is no debug-key fallback (release is left unsigned); `verifyReleaseSigning` makes `bundleRelease` fail
+  with instructions. Criterion 1 verified: `bundleRelease` without a key fails with "Release signing is not
+  configured…"; `assembleRelease` still produces `app-release-unsigned.apk`; with a throwaway key passed via the
+  environment variables, `bundleRelease` produced an AAB that `jarsigner -verify` accepted. Outstanding: create
+  the real upload key (you choose the passwords; see [play-console-checklist.md](play-console-checklist.md)),
+  enrol in Play App Signing and upload to internal testing (criterion 2).
 
 <a id="tech-006"></a>
 ### TECH-006 — Generate the baseline profile and measure startup

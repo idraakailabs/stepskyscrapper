@@ -6,7 +6,11 @@
 - [ ] **Billing products** (Monetize › Products):
   - Subscription `architect_pass` with base plans `monthly` (P1M) and `annual` (P1Y); on `annual`, add an offer with a 7-day free-trial phase for new customers.
   - One-time product `architect_pass_lifetime`.
-- [ ] **Signing**: create `keystore.properties` (storeFile, storePassword, keyAlias, keyPassword) or use Play App Signing with an upload key. `./gradlew :app:bundleRelease`.
+- [ ] **Signing**: create the upload key yourself (you choose the passwords; keep the file and passwords backed up
+  outside Git), copy `keystore.properties.example` to `keystore.properties` and fill it in, enrol in Play App
+  Signing, then `./gradlew :app:bundleRelease`. Key creation (JDK keytool):
+  `keytool -genkeypair -v -keystore keystore/upload-keystore.jks -alias upload -keyalg RSA -keysize 4096 -validity 10000`
+  CI: set `STEPSKY_KEYSTORE_FILE`, `STEPSKY_KEYSTORE_PASSWORD`, `STEPSKY_KEY_ALIAS`, `STEPSKY_KEY_PASSWORD`.
 - [ ] **Privacy policy**: host it (contents: see Help & privacy screen and the Data Safety answers below) and set `PRIVACY_POLICY_URL`; optionally `SUPPORT_EMAIL` for diagnostics.
 - [ ] **Baseline profile**: with a device or emulator attached, run `./gradlew :app:generateBaselineProfile` and commit the generated profile.
 

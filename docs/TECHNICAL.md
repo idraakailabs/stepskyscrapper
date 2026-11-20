@@ -98,14 +98,16 @@ Backup rules: `app/src/main/res/xml/backup_rules.xml`, `data_extraction_rules.xm
 | `SUPPORT_EMAIL` | empty (generic share sheet) | Diagnostic draft |
 | `app/google-services.json` | absent | Applies Google Services + Crashlytics plugins only if present |
 | Remote Config `tower_ladder` | `10,25,50,100,160,250` (bundled) | `RemoteConfigLadderRepository`; malformed values fall back |
-| `keystore.properties` | absent → release signed with **debug key** ([TECH-005](ROADMAP.md#tech-005)) | `app/build.gradle.kts` |
+| `keystore.properties` or `STEPSKY_KEYSTORE_FILE` / `STEPSKY_KEYSTORE_PASSWORD` / `STEPSKY_KEY_ALIAS` / `STEPSKY_KEY_PASSWORD` | absent → release **unsigned**, `bundleRelease` fails | `app/build.gradle.kts` (template `keystore.properties.example`) |
 
 Live values (Firebase, AdMob, Play Console) weren't available; they are unverified.
 
 ## 6. Build, signing and release
 
 - Variants: `debug` (`.debug` suffix) and `release` (R8 minify + resource shrinking, `app/proguard-rules.pro`).
-- Signing: from `keystore.properties` if present, otherwise the debug key.
+- Signing: upload key from `keystore.properties` (git-ignored, `storeFile` relative to the root, e.g. under the
+  ignored `keystore/` folder) or the `STEPSKY_*` environment variables in CI. Never the debug key: without a key
+  the release APK is unsigned and `bundleRelease` stops at `verifyReleaseSigning`.
 - Baseline profile: hand-seeded `app/src/main/baseline-prof.txt`; generator in `:baselineprofile` needs a
   device ([TECH-006](ROADMAP.md#tech-006)).
 - Git: `main`, remote `origin` = `github.com/idraakailabs/stepskyscrapper`; baseline commit `e5c003b`. `.gitattributes` pins LF line endings. No CI configuration yet.
@@ -145,7 +147,7 @@ Index only; details live in the linked card.
 | [TECH-002](ROADMAP.md#tech-002) | Observability | Firebase not configured: no analytics, crash reports or Remote Config |
 | [TECH-003](ROADMAP.md#tech-003) | Ads | Google sample AdMob ids by default |
 | [TECH-004](ROADMAP.md#tech-004) | Billing | Play products not created; purchase flows unverified |
-| [TECH-005](ROADMAP.md#tech-005) | Release | Release build falls back to debug signing |
+| [TECH-005](ROADMAP.md#tech-005) | Release | Upload key not created yet; build side fixed (no debug fallback) |
 | [TECH-006](ROADMAP.md#tech-006) | Performance | Baseline profile hand-seeded, startup not measured |
 | [TECH-007](ROADMAP.md#tech-007) | Release QA | Several screens not exercised in an R8 build on a device |
 | [TECH-008](ROADMAP.md#tech-008) | Tests | Screenshot tests not verified; no CI |

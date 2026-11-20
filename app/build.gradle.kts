@@ -16,10 +16,24 @@ if (file("google-services.json").exists()) {
     apply(plugin = libs.plugins.firebase.crashlytics.get().pluginId)
 }
 
+// Release signing (upload key). Read from keystore.properties (local, git-ignored) or, in CI, from the
+// STEPSKY_* environment variables. There is deliberately no fallback to the debug key: without a complete
+// config the release build is left unsigned, and bundleRelease fails (see verifyReleaseSigning below).
 val keystoreProperties = Properties().apply {
     val file = rootProject.file("keystore.properties")
     if (file.exists()) file.inputStream().use(::load)
 }
+
+fun signingValue(property: String, env: String): String? =
+    keystoreProperties.getProperty(property)?.takeIf { it.isNotBlank() }
+        ?: providers.environmentVariable(env).orNull?.takeIf { it.isNotBlank() }
+
+val releaseStoreFile = signingValue("storeFile", "STEPSKY_KEYSTORE_FILE")
+val releaseStorePassword = signingValue("storePassword", "STEPSKY_KEYSTORE_PASSWORD")
+val releaseKeyAlias = signingValue("keyAlias", "STEPSKY_KEY_ALIAS")
+val releaseKeyPassword = signingValue("keyPassword", "STEPSKY_KEY_PASSWORD")
+val hasReleaseSigning = listOf(releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword).all { it != null } &&
+    rootProject.file(releaseStoreFile!!).exists()
 
 android {
     namespace = "com.idraak.stepskyscraper"
@@ -34,12 +48,12 @@ android {
     }
 
     signingConfigs {
-        if (keystoreProperties.isNotEmpty()) {
+        if (hasReleaseSigning) {
             create("release") {
-                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
-                storePassword = keystoreProperties.getProperty("storePassword")
-                keyAlias = keystoreProperties.getProperty("keyAlias")
-                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = rootProject.file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
             }
         }
     }
@@ -52,10 +66,30 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+            // null (unsigned) when no upload key is configured; never the debug key.
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 }
+
+// A Play upload must be signed with the upload key: fail early with instructions instead of producing an
+// unsigned bundle. assembleRelease (part of `build`) still works and yields app-release-unsigned.apk.
+val verifyReleaseSigning = tasks.register("verifyReleaseSigning") {
+    group = "verification"
+    description = "Fails unless the release upload key is configured."
+    // Captured as a local so the configuration cache can serialise the action.
+    val releaseSigningConfigured = hasReleaseSigning
+    doLast {
+        if (!releaseSigningConfigured) {
+            throw GradleException(
+                "Release signing is not configured. Create keystore.properties in the project root " +
+                    "(see keystore.properties.example) or set STEPSKY_KEYSTORE_FILE, STEPSKY_KEYSTORE_PASSWORD, " +
+                    "STEPSKY_KEY_ALIAS and STEPSKY_KEY_PASSWORD. See docs/TECHNICAL.md §6.",
+            )
+        }
+    }
+}
+tasks.matching { it.name == "bundleRelease" }.configureEach { dependsOn(verifyReleaseSigning) }
 
 dependencies {
     implementation(projects.core.designsystem)

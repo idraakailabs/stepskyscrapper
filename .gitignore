@@ -15,3 +15,6 @@ keystore.properties
 *.jks
 *.keystore
 design/fonts-src/
+
+# Upload keystore folder
+keystore/

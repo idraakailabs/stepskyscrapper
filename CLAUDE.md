@@ -29,7 +29,7 @@ The design source files are in `design/source/` (`Step Skyscraper All.dc.html`, 
 3. **Protect user data.** Progress is derived from stored daily totals, never accumulated. Room changes need a
    version bump and a migration (schemas in `core/database/schemas/`). Never rename cosmetic or achievement ids
    or wallet key prefixes; they are stored.
-4. **No secrets in Git.** `app/google-services.json`, `keystore.properties`, `local.properties` and real AdMob
+4. **No secrets in Git.** `app/google-services.json`, `keystore.properties`, the `keystore/` folder, `local.properties` and real AdMob
    ids stay out of the repo (gradle properties or CI secrets).
 5. **Privacy is a product rule.** No step or floor values in analytics, ads, logs or crash reports. No ads on
    Build, onboarding or the topping-out ceremony.
@@ -81,8 +81,9 @@ This is a permanent project rule for every session.
 - AGP is pinned to **9.2.1**, the newest version Android Studio accepts; don't upgrade it past what Studio
   supports. Build needs JDK 17+ (21 used) and Android SDK platform **37.2** (Compose 1.13 requires compileSdk ≥ 37.1).
 - Without `app/google-services.json`, Firebase is skipped: analytics are dropped and the bundled ladder is used.
-- AdMob ids default to Google's sample ids (`gradle.properties`); release signing falls back to the debug key
-  until `keystore.properties` exists ([TECH-005](docs/ROADMAP.md#tech-005)).
+- AdMob ids default to Google's sample ids (`gradle.properties`). Release signing needs `keystore.properties` or
+  the `STEPSKY_*` env vars; without them the release APK is unsigned and `bundleRelease` fails by design
+  ([TECH-005](docs/ROADMAP.md#tech-005)).
 - Git: `main`, remote `origin` = `https://github.com/idraakailabs/stepskyscrapper.git`. Line endings are LF
   (`.gitattributes`). Commit email for this repo: zabiirana27@gmail.com (local git config).
 - Component gallery: Settings › "Component gallery (debug)" in debug builds.
