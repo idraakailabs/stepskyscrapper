@@ -1,0 +1,383 @@
+# Step Skyscraper — Roadmap
+
+> **Scope:** the phased development plan. Phase 1 is the current product. Every future item has a stable
+> ID, priority, status, dependencies and acceptance criteria. Bug details (`BUG-xxx`) live in
+> [BUGS.md](BUGS.md); this file only schedules them. Rationale: [PRODUCT.md](PRODUCT.md) · Context:
+> [TECHNICAL.md](TECHNICAL.md).
+>
+> **Last updated:** 2026-11-20
+
+## Current position
+
+| | |
+|---|---|
+| **Live baseline** | Phase 1, version 1.0.0, working tree of 2026-11-20 (not published, no version control) |
+| **Active phase** | Phase 2, Release blockers (not started) |
+| **Recommended next task** | [TECH-001](#tech-001): put the project under Git. It is minutes of work with no external dependency, and every later task needs commits to record resolutions. The P0 items in this phase all need console access you hold (Firebase, AdMob, Play). |
+
+Update this table whenever a task starts, finishes or the active phase changes.
+
+## Conventions
+
+- **ID prefixes:** `BUG` defect ([BUGS.md](BUGS.md)) · `TECH` technical, security or release work ·
+  `PROD` product or UX · `GROW` growth or monetisation.
+- **Type:** Confirmed bug · Suspected issue / investigation · Technical task · Product improvement · Product
+  decision · Product idea (optional; needs approval) · Growth task.
+- **Priority:** P0 critical · P1 high · P2 medium · P3 low. **Effort:** XS < 1 h, S ≤ 1 day, M ≤ 1 week, L > 1 week.
+- **Status:** `Planned` · `In Progress` · `Blocked` · `Done` (acceptance criteria verified) · `Dropped`
+  (with a reason).
+- IDs are permanent. Never reuse or renumber them.
+- Phases are ordered by dependency and risk. Later-phase work may start early only if its dependencies are
+  `Done`.
+
+---
+
+## Phase 1 — Current baseline (1.0.0) · Status: Built, not published
+
+A record, not a task list. Features: [PRODUCT.md §4](PRODUCT.md#4-phase-1-baseline--what-the-product-does-today).
+Architecture: [TECHNICAL.md](TECHNICAL.md). Known defects: [BUGS.md](BUGS.md). Design coverage:
+[design-inventory.md](design-inventory.md).
+
+- Every designed screen and state, both widgets, share cards, paywall, rewarded ad and step-source help.
+- Health Connect + sensor fallback; deterministic, repeat-safe sync; all data on the device.
+- Clean modular architecture (MVI, Hilt, Room, DataStore, WorkManager); 84 passing tests; green
+  `build test lint` and an R8 release APK.
+- Gaps: Firebase/AdMob/Play not configured, debug-signed release, no version control or CI, six small design
+  gaps (inventory items marked `[~]`).
+
+---
+
+<a id="phase-2--release-blockers"></a>
+## Phase 2 — Release blockers
+
+Goal: a release build that can be uploaded and observed. **Exit criteria:** a signed AAB on the internal
+testing track with crash reports, analytics, real ads and working purchases.
+
+| ID | Title | Type | Priority | Status | Depends on |
+|---|---|---|---|---|---|
+| [TECH-001](#tech-001) | Put the project under version control | Technical task | P1 | Planned | — |
+| [TECH-002](#tech-002) | Configure Firebase (Analytics, Crashlytics, Remote Config) | Technical task | P0 | Planned | Firebase console |
+| [TECH-003](#tech-003) | Real AdMob ids and UMP consent message | Technical task | P0 | Planned | AdMob console |
+| [TECH-004](#tech-004) | Create Play billing products and test purchases | Technical task | P0 | Planned | Play Console |
+| [TECH-005](#tech-005) | Release signing | Technical task | P0 | Planned | Upload key |
+| [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | Planned | Hosted policy, Play Console |
+
+## Phase 3 — Reliability and release quality
+
+Goal: trust the build on real devices. **Exit criteria:** every screen exercised in a release build, startup
+measured, regressions caught automatically.
+
+| ID | Title | Type | Priority | Status | Depends on |
+|---|---|---|---|---|---|
+| [TECH-007](#tech-007) | Release-build smoke test of every screen on devices | Technical task | P1 | Planned | TECH-002…005 |
+| [TECH-006](#tech-006) | Generate the baseline profile and measure startup | Technical task | P1 | Planned | Device |
+| [BUG-001](BUGS.md#bug-001) | Notifications "on" but never delivered on Android 13+ | Confirmed bug | P2 | Open | — |
+| [BUG-003](BUGS.md#bug-003) | "Save image" gives no feedback | Confirmed bug | P2 | Open | — |
+| [TECH-008](#tech-008) | CI with screenshot verification | Technical task | P2 | Planned | TECH-001 |
+| [TECH-009](#tech-009) | Tests for steps, billing, ads and widget | Technical task | P2 | Planned | — |
+| [BUG-007](BUGS.md#bug-007) | Ad consent form may appear on Skyline open | Suspected issue | P3 | Open | TECH-003 |
+| [TECH-010](#tech-010) | Record non-fatal errors in Crashlytics | Technical task | P3 | Planned | TECH-002 |
+
+## Phase 4 — Core product value
+
+Goal: close the remaining gaps in the main promise. **Exit criteria:** the week card leads to pausing, all
+districts are viewable, Blueprint rules are consistent.
+
+| ID | Title | Type | Priority | Status | Depends on |
+|---|---|---|---|---|---|
+| [PROD-006](#prod-006) | Decide first-tower height and premium-bonus rules | Product decision | P2 | Planned | — |
+| [BUG-002](BUGS.md#bug-002) | Blueprint bonuses can stack / apply retroactively | Confirmed bug | P2 | Open | PROD-006 |
+| [BUG-004](BUGS.md#bug-004) | Week card opens Goals, not weekly detail | Confirmed bug | P2 | Open | — |
+| [PROD-001](#prod-001) | Browse every district in Skyline | Product improvement | P2 | Planned | — |
+| [PROD-002](#prod-002) | Re-skin finished towers from the stats sheet | Product improvement | P3 | Planned | — |
+
+## Phase 5 — Growth and monetisation
+
+Goal: learn from real users. **Exit criteria:** funnel dashboards live and the store listing published.
+
+| ID | Title | Type | Priority | Status | Depends on |
+|---|---|---|---|---|---|
+| [GROW-001](#grow-001) | Activation and retention dashboards | Growth task | P2 | Planned | TECH-002 |
+| [GROW-002](#grow-002) | Store listing from share cards | Growth task | P2 | Planned | TECH-007 |
+| [GROW-003](#grow-003) | Paywall price and trial experiments | Product idea (optional) | P3 | Planned | TECH-004, GROW-001 |
+
+## Phase 6 — Polish and future
+
+Goal: finish the remaining design details. Each item is optional.
+
+| ID | Title | Type | Priority | Status | Depends on |
+|---|---|---|---|---|---|
+| [PROD-003](#prod-003) | Remaining motion details from the design | Product improvement | P3 | Planned | — |
+| [PROD-004](#prod-004) | "Equip" shortcut and Customise sticky thumbnail | Product improvement | P3 | Planned | — |
+| [PROD-005](#prod-005) | Localise cosmetic and achievement names | Technical task | P3 | Planned | — |
+| [BUG-005](BUGS.md#bug-005) | Skyline ignores the highlight argument | Confirmed bug | P3 | Open | — |
+| [BUG-006](BUGS.md#bug-006) | Payoff partial floor at 0 steps | Confirmed bug | P3 | Open | — |
+
+## Not planned
+
+See [PRODUCT.md §11](PRODUCT.md#11-out-of-scope-dont-build): accounts and cloud sync, streaks or decay, paying
+for floors, location features.
+
+---
+
+# Task cards
+
+Bug cards are in [BUGS.md](BUGS.md).
+
+<a id="tech-001"></a>
+### TECH-001 — Put the project under version control
+- **Type:** Technical task · **Priority:** P1 · **Status:** Planned · **Effort:** XS
+- **Problem (verified):** `git rev-parse` fails in the project root; there is no history, no way to cite a
+  baseline commit, and the doc update workflow can't diff changes.
+- **Solution:** `git init`, review `.gitignore` (it already excludes `google-services.json`, keystores and
+  `local.properties`), commit the current tree, push to a private remote.
+- **Benefit:** history, code review, CI, and docs that reference commits.
+- **Dependencies / risks:** choose a remote host.
+- **Acceptance criteria:**
+  1. `git log` shows an initial commit; `git status` is clean.
+  2. `google-services.json`, `keystore.properties` and `local.properties` aren't tracked (`git ls-files`).
+  3. The doc baselines are updated to that commit hash.
+
+<a id="tech-002"></a>
+### TECH-002 — Configure Firebase (Analytics, Crashlytics, Remote Config)
+- **Type:** Technical task · **Priority:** P0 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** the Google Services and Crashlytics plugins apply only when `app/google-services.json`
+  exists (`app/build.gradle.kts`); without it analytics events are dropped, crashes aren't reported and the
+  ladder is always the bundled default.
+- **Solution:** create the Firebase project, add `google-services.json` (git-ignored, provided to CI as a
+  secret), create Remote Config `tower_ladder`, confirm Crashlytics mapping upload in release.
+- **Benefit:** crash visibility and product metrics for a live app.
+- **Dependencies / risks:** Firebase console access.
+- **Acceptance criteria:**
+  1. A forced test crash in a release build appears in Crashlytics with a de-obfuscated stack trace.
+  2. `onboarding_completed` appears in DebugView; no event parameter contains a number of steps or floors.
+  3. Changing `tower_ladder` in the console changes the next tower's target on the next launch (device).
+
+<a id="tech-003"></a>
+### TECH-003 — Real AdMob ids and UMP consent message
+- **Type:** Technical task · **Priority:** P0 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** `gradle.properties` defaults `ADMOB_APP_ID` / `ADMOB_REWARDED_UNIT_ID` to Google's
+  public sample ids; shipping them earns nothing and breaks ad policy.
+- **Solution:** create the app and a rewarded unit; set the ids in `~/.gradle/gradle.properties` or CI; create
+  GDPR and US-state consent messages; fail the release build when sample ids are used.
+- **Benefit:** a working, policy-compliant rewarded ad.
+- **Dependencies / risks:** AdMob console; Play app listing for app-ads.txt.
+- **Acceptance criteria:**
+  1. `./gradlew :app:assembleRelease` fails if the sample app id is configured.
+  2. On a device in EEA debug geography, consent is collected before the first ad request (logcat).
+  3. Watching the ad doubles the newest tower's Blueprints once; a second claim shows "already doubled".
+
+<a id="tech-004"></a>
+### TECH-004 — Create Play billing products and test purchases
+- **Type:** Technical task · **Priority:** P0 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** product ids `architect_pass` (base plans `monthly`, `annual` + trial offer) and
+  `architect_pass_lifetime` are hard-coded in `core/billing/.../PlayBillingRepository.kt`; none exist in a Play
+  Console, so purchase, trial, acknowledgement and restore are untested (unverified area).
+- **Solution:** create the products in Play Console, add license testers, run each flow on a device.
+- **Benefit:** revenue path works on day one.
+- **Dependencies / risks:** an app uploaded to a testing track ([TECH-005](#tech-005)).
+- **Acceptance criteria:**
+  1. Yearly with trial, monthly and lifetime purchases each unlock premium items immediately (device).
+  2. Purchases are acknowledged (no auto-refund after 3 days on the test track).
+  3. Reinstall + Restore restores premium; a cancelled test subscription removes it after expiry.
+
+<a id="tech-005"></a>
+### TECH-005 — Release signing
+- **Type:** Technical task · **Priority:** P0 · **Status:** Planned · **Effort:** XS
+- **Problem (verified):** `signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")`
+  (`app/build.gradle.kts:55`): without `keystore.properties` the release build is signed with the debug key.
+- **Solution:** create an upload key, enrol in Play App Signing, add `keystore.properties` locally and as CI
+  secrets; make the release build fail instead of falling back to debug signing.
+- **Benefit:** an uploadable build and no accidental debug-signed releases.
+- **Dependencies / risks:** keep the upload key out of Git.
+- **Acceptance criteria:**
+  1. `./gradlew :app:bundleRelease` without `keystore.properties` fails with a clear message.
+  2. With it, the AAB is accepted by the Play internal testing track.
+
+<a id="tech-006"></a>
+### TECH-006 — Generate the baseline profile and measure startup
+- **Type:** Technical task · **Priority:** P1 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** `app/src/main/baseline-prof.txt` is hand-seeded; startup was observed once (`am start -W`
+  TotalTime ≈ 1.5 s after a reinstall, on an emulator) but not benchmarked.
+- **Solution:** run `:app:generateBaselineProfile` on a physical device, commit the profile, run
+  `StartupBenchmark` with and without it.
+- **Benefit:** faster first launch, which matters for the 30-second "aha" target.
+- **Dependencies / risks:** a physical device.
+- **Acceptance criteria:**
+  1. A generated profile is committed under `app/src/release/generated/`.
+  2. Cold-startup median with the profile is reported and at least 10% better than `CompilationMode.None`.
+
+<a id="tech-007"></a>
+### TECH-007 — Release-build smoke test of every screen on devices
+- **Type:** Technical task · **Priority:** P1 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** the R8 release build was exercised only through onboarding, Build and Me on one
+  emulator; Skyline, Customise, Share (export and share sheet), Paywall, widgets, ceremony and Step help weren't
+  (unverified area).
+- **Solution:** a scripted checklist on two devices (Android 9 and Android 14+, one Samsung), with seeded steps
+  to reach a topping-out.
+- **Benefit:** catches R8 keep-rule and OEM problems before testers do.
+- **Dependencies / risks:** TECH-002…005 for real services.
+- **Acceptance criteria:**
+  1. Every screen in [design-inventory.md §4](design-inventory.md) opened in the release build with no crash
+     (Crashlytics empty).
+  2. A share PNG at 1080×1920 and 1080×1080 is produced and opens in another app.
+  3. Both widgets render and update after a sync.
+
+<a id="tech-008"></a>
+### TECH-008 — CI with screenshot verification
+- **Type:** Technical task · **Priority:** P2 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** Roborazzi screenshots are recorded into `*/src/test/screenshots/` but `build` doesn't
+  run `verifyRoborazziDebug`; there is no CI configuration.
+- **Solution:** a CI workflow running `./gradlew build test lint verifyRoborazziDebug` on each push, with
+  JDK 21 and SDK 37.2.
+- **Benefit:** visual and logic regressions caught automatically.
+- **Dependencies / risks:** [TECH-001](#tech-001); font rendering must match between CI and local machines.
+- **Acceptance criteria:**
+  1. CI fails when a screenshot changes and passes after re-recording.
+  2. CI is green on the main branch.
+
+<a id="tech-009"></a>
+### TECH-009 — Tests for steps, billing, ads and widget
+- **Type:** Technical task · **Priority:** P2 · **Status:** Planned · **Effort:** M
+- **Problem (verified):** `core:steps`, `core:billing`, `core:ads` and `:widget` have no tests (their test
+  folders only hold `robolectric.properties`).
+- **Solution:** tests for Health Connect result mapping and source selection, entitlement mapping from purchase
+  lists (lifetime, subscription, pending), ad gateway state transitions with fakes, widget model loading.
+- **Benefit:** confidence in the paths that touch money and data sources.
+- **Dependencies / risks:** wrap SDK classes behind small seams where needed (no behaviour change).
+- **Acceptance criteria:**
+  1. Each of the four modules has at least one meaningful test class; `./gradlew test` passes.
+  2. Entitlement tests cover lifetime, active subscription, pending and none.
+
+<a id="tech-010"></a>
+### TECH-010 — Record non-fatal errors in Crashlytics
+- **Type:** Technical task · **Priority:** P3 · **Status:** Planned · **Effort:** XS
+- **Problem (verified):** `CrashReporter` in `core/analytics` is never injected; sync and billing failures are
+  only stored or shown, not reported.
+- **Solution:** report unexpected `DomainError`s (not permission or user-cancel cases) through `CrashReporter`,
+  without step data.
+- **Benefit:** visibility of silent failures in the field.
+- **Dependencies / risks:** [TECH-002](#tech-002).
+- **Acceptance criteria:**
+  1. A forced `StepSourceFailed` appears as a non-fatal in Crashlytics with no health values.
+
+<a id="tech-011"></a>
+### TECH-011 — Privacy policy, Health apps declaration, Data safety
+- **Type:** Technical task · **Priority:** P0 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** `PRIVACY_POLICY_URL` is empty, so the policy link is hidden; Health Connect apps
+  need a hosted policy and the Health apps declaration before release. Answers are drafted in
+  [play-console-checklist.md](play-console-checklist.md).
+- **Solution:** host the policy, set `PRIVACY_POLICY_URL`, complete the Health apps declaration (READ_STEPS,
+  background read) and the Data safety form.
+- **Benefit:** passes Play review; users can read the policy in-app and from Health Connect.
+- **Dependencies / risks:** a website or hosting; Play Console.
+- **Acceptance criteria:**
+  1. Help & privacy shows "Read the full privacy policy" and it opens the hosted page (device).
+  2. The Health Connect permission screen's privacy link opens the in-app rationale (device).
+  3. Play Console shows no outstanding policy declarations.
+
+<a id="prod-001"></a>
+### PROD-001 — Browse every district in Skyline
+- **Type:** Product improvement · **Priority:** P2 · **Status:** Planned · **Effort:** M
+- **Problem (verified):** `SkylineReducer.districtTowers` returns only the current (or last) district
+  (`feature/skyline/.../SkylineViewModel.kt:106-117`); once a ninth tower is started, District 1 is no longer
+  visible. The design says districts "sit together as the city grows".
+- **Solution:** a district switcher (chips or horizontal paging) in the Skyline header, keeping the current
+  district as default.
+- **Benefit:** the long-term collection stays visible, which is the main return driver after month one.
+- **Dependencies / risks:** performance with many towers (measure).
+- **Acceptance criteria:**
+  1. With 10 finished towers, both districts can be opened and show 8 and 2 towers (UI test).
+  2. Frame time stays under 16 ms while panning a full district (macrobenchmark or profiler).
+
+<a id="prod-002"></a>
+### PROD-002 — Re-skin finished towers from the stats sheet
+- **Type:** Product improvement · **Priority:** P3 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** Customise is reachable only from Build (active tower); the design says finished towers
+  "can be renamed and re-skinned", but the stats sheet offers Share and Rename only.
+- **Solution:** a "Customise" action in the stats sheet that opens `CustomiseRoute(towerIndex)`.
+- **Benefit:** more use for Blueprints and premium styles.
+- **Dependencies / risks:** none; `CustomiseTowerUseCase` already accepts any index.
+- **Acceptance criteria:**
+  1. Changing a finished tower's facade from Skyline updates its skyline rendering (UI test).
+
+<a id="prod-003"></a>
+### PROD-003 — Remaining motion details from the design
+- **Type:** Product improvement · **Priority:** P3 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** inventory items marked `[~]`: no crane swing on 1a, no lift-off before re-styling on 1d,
+  discrete sky switch instead of the 20-minute blend, no haptics on Build floor drops or "Target met".
+- **Solution:** implement each with Compose animation APIs; respect "Remove animations".
+- **Benefit:** closer match to the design's feel.
+- **Dependencies / risks:** none.
+- **Acceptance criteria:**
+  1. Each item is visible in a screen recording; with animator scale 0 only 150 ms crossfades remain.
+  2. The four inventory items are changed to `[x]`.
+
+<a id="prod-004"></a>
+### PROD-004 — "Equip" shortcut and Customise sticky thumbnail
+- **Type:** Product improvement · **Priority:** P3 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** the Achievements "Equip" chip is a label only; Customise has no 64 dp sticky
+  thumbnail when expanded (deviation D16).
+- **Solution:** make Equip open Customise on the reward's tab with it pre-selected; add the collapsing preview.
+- **Benefit:** rewards get used, which reinforces achievements.
+- **Dependencies / risks:** none.
+- **Acceptance criteria:**
+  1. Tapping Equip opens Customise with the reward selected (UI test).
+
+<a id="prod-005"></a>
+### PROD-005 — Localise cosmetic and achievement names
+- **Type:** Technical task · **Priority:** P3 · **Status:** Planned · **Effort:** S
+- **Problem (verified):** names live as English literals in `CosmeticCatalog` and `AchievementCatalog`
+  (domain module), not in string resources (deviation P16).
+- **Solution:** keep stable ids in the domain; map ids to string resources in `core:ui`.
+- **Benefit:** the app becomes translatable.
+- **Dependencies / risks:** don't change the ids (they are stored in Room and the wallet keys).
+- **Acceptance criteria:**
+  1. No user-visible cosmetic or achievement text comes from domain literals (grep + lint).
+
+<a id="prod-006"></a>
+### PROD-006 — Decide first-tower height and premium-bonus rules
+- **Type:** Product decision · **Priority:** P2 · **Status:** Planned · **Effort:** XS
+- **Problem:** the design review left open whether the first tower should be short for a quick first
+  topping-out (the ladder starts at 10); Blueprint bonus rules for the Pass and the rewarded ad are ambiguous
+  ([BUG-002](BUGS.md#bug-002)).
+- **Solution:** decide the ladder (Remote Config can test it) and whether the Pass bonus is retroactive and
+  stackable with the ad.
+- **Benefit:** a consistent economy and an informed first-session experience.
+- **Dependencies / risks:** analytics ([TECH-002](#tech-002)) for a ladder test.
+- **Acceptance criteria:**
+  1. The decision is written in this card and [PRODUCT.md §9](PRODUCT.md#9-monetisation-strategy).
+
+<a id="grow-001"></a>
+### GROW-001 — Activation and retention dashboards
+- **Type:** Growth task · **Priority:** P2 · **Status:** Planned · **Effort:** S
+- **Opportunity:** events for onboarding, step access, target, widget, topping-out, paywall, purchases, ads and
+  shares already exist (`core/domain/.../model/Analytics.kt`) but nothing reads them.
+- **Solution:** Firebase funnels for onboarding → first floor → first topping-out; D1/D7/D30 cohorts; paywall
+  funnel; add a `first_floor` event if needed (no step values).
+- **Benefit:** decisions based on data instead of guesses.
+- **Dependencies / risks:** [TECH-002](#tech-002).
+- **Acceptance criteria:**
+  1. The dashboards show the metrics in [PRODUCT.md §10](PRODUCT.md#10-product-metrics-to-track) for internal
+     testers.
+
+<a id="grow-002"></a>
+### GROW-002 — Store listing from share cards
+- **Type:** Growth task · **Priority:** P2 · **Status:** Planned · **Effort:** S
+- **Opportunity:** the share cards and screenshot tests already produce outcome-focused images.
+- **Solution:** listing screenshots (tower growing, ceremony, skyline, widget), feature graphic, description
+  that explains Health Connect use plainly.
+- **Benefit:** discoverability and conversion from the store page.
+- **Dependencies / risks:** [TECH-007](#tech-007).
+- **Acceptance criteria:**
+  1. The listing is published on the closed-testing track with at least 5 screenshots.
+
+<a id="grow-003"></a>
+### GROW-003 — Paywall price and trial experiments
+- **Type:** Product idea (optional) · **Priority:** P3 · **Status:** Planned · **Effort:** M
+- **Opportunity:** analysis: prices ($2.99 / $14.99 / $29.99) come from the design, not data.
+- **Solution:** Play pricing experiments or regional pricing once there is paywall traffic.
+- **Benefit:** better revenue per user.
+- **Dependencies / risks:** [TECH-004](#tech-004), [GROW-001](#grow-001); needs approval.
+- **Acceptance criteria:**
+  1. An experiment runs to its planned sample size and the decision is recorded here.

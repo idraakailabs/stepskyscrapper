@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and lower: back up the Room database and DataStore (progress is never lost on a new phone). -->
+<full-backup-content>
+    <include domain="database" path="step_skyscraper.db" />
+    <include domain="file" path="datastore/user_prefs.preferences_pb" />
+</full-backup-content>

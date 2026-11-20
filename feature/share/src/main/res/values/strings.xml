@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_title">Share</string>
+    <string name="share_close">Close</string>
+    <string name="share_tower">Tower</string>
+    <string name="share_skyline">Skyline</string>
+    <string name="share_story">Story 9:16</string>
+    <string name="share_square">Square 1:1</string>
+    <string name="share_stats">Show step stats</string>
+    <string name="share_save">Save image</string>
+    <string name="share_image">Share image</string>
+    <string name="share_saved">Saved to Pictures.</string>
+    <string name="share_save_failed">Couldn\'t save the image. Please try again.</string>
+    <string name="share_caption_tower">I built %1$s, %2$d floors, one walk at a time.</string>
+    <string name="share_caption_skyline">My district %1$s: %2$d towers, %3$d floors, one walk at a time.</string>
+    <string name="card_floors_style">%1$d floors · %2$s</string>
+    <string name="card_floors_style_month">%1$d floors · %2$s · %3$s</string>
+    <string name="card_steps">%1$s steps</string>
+    <string name="card_in_days">in %1$d Build Days</string>
+    <string name="card_steps_days">steps in %1$d Build Days</string>
+    <string name="card_my_district">My district</string>
+    <string name="card_district_meta">%1$d towers · %2$d floors</string>
+    <string name="card_towers">%1$d towers</string>
+    <string name="card_since">since %1$s</string>
+    <string name="card_brand">Built with\nStep Skyscraper</string>
+    <string name="card_brand_one_line">Built with Step Skyscraper</string>
+    <string name="card_preview">Share card preview</string>
+</resources>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Navigation -->
+    <string name="nav_build">Build</string>
+    <string name="nav_skyline">Skyline</string>
+    <string name="nav_me">Me</string>
+
+    <!-- Shared progress copy -->
+    <string name="to_next_floor">to next floor</string>
+    <string name="next_floor_in_steps">Next floor in %1$s steps</string>
+    <string name="segment_bar_description">Floor %1$d: %2$s of 1,000 steps</string>
+    <string name="tower_description">%1$s, %2$d of %3$d floors, next floor in %4$s steps.</string>
+    <string name="tower_description_complete">%1$s, %2$d floors, topped out.</string>
+    <string name="skyline_description">%1$d towers in your skyline</string>
+    <string name="blueprints_count">%1$s Blueprints</string>
+
+    <!-- Updated X ago -->
+    <string name="updated_never">Not synced yet</string>
+    <string name="updated_now">Updated just now</string>
+    <plurals name="updated_minutes">
+        <item quantity="one">Updated %1$d min ago</item>
+        <item quantity="other">Updated %1$d min ago</item>
+    </plurals>
+    <plurals name="updated_hours">
+        <item quantity="one">Updated %1$d h ago</item>
+        <item quantity="other">Updated %1$d h ago</item>
+    </plurals>
+    <plurals name="updated_days">
+        <item quantity="one">Updated yesterday</item>
+        <item quantity="other">Updated %1$d days ago</item>
+    </plurals>
+
+    <!-- Facade kits -->
+    <string name="kit_deco">Art Deco</string>
+    <string name="kit_glass">Glass Modern</string>
+    <string name="kit_glass_short">Glass</string>
+    <string name="kit_brick">Brick Classic</string>
+    <string name="kit_brick_short">Brick</string>
+    <string name="kit_brut">Brutalist</string>
+    <string name="kit_eco">Eco / Green</string>
+    <string name="kit_eco_short">Eco</string>
+
+    <!-- Calm error copy (no red, no blame) -->
+    <string name="error_hc_missing">Health Connect isn\'t installed yet. Install it to start building with your real steps.</string>
+    <string name="error_hc_update">Health Connect needs a quick update before we can read your steps.</string>
+    <string name="error_permission">Step access is off. Your tower is safe; turn it on to keep building.</string>
+    <string name="error_no_source">This phone has no step source we can read. Your tower is safe.</string>
+    <string name="error_sync_failed">We couldn\'t update just now. Your tower is safe and we\'ll try again soon.</string>
+    <string name="error_storage">Something went wrong saving on this phone. Please try again.</string>
+    <string name="error_blueprints">%1$d more Blueprints needed.</string>
+    <string name="error_locked">That item isn\'t unlocked yet.</string>
+    <string name="error_billing_cancelled">No problem. Nothing was charged.</string>
+    <string name="error_billing_pending">Your purchase is pending. We\'ll unlock it as soon as Google Play confirms.</string>
+    <string name="error_billing_owned">You already have Architect Pass. Restored.</string>
+    <string name="error_billing">Google Play couldn\'t complete that. Nothing was charged.</string>
+    <string name="error_ad_dismissed">The ad closed early, so no bonus this time. You can try again.</string>
+    <string name="error_ad_consent">Ads need your privacy choice first.</string>
+    <string name="error_ad">No ad is available right now. Try again later.</string>
+    <string name="error_claimed">You already doubled this tower\'s Blueprints.</string>
+    <!-- Style + name picker (1d, next tower) -->
+    <string name="tower_name_label">Tower name</string>
+    <string name="suggest_name">Suggest another name</string>
+    <string name="rename_any_time">You can rename it any time.</string>
+    <string name="style_preview_description">Preview of your tower in %1$s style</string>
+    <string name="retry">Try again</string>
+    <string name="loading">Loading</string>
+</resources>

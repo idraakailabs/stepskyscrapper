@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onb_promise_title">Every 1,000 steps builds a floor</string>
+    <string name="onb_promise_body">Walk the way you already do. Finished towers join your skyline, and nothing you build is ever taken away.</string>
+    <string name="onb_promise_cta">Start building</string>
+    <string name="onb_page">Page %1$d of %2$d</string>
+    <string name="onb_promise_tower">A tower being built floor by floor</string>
+
+    <string name="onb_perm_title">Your steps are the bricks</string>
+    <string name="onb_perm_lead">We read your step count only. Nothing leaves your phone.</string>
+    <string name="onb_perm_reads_bold">Reads</string>
+    <string name="onb_perm_reads">your daily step count from Health Connect</string>
+    <string name="onb_perm_never_bold">Never reads</string>
+    <string name="onb_perm_never">location, heart rate, sleep or workouts</string>
+    <string name="onb_perm_stays_bold">Stays on this phone.</string>
+    <string name="onb_perm_stays">No account needed.</string>
+    <string name="onb_perm_reads_sensor">your phone\'s step counter</string>
+    <string name="onb_perm_allow">Allow step access</string>
+    <string name="onb_perm_not_now">Not now</string>
+    <string name="onb_perm_install">Install Health Connect</string>
+    <string name="onb_perm_update">Update Health Connect</string>
+    <string name="onb_perm_install_note">Health Connect is a free Google app that keeps your step count on this phone. Install it, then come back here.</string>
+    <string name="onb_perm_denied_note">No problem. You can connect steps later from the Build screen.</string>
+
+    <string name="onb_payoff_already">You\'ve already walked</string>
+    <string name="onb_payoff_steps_today">steps today</string>
+    <plurals name="onb_payoff_title">
+        <item quantity="one">That\'s 1 floor. You\'re already building.</item>
+        <item quantity="other">That\'s %1$d floors. You\'re already building.</item>
+    </plurals>
+    <string name="onb_payoff_zero_title">Your first floor is 1,000 steps away.</string>
+    <string name="onb_payoff_zero_body">About 10 minutes of walking.</string>
+    <string name="onb_payoff_next">Floor %1$d in &lt;b>%2$s steps&lt;/b>. A short walk will do it.</string>
+    <string name="onb_payoff_cta">Choose its style</string>
+    <string name="onb_payoff_loading">Reading today\'s steps…</string>
+
+    <string name="onb_style_title">Pick a style for your first tower</string>
+    <string name="onb_style_cta">Lay the foundation</string>
+
+    <string name="onb_target_title">How much do you like to walk?</string>
+    <string name="onb_target_body">Over the last 7 days you averaged &lt;b>%1$s steps&lt;/b>. Your weekly goal is what counts; one slow day doesn\'t matter.</string>
+    <string name="onb_target_body_no_history">Your weekly goal is what counts; one slow day doesn\'t matter.</string>
+    <string name="onb_target_easy">Easy-going</string>
+    <string name="onb_target_steady">Steady</string>
+    <string name="onb_target_ambitious">Ambitious</string>
+    <string name="onb_target_custom">Set my own</string>
+    <string name="onb_target_option_sub">%1$s a day · %2$d floors a week</string>
+    <string name="onb_target_custom_sub">Any amount, in steps of 500</string>
+    <string name="onb_target_suggested">Suggested</string>
+    <string name="onb_target_pause_hint">Ill or resting? Pause goals any time in Me → Goals.</string>
+    <string name="onb_target_cta">Set %1$d floors a week</string>
+    <string name="onb_target_less">Fewer steps</string>
+    <string name="onb_target_more">More steps</string>
+    <string name="onb_back">Back</string>
+
+    <string name="onb_widget_mock">home screen</string>
+    <string name="onb_widget_title">Watch it grow from your home screen</string>
+    <string name="onb_widget_body">See how close the next floor is without opening the app. Updates every 15 minutes.</string>
+    <string name="onb_widget_cta">Add widget</string>
+    <string name="onb_widget_later">Maybe later</string>
+    <string name="onb_widget_unsupported">Your launcher doesn\'t support adding widgets from apps. Long-press your home screen and choose Widgets.</string>
+</resources>

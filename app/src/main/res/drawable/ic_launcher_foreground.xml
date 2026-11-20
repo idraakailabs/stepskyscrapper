@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Isometric deco tower: left face, right face, setback, spire, amber crane-hook dot. -->
+    <path android:fillColor="#E9DCC3" android:pathData="M42,40 L54,46 L54,80 L42,74 Z" />
+    <path android:fillColor="#CBB793" android:pathData="M54,46 L66,40 L66,74 L54,80 Z" />
+    <path android:fillColor="#F4ECDD" android:pathData="M42,40 L54,34 L66,40 L54,46 Z" />
+    <path android:fillColor="#E9DCC3" android:pathData="M46,32 L54,36 L54,46 L46,42 Z" />
+    <path android:fillColor="#CBB793" android:pathData="M54,36 L62,32 L62,42 L54,46 Z" />
+    <path android:fillColor="#B8873A" android:pathData="M53.4,20 L54.6,20 L54.6,34 L53.4,34 Z" />
+    <path android:fillColor="#E8A23A" android:pathData="M54,16 m-2.2,0 a2.2,2.2 0 1,0 4.4,0 a2.2,2.2 0 1,0 -4.4,0" />
+    <path android:fillColor="#5B503F" android:pathData="M45,48 L47,49 L47,55 L45,54 Z M45,58 L47,59 L47,65 L45,64 Z M49,50 L51,51 L51,57 L49,56 Z M49,60 L51,61 L51,67 L49,66 Z" />
+    <path android:fillColor="#4A3F31" android:pathData="M58,50 L60,49 L60,55 L58,56 Z M62,48 L64,47 L64,53 L62,54 Z M58,60 L60,59 L60,65 L58,66 Z M62,58 L64,57 L64,63 L62,64 Z" />
+</vector>

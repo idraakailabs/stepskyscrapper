@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Step Skyscraper</string>
+    <string name="diagnostic_subject">Step Skyscraper sync diagnostic</string>
+    <string name="health_permissions_rationale">Step Skyscraper reads your daily step count to build floors. Nothing leaves your phone.</string>
+</resources>

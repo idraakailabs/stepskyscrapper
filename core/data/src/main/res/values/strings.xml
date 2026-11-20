@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notify_topped_title">%1$s is topped out</string>
+    <string name="notify_topped_body">%1$d floors, built one walk at a time. Open the app for the ceremony.</string>
+    <string name="notify_weekly_title">Your week in floors</string>
+    <string name="notify_weekly_body">%1$d floors this week. %2$s is waiting for the next one.</string>
+    <string name="channel_topping_out">Topping out</string>
+    <string name="channel_weekly">Weekly summary</string>
+</resources>

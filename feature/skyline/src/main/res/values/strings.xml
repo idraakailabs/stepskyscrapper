@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sky_district">District %1$d</string>
+    <string name="sky_district_meta">%1$d towers · %2$d floors · since %3$s</string>
+    <string name="sky_share">Share skyline</string>
+    <string name="sky_joined">%1$s joined the skyline</string>
+    <string name="sky_earned">You earned %1$s Blueprints</string>
+    <string name="sky_earned_doubled">You earned %1$s Blueprints (doubled)</string>
+    <string name="sky_watch_ad">Watch a short ad to double Blueprints</string>
+    <string name="sky_ad_note">Optional · about 30 seconds · once per tower</string>
+    <string name="sky_ad_loading">Getting the ad ready…</string>
+    <string name="sky_ad_done">Blueprints doubled. Thanks for watching.</string>
+    <string name="sky_floors">%1$d floors</string>
+    <string name="sky_floors_new">%1$d floors · New</string>
+    <string name="sky_next_district">Next district</string>
+    <string name="sky_next_district_count">%1$d of 8 towers</string>
+    <plurals name="sky_next_district_body">
+        <item quantity="one">1 more tower and %2$s gets a park, a tram stop and a name plaque.</item>
+        <item quantity="other">%1$d more towers and %2$s gets a park, a tram stop and a name plaque.</item>
+    </plurals>
+    <string name="sky_district_complete">%1$s is complete. Your next tower founds a new district.</string>
+    <string name="sky_next_lot">Next lot: &lt;b>%1$s&lt;/b>, ground broken %2$s</string>
+    <string name="sky_today">today</string>
+    <string name="sky_on_date">on %1$s</string>
+    <string name="sky_empty_title">Your skyline starts with your first tower</string>
+    <string name="sky_empty_body">%1$s has %2$d of %3$d floors. When it tops out, it stands here for good.</string>
+    <string name="sky_open_build">Back to building</string>
+    <string name="sky_zoom_hint">Pinch to zoom, drag to look along the street</string>
+
+    <string name="stats_overline">Tower %1$d · %2$s</string>
+    <string name="stats_floors">Floors</string>
+    <string name="stats_build_days">Build Days</string>
+    <string name="stats_ground_broken">Ground broken</string>
+    <string name="stats_topped_out">Topped out</string>
+    <string name="stats_steps">Steps</string>
+    <string name="stats_best_day">Best day</string>
+    <string name="stats_best_day_value">%1$s · %2$d floors</string>
+    <string name="stats_look">Crown · palette</string>
+    <string name="stats_share">Share tower</string>
+    <string name="stats_rename">Rename</string>
+    <string name="stats_rename_title">Rename tower</string>
+    <string name="stats_save">Save</string>
+    <string name="stats_cancel">Cancel</string>
+    <string name="stats_prev">Previous tower</string>
+    <string name="stats_next">Next tower</string>
+    <string name="stats_none">—</string>
+</resources>

@@ -1,0 +1,17 @@
+*.iml
+.gradle/
+/local.properties
+.idea/
+.DS_Store
+build/
+/captures
+.externalNativeBuild
+.cxx
+.kotlin/
+# Firebase config is per-environment; never commit it.
+app/google-services.json
+# Release signing
+keystore.properties
+*.jks
+*.keystore
+design/fonts-src/

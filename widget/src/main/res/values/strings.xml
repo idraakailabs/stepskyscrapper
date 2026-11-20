@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_small_name">Next floor</string>
+    <string name="widget_small_desc">How close your next floor is</string>
+    <string name="widget_medium_name">Tower</string>
+    <string name="widget_medium_desc">Your tower, today\'s floors and the week</string>
+    <string name="widget_floor">FLOOR %1$d</string>
+    <string name="widget_to_next">to next floor</string>
+    <string name="widget_week">Week %1$d/%2$d</string>
+    <plurals name="widget_floors_today">
+        <item quantity="one">%1$d floor today</item>
+        <item quantity="other">%1$d floors today</item>
+    </plurals>
+    <string name="widget_setup">Open Step Skyscraper to start building</string>
+    <string name="widget_small_cd">%1$s, %2$s steps to next floor</string>
+    <string name="widget_medium_cd">%1$s, %2$d floors today, %3$d of %4$d this week, %5$s steps to next floor</string>
+</resources>

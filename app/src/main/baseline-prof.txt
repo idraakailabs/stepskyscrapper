@@ -1,0 +1,12 @@
+# Startup baseline profile (hand-seeded; regenerate with :app:generateBaselineProfile on a device).
+HSPLcom/idraak/stepskyscraper/StepSkyscraperApp;->**(**)**
+HSPLcom/idraak/stepskyscraper/MainActivity;->**(**)**
+HSPLcom/idraak/stepskyscraper/MainViewModel;->**(**)**
+HSPLcom/idraak/stepskyscraper/navigation/**;->**(**)**
+HSPLcom/idraak/stepskyscraper/feature/build/**;->**(**)**
+HSPLcom/idraak/stepskyscraper/core/designsystem/**;->**(**)**
+HSPLcom/idraak/stepskyscraper/core/domain/usecase/**;->**(**)**
+HSPLcom/idraak/stepskyscraper/core/data/**;->**(**)**
+HSPLcom/idraak/stepskyscraper/core/datastore/**;->**(**)**
+HSPLcom/idraak/stepskyscraper/core/ui/**;->**(**)**
+Lcom/idraak/stepskyscraper/**;

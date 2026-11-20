@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cus_title">Customise</string>
+    <string name="cus_tab_facade">Facade</string>
+    <string name="cus_tab_palette">Palette</string>
+    <string name="cus_tab_crown">Crown</string>
+    <string name="cus_tab_lights">Lights</string>
+    <string name="cus_tab_ground">Ground</string>
+    <string name="cus_section_palette">Colour palette</string>
+    <string name="cus_section_lights">Window lighting</string>
+    <string name="cus_section_ground">Ground details</string>
+    <string name="cus_section_crown">Crown</string>
+    <string name="cus_done">Done</string>
+    <string name="cus_close">Close</string>
+    <string name="cus_preview">Preview</string>
+    <string name="cus_lock_floors">Build %1$d floors</string>
+    <string name="cus_lock_floors_short">%1$d floors</string>
+    <string name="cus_lock_towers">Finish %1$d towers</string>
+    <string name="cus_lock_days">%1$d days</string>
+    <string name="cus_lock_days_long">Build on %1$d days</string>
+    <string name="cus_lock_level">Reach Architect level %1$d</string>
+    <string name="cus_lock_price">%1$d Blueprints</string>
+    <string name="cus_lock_achievement">Earn \"%1$s\"</string>
+    <string name="cus_lock_pass">Architect Pass</string>
+    <string name="cus_explain_progress">You\'re at %1$d of %2$d. It unlocks on its own; nothing to buy.</string>
+    <string name="cus_explain_price">Spend %1$d of your %2$d Blueprints. Blueprints are earned by finishing towers.</string>
+    <string name="cus_explain_price_short">You have %2$d of %1$d Blueprints. Finish towers to earn more.</string>
+    <string name="cus_explain_achievement">Unlocks with the achievement \"%1$s\": %2$s.</string>
+    <string name="cus_explain_pass">Included with Architect Pass, together with 11 more premium styles.</string>
+    <string name="cus_unlock_for">Unlock for %1$d Blueprints</string>
+    <string name="cus_see_pass">See Architect Pass</string>
+    <string name="cus_ok">Got it</string>
+    <string name="cus_selected">Selected</string>
+    <string name="cus_tower_preview">%1$s with your changes</string>
+</resources>

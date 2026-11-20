@@ -1,0 +1,86 @@
+build:
+  maxIssues: 0
+
+complexity:
+  LongParameterList:
+    functionThreshold: 12
+    constructorThreshold: 14
+    ignoreDefaultParameters: true
+    ignoreAnnotated: ['Composable']
+  LongMethod:
+    threshold: 120
+    ignoreAnnotated: ['Composable', 'Test']
+  CyclomaticComplexMethod:
+    threshold: 25
+    ignoreAnnotated: ['Composable']
+  TooManyFunctions:
+    thresholdInFiles: 40
+    thresholdInClasses: 30
+    thresholdInInterfaces: 20
+    thresholdInObjects: 40
+    ignorePrivate: true
+  LargeClass:
+    threshold: 700
+  NestedBlockDepth:
+    threshold: 5
+
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable', 'Test']
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Z][A-Za-z0-9_]*'
+  MatchingDeclarationName:
+    active: false
+  ConstructorParameterNaming:
+    privateParameterPattern: '[a-z_][A-Za-z0-9]*'
+  VariableNaming:
+    privateVariablePattern: '(_)?[a-z][A-Za-z0-9]*'
+
+style:
+  MagicNumber:
+    active: false
+  MaxLineLength:
+    maxLineLength: 180
+    excludeCommentStatements: true
+  ReturnCount:
+    max: 6
+    excludeGuardClauses: true
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview', 'PreviewLightDark', 'PreviewFontScale', 'ScreenPreviews']
+  UnusedPrivateProperty:
+    active: true
+  ForbiddenComment:
+    active: true
+    comments:
+      - reason: 'No TODOs may ship.'
+        value: 'TODO:'
+      - reason: 'No FIXMEs may ship.'
+        value: 'FIXME:'
+  WildcardImport:
+    active: true
+  DestructuringDeclarationWithTooManyEntries:
+    maxDestructuringEntries: 4
+  UseCheckOrError:
+    active: true
+  SerialVersionUIDInSerializableClass:
+    active: false
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - Error
+      - Throwable
+  SwallowedException:
+    active: true
+    ignoredExceptionTypes:
+      - CancellationException
+
+potential-bugs:
+  LateinitUsage:
+    active: false
+
+performance:
+  SpreadOperator:
+    # Compose / Android APIs take varargs (Brush stops, string format args); copies are trivial.
+    active: false
