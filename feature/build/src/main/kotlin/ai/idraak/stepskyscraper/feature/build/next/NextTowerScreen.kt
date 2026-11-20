@@ -1,6 +1,7 @@
 package ai.idraak.stepskyscraper.feature.build.next
 
 import androidx.compose.foundation.background
+import ai.idraak.stepskyscraper.core.designsystem.component.cssLineBox
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -132,7 +133,7 @@ fun NextTowerScreen(state: NextTowerUiState, onBack: () -> Unit, onIntent: (Next
                 stringResource(R.string.next_title),
                 style = SsTheme.type.headlineS,
                 color = c.onSurface,
-                modifier = Modifier.padding(horizontal = SsSpacing.onboardingMargin),
+                modifier = Modifier.padding(horizontal = SsSpacing.onboardingMargin).cssLineBox(SsTheme.type.headlineS),
             )
             StyleAndNamePicker(
                 selected = state.kit,

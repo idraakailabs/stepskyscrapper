@@ -42,7 +42,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -80,11 +79,7 @@ fun StepSkyscraperApp(onboardingComplete: Boolean) {
                         "me" -> MeRoute
                         else -> BuildRoute
                     }
-                    nav.navigate(route) {
-                        popUpTo(nav.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    nav.goToTab(route)
                 })
             }
         },
@@ -95,9 +90,15 @@ fun StepSkyscraperApp(onboardingComplete: Boolean) {
     }
 }
 
-private fun NavHostController.goToTab(route: Any) = navigate(route) {
-    popUpTo(graph.findStartDestination().id) { saveState = false }
+/**
+ * Switches tab. Build is the root of the tab stack (onboarding is popped when it finishes, so the graph's start
+ * destination may not be on the stack), so tabs pop up to Build and save the other tabs' state. Selecting Build
+ * itself never restores saved state: that would bring back the stack just saved (the tab before it) — BUG-011.
+ */
+private fun NavHostController.goToTab(route: Any, restore: Boolean = route !is BuildRoute) = navigate(route) {
+    popUpTo<BuildRoute> { saveState = true }
     launchSingleTop = true
+    restoreState = restore
 }
 
 @Composable
@@ -138,7 +139,7 @@ private fun AppNavHost(nav: NavHostController, onboardingComplete: Boolean) {
                     if (paywall) nav.navigate(PaywallRoute("first_tower"))
                 },
                 onClose = { index, paywall ->
-                    nav.goToTab(SkylineRoute(index))
+                    nav.goToTab(SkylineRoute(index), restore = false)
                     if (paywall) nav.navigate(PaywallRoute("first_tower"))
                 },
             )

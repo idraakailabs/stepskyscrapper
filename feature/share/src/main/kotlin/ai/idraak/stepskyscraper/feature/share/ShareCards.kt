@@ -1,6 +1,7 @@
 package ai.idraak.stepskyscraper.feature.share
 
 import ai.idraak.stepskyscraper.core.designsystem.component.BrandMark
+import ai.idraak.stepskyscraper.core.designsystem.component.cssLineBox
 import ai.idraak.stepskyscraper.core.designsystem.theme.SkyTokens
 import ai.idraak.stepskyscraper.core.designsystem.theme.SkyTone
 import ai.idraak.stepskyscraper.core.designsystem.theme.SsTheme
@@ -133,6 +134,7 @@ private fun StoryTower(t: TowerCardData, stats: Boolean) {
                         style = SsTheme.type.numberXS.copy(fontSize = 20.sp),
                         color = Light,
                         maxLines = 1,
+                        modifier = Modifier.cssLineBox(SsTheme.type.numberXS.copy(fontSize = 20.sp)),
                     )
                     Text(stringResource(R.string.card_in_days, t.buildDays), style = SsTheme.type.micro, color = Light)
                 }
@@ -159,6 +161,7 @@ private fun StorySkyline(s: SkylineCardData, stats: Boolean) {
                         style = SsTheme.type.numberXS.copy(fontSize = 20.sp),
                         color = NightInk,
                         maxLines = 1,
+                        modifier = Modifier.cssLineBox(SsTheme.type.numberXS.copy(fontSize = 20.sp)),
                     )
                     Text(stringResource(R.string.card_since, s.since), style = SsTheme.type.micro, color = NightSub)
                 }
@@ -179,7 +182,7 @@ private fun SquareTower(t: TowerCardData, stats: Boolean) {
         }
         if (stats) {
             Column(Modifier.align(Alignment.BottomStart).padding(start = 20.dp, bottom = 56.dp)) {
-                Text(Formats.steps(t.steps), style = SsTheme.type.numberXS, color = DayInk)
+                Text(Formats.steps(t.steps), style = SsTheme.type.numberXS, color = DayInk, modifier = Modifier.cssLineBox(SsTheme.type.numberXS))
                 Text(stringResource(R.string.card_steps_days, t.buildDays), style = SsTheme.type.micro, color = sub)
             }
         }

@@ -48,7 +48,7 @@ class SyncStepsUseCase @Inject constructor(
         val result = runSync()
         when (result) {
             is Outcome.Success -> {
-                syncStatus.markSucceeded(clock.now(), dataChanged = result.value.daysWritten > 0)
+                syncStatus.markSucceeded(clock.now(), dataChanged = result.value.stepsArrived)
                 listeners.forEach { it.onSynced() }
             }
             is Outcome.Failure -> syncStatus.markFailed(clock.now(), result.error)
@@ -86,7 +86,8 @@ class SyncStepsUseCase @Inject constructor(
             ensureTowers()
             awardAchievements()
         }
-        return Outcome.Success(SyncResult((written as Outcome.Success).value, newFloors.coerceAtLeast(0), after))
+        val stepsArrived = merged.any { it.steps > (stored[it.date]?.steps ?: 0) }
+        return Outcome.Success(SyncResult((written as Outcome.Success).value, newFloors.coerceAtLeast(0), after, stepsArrived))
     }
 
     private suspend fun expirePause(pause: GoalPause, today: java.time.LocalDate) {

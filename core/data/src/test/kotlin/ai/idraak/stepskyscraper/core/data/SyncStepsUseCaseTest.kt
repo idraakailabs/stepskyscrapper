@@ -40,6 +40,23 @@ class SyncStepsUseCaseTest {
     }
 
     @Test
+    fun newEmptyDaysAreNotNewData() = runTest {
+        // BUG-012: a new day's 0-step row must not count as data, or the 48h step-help link never shows.
+        val g = TestGraph()
+        g.onboarded()
+        g.source.totals[g.today] = 3_000
+        g.sync()
+        val firstChange = g.syncStatus.state.value.lastDataChangeAt
+        assertThat(firstChange).isNotNull()
+        g.clock.current = g.clock.current.plusDays(3)
+        g.sync()
+        assertThat(g.syncStatus.state.value.lastDataChangeAt).isEqualTo(firstChange)
+        g.source.totals[g.clock.today()] = 500
+        g.sync()
+        assertThat(g.syncStatus.state.value.lastDataChangeAt).isEqualTo(g.clock.now())
+    }
+
+    @Test
     fun numbersNeverJumpBackwards() = runTest {
         val g = TestGraph()
         g.onboarded()

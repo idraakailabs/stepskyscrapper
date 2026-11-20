@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +38,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -58,7 +60,17 @@ import java.text.NumberFormat
 fun RollingNumber(value: Int, style: TextStyle, color: Color, modifier: Modifier = Modifier) {
     val text = NumberFormat.getIntegerInstance().format(value)
     val reduce = SsTheme.reduceMotion
-    Row(modifier.clearAndSetSemantics { contentDescription = text }) {
+    // AnimatedContent doesn't keep reporting its child's baseline once a digit has rolled, so the row reports
+    // the baseline itself (callers align the unit with alignByBaseline()).
+    val baseline = rememberCssBaseline(style)
+    Row(
+        modifier
+            .clearAndSetSemantics { contentDescription = text }
+            .layout { measurable, constraints ->
+                val p = measurable.measure(constraints)
+                layout(p.width, p.height, mapOf(FirstBaseline to baseline, LastBaseline to baseline)) { p.place(0, 0) }
+            },
+    ) {
         text.forEachIndexed { index, ch ->
             AnimatedContent(
                 targetState = ch,
@@ -71,22 +83,17 @@ fun RollingNumber(value: Int, style: TextStyle, color: Color, modifier: Modifier
                     }
                 },
                 label = "digit-$index",
-            ) { digit -> Text(digit.toString(), style = style, color = color) }
+            ) { digit -> Text(digit.toString(), style = style, color = color, modifier = Modifier.cssLineBox(style)) }
         }
     }
 }
 
-/** Counts up from 0 to [target] (onboarding "4,200", ceremony "+120 Blueprints"). */
+/**
+ * The value shown while counting up from 0 to [target] over [durationMs] (final value at once under reduce
+ * motion). [onTick] is called for every new value.
+ */
 @Composable
-fun CountUpNumber(
-    target: Int,
-    style: TextStyle,
-    color: Color,
-    modifier: Modifier = Modifier,
-    durationMs: Int = SsMotion.STEP_COUNT_ROLL_MS,
-    prefix: String = "",
-    onTick: (Int) -> Unit = {},
-) {
+fun rememberCountUp(target: Int, durationMs: Int = SsMotion.STEP_COUNT_ROLL_MS, onTick: (Int) -> Unit = {}): Int {
     val reduce = SsTheme.reduceMotion
     val anim = remember { Animatable(if (reduce) target.toFloat() else 0f) }
     var shown by remember { mutableIntStateOf(if (reduce) target else 0) }
@@ -104,13 +111,28 @@ fun CountUpNumber(
         }
         shown = target
     }
+    return shown
+}
+
+/** Counts up from 0 to [target] (onboarding "4,200"). */
+@Composable
+fun CountUpNumber(
+    target: Int,
+    style: TextStyle,
+    color: Color,
+    modifier: Modifier = Modifier,
+    durationMs: Int = SsMotion.STEP_COUNT_ROLL_MS,
+    prefix: String = "",
+    onTick: (Int) -> Unit = {},
+) {
+    val shown = rememberCountUp(target, durationMs, onTick)
     val format = remember { NumberFormat.getIntegerInstance() }
     val finalText = prefix + format.format(target)
     Text(
         prefix + format.format(shown),
         style = style,
         color = color,
-        modifier = modifier.clearAndSetSemantics { contentDescription = finalText },
+        modifier = modifier.clearAndSetSemantics { contentDescription = finalText }.cssLineBox(style),
     )
 }
 
@@ -184,14 +206,15 @@ fun SkyHeader(
 @Composable
 fun AutoSizeName(text: String, style: TextStyle, color: Color, modifier: Modifier = Modifier, min: TextUnit = 26.sp) {
     var size by remember(text) { mutableIntStateOf(style.fontSize.value.toInt()) }
+    val sized = style.copy(fontSize = size.sp, lineHeight = (size * 1.05f).sp)
     Text(
         text.uppercase(),
-        style = style.copy(fontSize = size.sp, lineHeight = (size * 1.05f).sp),
+        style = sized,
         color = color,
         maxLines = 1,
         softWrap = false,
         overflow = TextOverflow.Ellipsis,
-        modifier = modifier,
+        modifier = modifier.cssLineBox(sized),
         onTextLayout = { layout ->
             if (layout.hasVisualOverflow && size > min.value) size -= 1
         },
@@ -248,10 +271,18 @@ fun HelpStepCard(number: Int, title: String, body: @Composable () -> Unit, actio
             Text(number.toString(), style = SsTheme.type.labelSBold, color = c.onInk)
         }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(SsSpacing.xs)) {
-            Text(title, style = SsTheme.type.bodyMStrong, color = c.onSurface)
+            Text(title, style = SsTheme.type.planTitle, color = c.onSurface)
             body()
-            // Design: the inline action is pulled 12dp left / 6dp up so its text aligns with the body copy.
-            Box(Modifier.offset(x = (-12).dp, y = (-6).dp)) { action() }
+            // Design: a 44dp inline action with `margin: -6px 0 -6px -12px`, so it takes 32dp of layout and its
+            // text lines up with the body copy. The 48dp touch target is kept; it overlaps the padding instead.
+            Box(
+                Modifier.layout { measurable, constraints ->
+                    val p = measurable.measure(constraints)
+                    val pull = INLINE_ACTION_PULL.roundToPx()
+                    val consumed = INLINE_ACTION_HEIGHT.roundToPx()
+                    layout((p.width - pull).coerceAtLeast(0), consumed) { p.place(-pull, (consumed - p.height) / 2) }
+                },
+            ) { action() }
         }
     }
 }
@@ -297,3 +328,6 @@ fun SsMessageState(symbol: Symbol, title: String, body: String, modifier: Modifi
         action?.invoke()
     }
 }
+
+private val INLINE_ACTION_PULL = 12.dp
+private val INLINE_ACTION_HEIGHT = 32.dp

@@ -9,6 +9,7 @@ import ai.idraak.stepskyscraper.core.designsystem.component.SsIconButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsPrimaryButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsRadioCard
 import ai.idraak.stepskyscraper.core.designsystem.component.SsTextButton
+import ai.idraak.stepskyscraper.core.designsystem.component.cssLineBox
 import ai.idraak.stepskyscraper.core.designsystem.component.ssShadow
 import ai.idraak.stepskyscraper.core.designsystem.icon.IconSize
 import ai.idraak.stepskyscraper.core.designsystem.icon.SsIcon
@@ -167,7 +168,7 @@ private fun PromiseStep(onIntent: (OnboardingIntent) -> Unit) {
             )
         }
         BottomBlock {
-            Text(stringResource(R.string.onb_promise_title), style = SsTheme.type.headlineL, color = c.onSurface)
+            Text(stringResource(R.string.onb_promise_title), style = SsTheme.type.headlineL, color = c.onSurface, modifier = Modifier.cssLineBox(SsTheme.type.headlineL))
             Text(stringResource(R.string.onb_promise_body), style = SsTheme.type.body, color = c.bodySecondary)
             Dots(0)
             SsPrimaryButton(stringResource(R.string.onb_promise_cta), { onIntent(OnboardingIntent.Start) }, Modifier.fillMaxWidth())
@@ -191,7 +192,7 @@ private fun PermissionStep(state: OnboardingUiState, onIntent: (OnboardingIntent
             Box(Modifier.size(72.dp).background(c.surfaceVariant, SsRadius.shapeLg), contentAlignment = Alignment.Center) {
                 SsIcon(Symbol.DirectionsWalk, size = IconSize.hero, tint = c.onSurface)
             }
-            Text(stringResource(R.string.onb_perm_title), style = SsTheme.type.headlineL, color = c.onSurface)
+            Text(stringResource(R.string.onb_perm_title), style = SsTheme.type.headlineL, color = c.onSurface, modifier = Modifier.cssLineBox(SsTheme.type.headlineL))
             Text(stringResource(R.string.onb_perm_lead), style = SsTheme.type.bodyL, color = c.onSurface)
             SsCard(padding = androidx.compose.foundation.layout.PaddingValues(horizontal = 18.dp, vertical = 6.dp)) {
                 val reads = if (state.usesSensor) R.string.onb_perm_reads_sensor else R.string.onb_perm_reads
@@ -300,13 +301,14 @@ private fun PayoffStep(state: OnboardingUiState, onIntent: (OnboardingIntent) ->
         }
         BottomBlock {
             if (state.floorsToday == 0) {
-                Text(stringResource(R.string.onb_payoff_zero_title), style = SsTheme.type.headline, color = c.onSurface)
+                Text(stringResource(R.string.onb_payoff_zero_title), style = SsTheme.type.headline, color = c.onSurface, modifier = Modifier.cssLineBox(SsTheme.type.headline))
                 Text(stringResource(R.string.onb_payoff_zero_body), style = SsTheme.type.bodyM, color = c.bodySecondary)
             } else {
                 Text(
                     pluralStringResource(R.plurals.onb_payoff_title, state.floorsToday, state.floorsToday),
                     style = SsTheme.type.headline,
                     color = c.onSurface,
+                    modifier = Modifier.cssLineBox(SsTheme.type.headline),
                 )
             }
             Column(verticalArrangement = Arrangement.spacedBy(SsSpacing.s)) {
@@ -356,7 +358,7 @@ private fun StyleStep(state: OnboardingUiState, onIntent: (OnboardingIntent) -> 
                     start = SsSpacing.onboardingMargin,
                     end = SsSpacing.onboardingMargin,
                     top = SsSpacing.screenMargin,
-                ),
+                ).cssLineBox(SsTheme.type.headlineS),
             )
             StyleAndNamePicker(
                 selected = state.kit,
@@ -395,7 +397,7 @@ private fun TargetStep(state: OnboardingUiState, onIntent: (OnboardingIntent) ->
                 Modifier.padding(start = SsSpacing.onboardingMargin, end = SsSpacing.onboardingMargin, top = SsSpacing.s),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Text(stringResource(R.string.onb_target_title), style = SsTheme.type.headlineS, color = c.onSurface)
+                Text(stringResource(R.string.onb_target_title), style = SsTheme.type.headlineS, color = c.onSurface, modifier = Modifier.cssLineBox(SsTheme.type.headlineS))
                 val body = if (state.sevenDayAverage > 0) {
                     boldText(stringResource(R.string.onb_target_body, Formats.steps(state.sevenDayAverage)), c.onSurface)
                 } else {
@@ -496,7 +498,7 @@ private fun WidgetStep(state: OnboardingUiState, onIntent: (OnboardingIntent) ->
             Modifier.weight(1f).padding(start = SsSpacing.onboardingMargin, end = SsSpacing.onboardingMargin, top = 28.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text(stringResource(R.string.onb_widget_title), style = SsTheme.type.headlineS, color = c.onSurface)
+            Text(stringResource(R.string.onb_widget_title), style = SsTheme.type.headlineS, color = c.onSurface, modifier = Modifier.cssLineBox(SsTheme.type.headlineS))
             Text(stringResource(R.string.onb_widget_body), style = SsTheme.type.bodyM, color = c.bodySecondary)
             if (state.widgetUnsupported) {
                 Text(
@@ -542,7 +544,7 @@ private fun WidgetMock(state: OnboardingUiState) {
         Column(Modifier.weight(1f).padding(14.dp), verticalArrangement = Arrangement.SpaceBetween) {
             Column {
                 Text(state.name.uppercase(), style = SsTheme.type.microStrong, color = c.onSurfaceVariant, maxLines = 1)
-                Text(Formats.steps(400), style = SsTheme.type.numberWidgetMock, color = c.onSurface)
+                Text(Formats.steps(400), style = SsTheme.type.numberWidgetMock, color = c.onSurface, modifier = Modifier.cssLineBox(SsTheme.type.numberWidgetMock))
                 Text(
                     stringResource(ai.idraak.stepskyscraper.core.ui.R.string.to_next_floor),
                     style = SsTheme.type.planSubtitle,

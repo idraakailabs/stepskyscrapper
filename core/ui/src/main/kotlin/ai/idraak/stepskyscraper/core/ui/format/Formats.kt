@@ -22,7 +22,8 @@ object Formats {
     private fun pattern(p: String) = DateTimeFormatter.ofPattern(p, Locale.getDefault())
 
     /** "14 Aug" */
-    fun dayMonth(date: LocalDate): String = date.format(pattern("d MMM"))
+    /** "17 Nov", with a no-break space so a wrapped sentence never splits the date. */
+    fun dayMonth(date: LocalDate): String = date.format(pattern("d MMM")).replace(' ', ' ')
 
     /** "2 Sep 2026" */
     fun fullDate(date: LocalDate): String = date.format(pattern("d MMM yyyy"))

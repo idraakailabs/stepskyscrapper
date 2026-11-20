@@ -120,7 +120,7 @@ Live values (Firebase, AdMob, Play Console) weren't available; they are unverifi
   `app/src/debug` (`@BindsOptionalOf` in `DataModule`; release binds nothing). Set a time of day to check the
   dawn / dusk / night skies without changing the phone's clock:
   `adb shell am broadcast -n ai.idraak.stepskyscraper.debug/ai.idraak.stepskyscraper.debug.DebugClockReceiver --es time 18:30`
-  (`--es time off` to clear).
+  (`--es time 2026-11-22T10:00` for another day, `--es time off` to clear).
 - **Seeding data:** pull `databases/step_skyscraper.db` with `adb exec-out run-as ai.idraak.stepskyscraper.debug cat …`,
   edit it with SQLite, push it back with `run-as` while the app is stopped. A sync never lowers a stored day
   total, so seeded totals survive the next Health Connect read.

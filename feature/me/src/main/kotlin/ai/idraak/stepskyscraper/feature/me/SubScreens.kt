@@ -9,6 +9,7 @@ import ai.idraak.stepskyscraper.core.designsystem.component.SsSectionLabel
 import ai.idraak.stepskyscraper.core.designsystem.component.SsSwitchRow
 import ai.idraak.stepskyscraper.core.designsystem.component.SsTextButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsTonalButton
+import ai.idraak.stepskyscraper.core.designsystem.component.cssLineBox
 import ai.idraak.stepskyscraper.core.designsystem.icon.Symbol
 import ai.idraak.stepskyscraper.core.designsystem.theme.SsSpacing
 import ai.idraak.stepskyscraper.core.designsystem.theme.SsTheme
@@ -86,7 +87,7 @@ internal fun SubScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SsIconButton(Symbol.ArrowBack, stringResource(R.string.me_back), onBack)
-            Text(title, style = SsTheme.type.screenTitle, color = c.onSurface, modifier = Modifier.weight(1f).semantics { heading() })
+            Text(title, style = SsTheme.type.screenTitle, color = c.onSurface, modifier = Modifier.weight(1f).semantics { heading() }.cssLineBox(SsTheme.type.screenTitle))
             if (trailing != null) Text(trailing, style = SsTheme.type.bodyXS, color = c.onSurfaceVariant)
         }
         Column(

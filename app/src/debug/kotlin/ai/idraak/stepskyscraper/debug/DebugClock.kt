@@ -12,6 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.time.Duration
+import java.time.LocalDateTime
 import java.time.LocalTime
 import javax.inject.Singleton
 
@@ -21,6 +22,7 @@ import javax.inject.Singleton
  *
  * ```
  * adb shell am broadcast -n ai.idraak.stepskyscraper.debug/ai.idraak.stepskyscraper.debug.DebugClockReceiver --es time 18:30
+ * adb shell am broadcast -n ai.idraak.stepskyscraper.debug/ai.idraak.stepskyscraper.debug.DebugClockReceiver --es time 2026-11-22T10:00
  * adb shell am broadcast -n ai.idraak.stepskyscraper.debug/ai.idraak.stepskyscraper.debug.DebugClockReceiver --es time off
  * ```
  * The shift is fixed when set (the clock keeps running from the chosen time). Screens pick it up on their
@@ -29,11 +31,11 @@ import javax.inject.Singleton
 class DebugClockReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val time = intent.getStringExtra("time") ?: return
-        val shiftMs = if (time == "off") {
-            0L
-        } else {
-            val now = LocalTime.now()
-            Duration.between(now, LocalTime.parse(time)).toMillis()
+        val shiftMs = when {
+            time == "off" -> 0L
+            // Full local date-time, e.g. 2026-11-22T10:00 (reach other days, such as a day with no steps yet).
+            'T' in time -> Duration.between(LocalDateTime.now(), LocalDateTime.parse(time)).toMillis()
+            else -> Duration.between(LocalTime.now(), LocalTime.parse(time)).toMillis()
         }
         prefs(context).edit { putLong(KEY_SHIFT, shiftMs) }
         Log.i("DebugClock", "clock shift set to ${Duration.ofMillis(shiftMs)}")

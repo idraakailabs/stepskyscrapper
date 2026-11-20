@@ -13,6 +13,7 @@ import ai.idraak.stepskyscraper.core.designsystem.component.SsPrimaryButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsSnackbar
 import ai.idraak.stepskyscraper.core.designsystem.component.SsTextButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsTonalButton
+import ai.idraak.stepskyscraper.core.designsystem.component.cssLineBox
 import ai.idraak.stepskyscraper.core.designsystem.icon.IconSize
 import ai.idraak.stepskyscraper.core.designsystem.icon.SsIcon
 import ai.idraak.stepskyscraper.core.designsystem.icon.Symbol
@@ -356,7 +357,7 @@ private fun TowerChip(tower: Tower, isNew: Boolean, selected: Boolean, onClick: 
             pad = 2f,
         )
         Column {
-            Text(tower.name.uppercase(), style = SsTheme.type.towerNameChip, color = c.onSurface, maxLines = 1)
+            Text(tower.name.uppercase(), style = SsTheme.type.towerNameChip, color = c.onSurface, maxLines = 1, modifier = Modifier.cssLineBox(SsTheme.type.towerNameChip))
             Text(
                 if (isNew) {
                     stringResource(

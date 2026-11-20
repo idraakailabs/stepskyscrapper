@@ -7,6 +7,7 @@ import ai.idraak.stepskyscraper.core.designsystem.component.SsPrimaryButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsRadioCard
 import ai.idraak.stepskyscraper.core.designsystem.component.SsTextButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsTonalButton
+import ai.idraak.stepskyscraper.core.designsystem.component.cssLineBox
 import ai.idraak.stepskyscraper.core.designsystem.icon.IconSize
 import ai.idraak.stepskyscraper.core.designsystem.icon.SsIcon
 import ai.idraak.stepskyscraper.core.designsystem.icon.Symbol
@@ -201,7 +202,12 @@ fun PaywallScreen(state: PaywallUiState, onClose: () -> Unit, onIntent: (Paywall
                 Modifier.padding(start = SsSpacing.onboardingMargin, end = SsSpacing.onboardingMargin, top = 18.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text(stringResource(R.string.pw_title).uppercase(), style = SsTheme.type.displayTitle, color = c.onSurface)
+                Text(
+                    stringResource(R.string.pw_title).uppercase(),
+                    style = SsTheme.type.displayTitle,
+                    color = c.onSurface,
+                    modifier = Modifier.cssLineBox(SsTheme.type.displayTitle),
+                )
                 Text(stringResource(R.string.pw_body), style = SsTheme.type.bodyM, color = c.bodySecondary)
             }
             Column(

@@ -45,6 +45,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -373,6 +374,7 @@ fun StepHelpScreen(state: StepHelpUiState, onBack: () -> Unit, onIntent: (StepHe
             stringResource(R.string.help_diag_note),
             style = SsTheme.type.captionRegular,
             color = c.onSurfaceVariant,
+            textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),
         )
     }

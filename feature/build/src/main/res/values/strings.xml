@@ -51,7 +51,8 @@
 
     <string name="ceremony_topped_out">Topped out</string>
     <string name="ceremony_stats">%1$d floors · %2$d Build Days · %3$s steps</string>
-    <string name="ceremony_blueprints_rest">Blueprints for new crowns and palettes</string>
+    <string name="ceremony_blueprints_amount">+%1$s Blueprints</string>
+    <string name="ceremony_blueprints_rest">for new crowns and palettes</string>
     <string name="ceremony_share">Share</string>
     <string name="ceremony_next">Start next tower</string>
     <string name="ceremony_close">Close</string>

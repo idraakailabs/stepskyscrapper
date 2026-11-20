@@ -54,4 +54,6 @@ data class SyncResult(
     val daysWritten: Int,
     val floorsAddedToday: Int,
     val todaySteps: Int,
+    /** A day's total went up. Inserting a new day with 0 steps is not new data (drives the 48h step-help link). */
+    val stepsArrived: Boolean = false,
 )

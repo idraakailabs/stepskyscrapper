@@ -11,6 +11,7 @@ import ai.idraak.stepskyscraper.core.designsystem.component.SsSegmentedToggle
 import ai.idraak.stepskyscraper.core.designsystem.component.SsSettingsRow
 import ai.idraak.stepskyscraper.core.designsystem.component.SsSwitch
 import ai.idraak.stepskyscraper.core.designsystem.component.SsTextButton
+import ai.idraak.stepskyscraper.core.designsystem.component.cssLineBox
 import ai.idraak.stepskyscraper.core.designsystem.icon.IconSize
 import ai.idraak.stepskyscraper.core.designsystem.icon.SsIcon
 import ai.idraak.stepskyscraper.core.designsystem.icon.Symbol
@@ -110,7 +111,7 @@ private fun MeContentView(content: MeContent, state: MeUiState, nav: MeNavigatio
             Modifier.fillMaxWidth().padding(start = SsSpacing.screenMargin, end = SsSpacing.s, top = SsSpacing.s),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(stringResource(R.string.me_title), style = SsTheme.type.headline, color = c.onSurface, modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.me_title), style = SsTheme.type.headline, color = c.onSurface, modifier = Modifier.weight(1f).cssLineBox(SsTheme.type.headline))
             SsIconButton(Symbol.Settings, stringResource(R.string.me_settings), nav.settings)
         }
         NextFloorPill(
@@ -150,6 +151,7 @@ private fun LevelCard(content: MeContent) {
                     level.level.toString(),
                     style = SsTheme.type.numberXS.copy(fontSize = SsTheme.type.headlineS.fontSize),
                     color = SsTheme.brand.onPassSurface,
+                    modifier = Modifier.cssLineBox(SsTheme.type.numberXS.copy(fontSize = SsTheme.type.headlineS.fontSize)),
                 )
             }
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -192,7 +194,8 @@ private fun StatCard(label: String, value: Int, large: Boolean, modifier: Modifi
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         Text(label, style = SsTheme.type.captionStrong, color = c.onSurfaceVariant, maxLines = 1)
-        Text(Formats.steps(value), style = if (large) SsTheme.type.numberStat else SsTheme.type.numberS, color = c.onSurface, maxLines = 1)
+        val numberStyle = if (large) SsTheme.type.numberStat else SsTheme.type.numberS
+        Text(Formats.steps(value), style = numberStyle, color = c.onSurface, maxLines = 1, modifier = Modifier.cssLineBox(numberStyle))
     }
 }
 
@@ -222,7 +225,7 @@ private fun FloorsChart(content: MeContent, month: Boolean, onToggle: (Boolean) 
             color = c.onSurfaceVariant,
         )
         Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(Formats.steps(total), style = SsTheme.type.numberM, color = c.onSurface)
+            Text(Formats.steps(total), style = SsTheme.type.numberM, color = c.onSurface, modifier = Modifier.cssLineBox(SsTheme.type.numberM))
             Text(
                 if (month) stringResource(R.string.me_floors_month) else stringResource(R.string.me_of_floors, content.weekGoal),
                 style = SsTheme.type.bodyM,

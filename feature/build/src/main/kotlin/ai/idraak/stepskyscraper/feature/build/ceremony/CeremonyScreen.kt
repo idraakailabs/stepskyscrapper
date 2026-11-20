@@ -26,6 +26,9 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -45,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ai.idraak.stepskyscraper.core.designsystem.component.AutoSizeName
-import ai.idraak.stepskyscraper.core.designsystem.component.CountUpNumber
+import ai.idraak.stepskyscraper.core.designsystem.component.rememberCountUp
 import ai.idraak.stepskyscraper.core.designsystem.component.SsIconButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsMessageState
 import ai.idraak.stepskyscraper.core.designsystem.component.SsPrimaryButton
@@ -199,15 +202,21 @@ private fun CeremonySheet(content: CeremonyContent, onIntent: (CeremonyIntent) -
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             SsIcon(Symbol.Architecture, size = IconSize.ml, tint = c.primaryText)
-            Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                CountUpNumber(content.blueprints, SsTheme.type.bodySStrong, c.onSurface, prefix = "+", durationMs = 800)
-                Text(
-                    " " + stringResource(R.string.ceremony_blueprints_rest),
-                    style = SsTheme.type.bodyS,
-                    color = c.onSurface,
-                    modifier = Modifier.semantics { contentDescription = "" },
-                )
-            }
+            // Design: one sentence, "+120 Blueprints" bold, wrapping as a whole; the number counts up.
+            val shown = rememberCountUp(content.blueprints, durationMs = BLUEPRINT_COUNT_MS)
+            val amount = stringResource(R.string.ceremony_blueprints_amount, Formats.steps(shown))
+            val rest = stringResource(R.string.ceremony_blueprints_rest)
+            val spoken = stringResource(R.string.ceremony_blueprints_amount, Formats.steps(content.blueprints)) + " " + rest
+            Text(
+                buildAnnotatedString {
+                    withStyle(SsTheme.type.bodySStrong.toSpanStyle()) { append(amount) }
+                    append(" ")
+                    append(rest)
+                },
+                style = SsTheme.type.bodyS,
+                color = c.onSurface,
+                modifier = Modifier.weight(1f).clearAndSetSemantics { contentDescription = spoken },
+            )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(SsSpacing.s)) {
             SsPrimaryButton(stringResource(R.string.ceremony_share), { onIntent(CeremonyIntent.Share) }, Modifier.weight(1f), icon = Symbol.IosShare, large = false)
@@ -225,3 +234,5 @@ private fun previewCeremony() = CeremonyContent(5, "Marlow Spire", CityCalculato
 @ScreenPreviews
 @Composable
 private fun CeremonyPreview() = PreviewSurface { CeremonyScreen(CeremonyUiState(Lce.Content(previewCeremony()), sheetVisible = true), {}) }
+
+private const val BLUEPRINT_COUNT_MS = 800
