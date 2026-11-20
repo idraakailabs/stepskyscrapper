@@ -13,7 +13,7 @@
 |---|---|
 | **Live baseline** | Phase 1, version 1.0.0, commit `e5c003b` on `main` (not published) |
 | **Active phase** | Phase 2, Release blockers (not started) |
-| **Recommended next task** | [TECH-001](#tech-001) is blocked only on GitHub write access; once the push succeeds, start [TECH-005](#tech-005) (release signing, XS) and then [TECH-002](#tech-002) (Firebase). |
+| **Recommended next task** | [TECH-005](#tech-005): release signing. Smallest P0 (XS); a signed build is needed before Play products ([TECH-004](#tech-004)) can be created on a testing track. Then [TECH-002](#tech-002) (Firebase). |
 
 Update this table whenever a task starts, finishes or the active phase changes.
 
@@ -42,8 +42,7 @@ Architecture: [TECHNICAL.md](TECHNICAL.md). Known defects: [BUGS.md](BUGS.md). D
 - Health Connect + sensor fallback; deterministic, repeat-safe sync; all data on the device.
 - Clean modular architecture (MVI, Hilt, Room, DataStore, WorkManager); 84 passing tests; green
   `build test lint` and an R8 release APK.
-- Gaps: Firebase/AdMob/Play not configured, debug-signed release, no CI, the first push to GitHub pending,
-  six small design gaps (inventory items marked `[~]`).
+- Gaps: Firebase/AdMob/Play not configured, debug-signed release, no CI, six small design gaps (inventory items marked `[~]`).
 
 ---
 
@@ -55,7 +54,7 @@ testing track with crash reports, analytics, real ads and working purchases.
 
 | ID | Title | Type | Priority | Status | Depends on |
 |---|---|---|---|---|---|
-| [TECH-001](#tech-001) | Put the project under version control | Technical task | P1 | Blocked | GitHub write access |
+| [TECH-001](#tech-001) | Put the project under version control | Technical task | P1 | Done | — |
 | [TECH-002](#tech-002) | Configure Firebase (Analytics, Crashlytics, Remote Config) | Technical task | P0 | Planned | Firebase console |
 | [TECH-003](#tech-003) | Real AdMob ids and UMP consent message | Technical task | P0 | Planned | AdMob console |
 | [TECH-004](#tech-004) | Create Play billing products and test purchases | Technical task | P0 | Planned | Play Console |
@@ -126,7 +125,7 @@ Bug cards are in [BUGS.md](BUGS.md).
 
 <a id="tech-001"></a>
 ### TECH-001 — Put the project under version control
-- **Type:** Technical task · **Priority:** P1 · **Status:** Blocked (GitHub write access) · **Effort:** XS
+- **Type:** Technical task · **Priority:** P1 · **Status:** Done · **Effort:** XS
 - **Problem (verified):** `git rev-parse` failed in the project root; there is no history, no way to cite a
   baseline commit, and the doc update workflow can't diff changes.
 - **Solution:** `git init`, review `.gitignore` (it already excludes `google-services.json`, keystores and
