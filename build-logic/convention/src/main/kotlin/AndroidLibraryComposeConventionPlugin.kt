@@ -1,7 +1,7 @@
 import com.android.build.api.dsl.LibraryExtension
-import com.idraak.stepskyscraper.buildlogic.configureCompose
-import com.idraak.stepskyscraper.buildlogic.lib
-import com.idraak.stepskyscraper.buildlogic.libs
+import ai.idraak.stepskyscraper.buildlogic.configureCompose
+import ai.idraak.stepskyscraper.buildlogic.lib
+import ai.idraak.stepskyscraper.buildlogic.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

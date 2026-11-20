@@ -55,6 +55,7 @@ testing track with crash reports, analytics, real ads and working purchases.
 | ID | Title | Type | Priority | Status | Depends on |
 |---|---|---|---|---|---|
 | [TECH-001](#tech-001) | Put the project under version control | Technical task | P1 | Done | — |
+| [BUG-008](BUGS.md#bug-008) | Build feature module missing from Git | Confirmed bug | P0 | Fixed – unverified | — |
 | [TECH-002](#tech-002) | Configure Firebase (Analytics, Crashlytics, Remote Config) | Technical task | P0 | Planned | Firebase console |
 | [TECH-003](#tech-003) | Real AdMob ids and UMP consent message | Technical task | P0 | Planned | AdMob console |
 | [TECH-004](#tech-004) | Create Play billing products and test purchases | Technical task | P0 | Planned | Play Console |

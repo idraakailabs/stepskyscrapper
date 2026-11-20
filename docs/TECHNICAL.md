@@ -104,6 +104,8 @@ Live values (Firebase, AdMob, Play Console) weren't available; they are unverifi
 
 ## 6. Build, signing and release
 
+- Application id / namespace: `ai.idraak.stepskyscraper` (renamed from `com.idraak.stepskyscraper` on
+  2026-11-20, before any store release); library namespaces follow `ai.idraak.stepskyscraper.<module path>`.
 - Variants: `debug` (`.debug` suffix) and `release` (R8 minify + resource shrinking, `app/proguard-rules.pro`).
 - Signing: upload key from `keystore.properties` (git-ignored, `storeFile` relative to the root, e.g. under the
   ignored `keystore/` folder) or the `STEPSKY_*` environment variables in CI. Never the debug key: without a key

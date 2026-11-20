@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="build_overline_tower">Tower %1$d · %2$s</string>
+    <string name="build_overline_morning">Good morning · %1$s</string>
+    <string name="build_floors_of">%1$d of %2$d floors</string>
+    <string name="build_customise">Customise tower</string>
+    <string name="build_share">Share tower</string>
+    <string name="build_next_floor_in">Next floor in</string>
+    <string name="build_steps_unit">steps</string>
+    <string name="build_steps_today">&lt;b>%1$s&lt;/b> steps today</string>
+    <string name="build_steps_of_target">&lt;b>%1$s&lt;/b> of %2$s today</string>
+    <plurals name="build_floors_today">
+        <item quantity="one">&lt;b>%1$d&lt;/b> floor today</item>
+        <item quantity="other">&lt;b>%1$d&lt;/b> floors today</item>
+    </plurals>
+    <string name="build_fresh_day">A fresh day. Your tower is right where you left it.</string>
+    <string name="build_target_met">Target met</string>
+    <string name="build_syncing">Syncing…</string>
+    <string name="build_week_title">%1$d of %2$d floors this week</string>
+    <string name="build_week_to_go">%1$d to go · %2$s</string>
+    <plurals name="build_days_left">
+        <item quantity="one">%1$d day left</item>
+        <item quantity="other">%1$d days left</item>
+    </plurals>
+    <plurals name="build_week_topping">
+        <item quantity="one">%1$d floor to topping out</item>
+        <item quantity="other">%1$d floors to topping out</item>
+    </plurals>
+    <string name="build_week_bonus">Anything more today is a bonus</string>
+    <string name="build_week_rest">Resting? You can pause goals</string>
+    <string name="build_week_paused">Goals paused. Floors still count.</string>
+    <string name="build_week_reached">Weekly goal reached. Every floor counts.</string>
+    <string name="build_week_help">Steps not arriving? Let\'s check</string>
+    <string name="build_week_open">Weekly detail</string>
+    <string name="build_ring_percent">%1$d%%</string>
+    <string name="build_connect_title">Connect steps to start building.</string>
+    <string name="build_connect_body">This is a demo tower. Allow step access and your real walks start building floors.</string>
+    <string name="build_connect_cta">Connect steps</string>
+    <string name="build_hc_missing_cta">Install Health Connect</string>
+    <string name="build_hc_update_cta">Update Health Connect</string>
+    <plurals name="build_synced">
+        <item quantity="one">Synced. 1 floor added.</item>
+        <item quantity="other">Synced. %1$d floors added.</item>
+    </plurals>
+    <string name="build_synced_none">Synced. Your tower is up to date.</string>
+    <string name="build_view">View</string>
+    <string name="build_zoom_label">Floor %1$d · %2$s of 1,000 steps</string>
+    <string name="build_tower_actions">Tap to zoom to the active floor, long-press to see the other side</string>
+    <string name="build_loading">Loading your tower</string>
+    <string name="build_error_title">Your tower is safe</string>
+
+    <string name="ceremony_topped_out">Topped out</string>
+    <string name="ceremony_stats">%1$d floors · %2$d Build Days · %3$s steps</string>
+    <string name="ceremony_blueprints_rest">Blueprints for new crowns and palettes</string>
+    <string name="ceremony_share">Share</string>
+    <string name="ceremony_next">Start next tower</string>
+    <string name="ceremony_close">Close</string>
+    <string name="ceremony_skip">Tap to skip the animation</string>
+    <string name="ceremony_tower">%1$s, topped out with its crown</string>
+
+    <string name="next_title">Pick a style for your next tower</string>
+    <string name="next_cta">Lay the foundation</string>
+    <string name="next_back">Back</string>
+</resources>

@@ -36,10 +36,10 @@ val hasReleaseSigning = listOf(releaseStoreFile, releaseStorePassword, releaseKe
     rootProject.file(releaseStoreFile!!).exists()
 
 android {
-    namespace = "com.idraak.stepskyscraper"
+    namespace = "ai.idraak.stepskyscraper"
 
     defaultConfig {
-        applicationId = "com.idraak.stepskyscraper"
+        applicationId = "ai.idraak.stepskyscraper"
         versionCode = 1
         versionName = "1.0.0"
         manifestPlaceholders["admobAppId"] = providers.gradleProperty("ADMOB_APP_ID").get()

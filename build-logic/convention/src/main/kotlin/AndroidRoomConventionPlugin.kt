@@ -1,6 +1,6 @@
 import androidx.room.gradle.RoomExtension
-import com.idraak.stepskyscraper.buildlogic.lib
-import com.idraak.stepskyscraper.buildlogic.libs
+import ai.idraak.stepskyscraper.buildlogic.lib
+import ai.idraak.stepskyscraper.buildlogic.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

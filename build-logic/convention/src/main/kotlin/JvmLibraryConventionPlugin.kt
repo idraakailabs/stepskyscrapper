@@ -1,7 +1,7 @@
-import com.idraak.stepskyscraper.buildlogic.JAVA_VERSION
-import com.idraak.stepskyscraper.buildlogic.configureKotlinCompiler
-import com.idraak.stepskyscraper.buildlogic.lib
-import com.idraak.stepskyscraper.buildlogic.libs
+import ai.idraak.stepskyscraper.buildlogic.JAVA_VERSION
+import ai.idraak.stepskyscraper.buildlogic.configureKotlinCompiler
+import ai.idraak.stepskyscraper.buildlogic.lib
+import ai.idraak.stepskyscraper.buildlogic.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension

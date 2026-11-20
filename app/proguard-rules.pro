@@ -8,10 +8,10 @@
     *** Companion;
     kotlinx.serialization.KSerializer serializer(...);
 }
--keep,includedescriptorclasses class com.idraak.stepskyscraper.**$$serializer { *; }
+-keep,includedescriptorclasses class ai.idraak.stepskyscraper.**$$serializer { *; }
 
 # Glance receivers are referenced from the manifest.
--keep class com.idraak.stepskyscraper.widget.** extends androidx.glance.appwidget.GlanceAppWidgetReceiver
+-keep class ai.idraak.stepskyscraper.widget.** extends androidx.glance.appwidget.GlanceAppWidgetReceiver
 
 # Crashlytics: readable stack traces with uploaded mapping files.
 -keepattributes SourceFile, LineNumberTable

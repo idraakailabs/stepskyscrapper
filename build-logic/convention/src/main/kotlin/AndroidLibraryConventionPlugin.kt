@@ -1,9 +1,9 @@
 import com.android.build.api.dsl.LibraryExtension
-import com.idraak.stepskyscraper.buildlogic.JAVA_VERSION
-import com.idraak.stepskyscraper.buildlogic.configureKotlinCompiler
-import com.idraak.stepskyscraper.buildlogic.lib
-import com.idraak.stepskyscraper.buildlogic.libs
-import com.idraak.stepskyscraper.buildlogic.version
+import ai.idraak.stepskyscraper.buildlogic.JAVA_VERSION
+import ai.idraak.stepskyscraper.buildlogic.configureKotlinCompiler
+import ai.idraak.stepskyscraper.buildlogic.lib
+import ai.idraak.stepskyscraper.buildlogic.libs
+import ai.idraak.stepskyscraper.buildlogic.version
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -32,8 +32,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             lint {
                 targetSdk = libs.version("targetSdk").toInt()
             }
-            // Namespace derived from the Gradle path: :core:data -> com.idraak.stepskyscraper.core.data
-            namespace = "com.idraak.stepskyscraper." + path.removePrefix(":").replace(':', '.').replace('-', '_')
+            // Namespace derived from the Gradle path: :core:data -> ai.idraak.stepskyscraper.core.data
+            namespace = "ai.idraak.stepskyscraper." + path.removePrefix(":").replace(':', '.').replace('-', '_')
         }
         configureKotlinCompiler()
         dependencies {

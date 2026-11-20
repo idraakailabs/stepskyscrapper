@@ -3,7 +3,17 @@
 /local.properties
 .idea/
 .DS_Store
-build/
+# Gradle output folders. Listed explicitly: a blanket `build/` rule would also hide the :feature:build module
+# and the Kotlin package folder `.../feature/build/`.
+/build/
+/app/build/
+/baselineprofile/build/
+/widget/build/
+/core/build/
+/core/*/build/
+/feature/*/build/
+/build-logic/build/
+/build-logic/*/build/
 /captures
 .externalNativeBuild
 .cxx
@@ -18,3 +28,4 @@ design/fonts-src/
 
 # Upload keystore folder
 keystore/
+/feature/build/intermediates/

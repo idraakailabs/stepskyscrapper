@@ -4,7 +4,7 @@ plugins {
     `kotlin-dsl`
 }
 
-group = "com.idraak.stepskyscraper.buildlogic"
+group = "ai.idraak.stepskyscraper.buildlogic"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17

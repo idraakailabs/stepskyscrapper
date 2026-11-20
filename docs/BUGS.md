@@ -32,6 +32,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-005](#bug-005) | Skyline ignores the tower to highlight after the ceremony | P3 | Confirmed (code) | Open |
 | [BUG-006](#bug-006) | Onboarding payoff shows a 20% partial floor at 0 steps and rounds to segments | P3 | Confirmed (code) | Open |
 | [BUG-007](#bug-007) | Ad consent form may appear just by opening Skyline | P3 | Suspected | Open |
+| [BUG-008](#bug-008) | The Build feature module was missing from the Git repository | P0 | Confirmed (reproduced) | Fixed – unverified |
 
 ---
 
@@ -144,3 +145,23 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Acceptance criteria:**
   1. EEA debug geography: no consent form appears until the ad button is tapped (device).
 - **Resolution:** — · **Verification:** —
+
+<a id="bug-008"></a>
+## BUG-008 — The Build feature module was missing from the Git repository
+
+- **Priority:** P0 · **Classification:** Confirmed (reproduced) · **Status:** Fixed – unverified
+- **Evidence:** `.gitignore` had a blanket `build/` rule, which also matched the `:feature:build` module folder
+  (`feature/build/`) and the Kotlin package folder `…/feature/build/`. `git check-ignore -v` reported
+  `.gitignore:6:build/` for `feature/build/src/main/kotlin/…/BuildScreen.kt`; commits `e5c003b`…`df71b8f` on
+  `origin/main` contain no `feature/build` files.
+- **Files:** `.gitignore`; all of `feature/build/`.
+- **Impact:** a fresh clone of `main` doesn't build (Build tab, ceremony and next-tower screens missing);
+  found during the package rename when KSP still compiled the un-renamed, untracked sources.
+- **Proposed fix:** replace `build/` with explicit Gradle output folders (`/app/build/`, `/core/*/build/`,
+  `/feature/*/build/`, …) and add the module's sources.
+- **Acceptance criteria:**
+  1. `git ls-tree -r origin/main --name-only` lists `feature/build/src/main/kotlin/…/BuildScreen.kt`.
+  2. A fresh clone of `main` passes `./gradlew build`.
+  3. No Gradle output (`*/build/intermediates`, `generated`, `outputs`) is tracked.
+- **Resolution:** `.gitignore` now lists the Gradle output folders explicitly; `feature/build` sources added
+  (commit below this entry's change). · **Verification:** —
