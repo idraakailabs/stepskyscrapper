@@ -11,8 +11,10 @@
 **Status key:** **Done** (checked, evidence given) · **Pending – user** (needs your keys, accounts or console) ·
 **Manual verification** (needs a device or situation not available here) · **Blocked** (waiting on another item).
 
-**Bottom line:** no known code blocker remains. The upload is blocked only on items that need you: upload key,
-Firebase, AdMob ids and messages, the hosted privacy policy, and the Play Console forms.
+**Bottom line:** no known code blocker remains. Firebase (project `skyscrapper-a675f`, Remote Config)
+and RevenueCat (SDK, API key, offering) are set up. The upload is blocked only on items that need your accounts:
+upload key, live AdMob ids and messages, the hosted privacy policy, RevenueCat's Play service account, and the Play
+Console forms.
 
 ## 1. Bug fixes and verification
 - [x] **Done** — BUG-016 sync icon wobble, BUG-017 capsule ripple: fixed and checked on the Pixel 6a (frame
@@ -140,7 +142,8 @@ Firebase, AdMob ids and messages, the hosted privacy policy, and the Play Consol
 ## 15. Final pre-upload verification
 - [ ] `./gradlew :app:verifyReleaseSigning :app:verifyReleaseAdMob :app:verifyReleasePrivacyPolicy` passes.
 - [ ] `./gradlew clean :app:bundleRelease` succeeds with no `w: AdMob: … ads disabled` line; `jarsigner -verify` OK.
-- [ ] `google-services.json` present; Crashlytics mapping upload ran in the build log.
+- [x] `google-services.json` present (dev machine, 2026-11-21).
+- [ ] Crashlytics mapping upload ran in the release build log.
 - [ ] Install from internal testing; onboarding with Health Connect, Build sync, Skyline, Share, paywall prices load.
 - [ ] `ads_enabled` still false until AdMob approval and UMP messages are live.
 - [ ] Play Console › Dashboard shows no outstanding declarations; Data safety matches the hosted policy.
