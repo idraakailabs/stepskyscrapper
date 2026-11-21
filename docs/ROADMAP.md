@@ -66,6 +66,7 @@ testing track with crash reports, analytics, real ads and working purchases.
 | [TECH-013](#tech-013) | Play release readiness review | Technical task | P0 | Done | — |
 | [TECH-014](#tech-014) | Architect Pass purchases through RevenueCat | Technical task | P0 | In Progress | Play service account, TECH-004 |
 | [TECH-015](#tech-015) | Device smoke test, crash fixes, pressed-state polish, paywall speed | Technical task | P0 | In Progress | — |
+| [TECH-016](#tech-016) | Night Tower launcher icon | Technical task | P1 | In Progress (device check pending) | — |
 | [BUG-019](BUGS.md#bug-019) | Paywall promises a trial reminder the app never sends | Confirmed bug | P1 | Done | — |
 | [BUG-018](BUGS.md#bug-018) | Health Connect privacy link opens Build | Confirmed bug | P1 | Done | — |
 
@@ -394,6 +395,22 @@ Bug cards are in [BUGS.md](BUGS.md).
   in [TECHNICAL.md §6](TECHNICAL.md#6-build-signing-and-release)); new unit tests `AdMobPrivacyChoicesTest` (2) and
   `MeTest.adPrivacyChoicesFollowTheUmpRequirement`; `ktlintFormat build test lint` green. Device checks of the two
   UI changes are listed in RELEASE-READINESS.md.
+
+<a id="tech-016"></a>
+### TECH-016 — Night Tower launcher icon
+- **Type:** Technical task · **Priority:** P1 · **Status:** In Progress (device check pending) · **Effort:** XS
+- **Problem:** the launcher icon was a placeholder deco tower on flat sky blue; the design project's icon review
+  (`icons/README.md`) picked "Night Tower" as the top concept.
+- **Solution:** install the Night Tower adaptive icon from Claude Design (`icons/concept-1-night-tower`): background,
+  foreground and monochrome vector drawables plus `mipmap-anydpi/ic_launcher*.xml`; give the splash icon a navy disc.
+- **Acceptance criteria:**
+  1. The launcher, App info and recents show the Night Tower icon in circle and rounded-square masks (device).
+  2. Android 13+ themed icons use the monochrome layer.
+  3. The splash shows the tower legibly on the cream background.
+- **Progress (2026-11-21):** files copied verbatim from the design (etag 1795280601051559); the unused
+  `ic_launcher_background` colour was replaced by `splash_icon_background` (#1F2450). `assembleDebug` and `lintDebug`
+  pass. Device check not done: the Pixel 6a disconnected. Play Console icon still to upload
+  ([design-inventory.md](design-inventory.md)).
 
 <a id="tech-015"></a>
 ### TECH-015 — Device smoke test, crash fixes, pressed-state polish, paywall speed

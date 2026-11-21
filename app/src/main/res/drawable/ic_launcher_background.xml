@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Night Tower launcher background (Claude Design, icons/concept-1-night-tower): dusk sky, glow and three stars. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+  <path android:pathData="M0 0 H108 V108 H0 Z">
+    <aapt:attr name="android:fillColor">
+      <gradient android:type="linear" android:startX="54" android:startY="10" android:endX="54" android:endY="100">
+        <item android:offset="0" android:color="#FF1F2450"/>
+        <item android:offset="0.5" android:color="#FF6B4886"/>
+        <item android:offset="0.86" android:color="#FFEE9F72"/>
+        <item android:offset="1" android:color="#FFF6B884"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path android:pathData="M12.69 70.52 A41.31 41.31 0 1 0 95.31 70.52 A41.31 41.31 0 1 0 12.69 70.52 Z">
+    <aapt:attr name="android:fillColor">
+      <gradient android:type="radial" android:centerX="54" android:centerY="70.52" android:gradientRadius="41.31">
+        <item android:offset="0" android:color="#8CFFD27A"/>
+        <item android:offset="1" android:color="#00FFD27A"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path android:pathData="M30 28.4 L30.59 30.41 L32.6 31 L30.59 31.59 L30 33.6 L29.41 31.59 L27.4 31 L29.41 30.41 Z" android:fillColor="#FFE6B8"/>
+  <path android:pathData="M79 25 L79.45 26.55 L81 27 L79.45 27.45 L79 29 L78.55 27.45 L77 27 L78.55 26.55 Z" android:fillColor="#FFE6B8"/>
+  <path android:pathData="M82 44.5 L82.34 45.66 L83.5 46 L82.34 46.34 L82 47.5 L81.66 46.34 L80.5 46 L81.66 45.66 Z" android:fillColor="#FFE6B8"/>
+</vector>

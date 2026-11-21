@@ -173,6 +173,15 @@ when it couldn't be.
 - [x] Medium 4×2 (sky panel tower with crane, name, number, floors today, week x/y, bar), light + dark
 - [x] Tap → Build; update after each sync
 
+### App icon and splash (`app/src/main/res`)
+- [x] Launcher icon *(2026-11-21, Night Tower, TECH-016; device check pending)*: adaptive icon from Claude Design
+  `icons/concept-1-night-tower`: `drawable/ic_launcher_background.xml` (dusk gradient, glow, stars),
+  `ic_launcher_foreground.xml` (Art Deco tower, lit windows, gold crown and spire glow), `ic_launcher_monochrome.xml`
+  (Android 13+ themed icon); `mipmap-anydpi/ic_launcher*.xml`. No PNG mipmaps needed (minSdk 26).
+- [x] Splash: the Night Tower foreground on a navy (#1F2450) icon disc over the cream window background.
+- [ ] Play Store icon: upload `icons/concept-1-night-tower/play-512.png` (same as `store-listing/graphics/app-icon-512.png`)
+  from the design project in Play Console.
+
 ## 5. Copy (verbatim, `strings.xml`)
 All UI strings from the design are in `values/strings.xml` under the screen prefixes (`onb_`, `build_`, `ceremony_`, `skyline_`, `customise_`, `me_`, `ach_`, `share_`, `paywall_`, `help_`, `widget_`). Copy audit: no "streak", "missed", "lost", "behind", "only" in user-facing strings.
 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Night Tower themed icon (Android 13+): one colour at stepped alpha keeps the 3D read (Claude Design, concept 1). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+  <path android:pathData="M37.9 81.47 L54 90.77 L54 88.08 L37.9 78.79 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.3"/>
+  <path android:pathData="M70.1 81.47 L54 90.77 L54 88.08 L70.1 78.79 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.2"/>
+  <path android:pathData="M54 69.49 L70.1 78.79 L54 88.08 L37.9 78.79 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.3"/>
+  <path android:pathData="M42.37 78.79 L54 85.5 L54 65.88 L42.37 59.16 Z" android:fillColor="#FFFFFF"/>
+  <path android:pathData="M65.63 78.79 L54 85.5 L54 65.88 L65.63 59.16 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.5"/>
+  <path android:pathData="M54 52.45 L65.63 59.16 L54 65.88 L42.37 59.16 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.8"/>
+  <path android:pathData="M45.06 59.16 L54 64.33 L54 49.87 L45.06 44.7 Z" android:fillColor="#FFFFFF"/>
+  <path android:pathData="M62.94 59.16 L54 64.33 L54 49.87 L62.94 44.7 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.5"/>
+  <path android:pathData="M54 39.54 L62.94 44.7 L54 49.87 L45.06 44.7 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.8"/>
+  <path android:pathData="M47.56 44.7 L54 48.42 L54 39.13 L47.56 35.41 Z" android:fillColor="#FFFFFF"/>
+  <path android:pathData="M60.44 44.7 L54 48.42 L54 39.13 L60.44 35.41 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.5"/>
+  <path android:pathData="M54 31.69 L60.44 35.41 L54 39.13 L47.56 35.41 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.8"/>
+  <path android:pathData="M49.71 35.41 L54 37.89 L54 32.21 L49.71 29.73 Z" android:fillColor="#FFFFFF"/>
+  <path android:pathData="M58.29 35.41 L54 37.89 L54 32.21 L58.29 29.73 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.6"/>
+  <path android:pathData="M54 27.25 L58.29 29.73 L54 32.21 L49.71 29.73 Z" android:fillColor="#FFFFFF"/>
+  <path android:pathData="M51.32 29.73 L54 31.28 L54 22.5 Z" android:fillColor="#FFFFFF"/>
+  <path android:pathData="M56.68 29.73 L54 31.28 L54 22.5 Z" android:fillColor="#FFFFFF" android:fillAlpha="0.6"/>
+</vector>

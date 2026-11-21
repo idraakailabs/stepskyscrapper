@@ -131,7 +131,8 @@ rows don't apply to that build, but declare what the published build does.
 - [ ] App name (≤ 30 characters), short description (≤ 80), full description (≤ 4,000) that explains Health Connect
   use plainly ("reads your daily step count only; steps never leave your phone") and mentions the optional rewarded
   ad and Architect Pass.
-- [ ] App icon 512 × 512 PNG (32-bit, ≤ 1 MB) from the launcher icon source.
+- [ ] App icon 512 × 512 PNG (32-bit, ≤ 1 MB): the Night Tower `play-512.png` from the Claude Design project
+  (`icons/concept-1-night-tower/play-512.png`, also `store-listing/graphics/app-icon-512.png`).
 - [ ] Feature graphic 1024 × 500 JPEG or 24-bit PNG.
 - [ ] Phone screenshots: at least 2 (aim for 4–8), PNG or JPEG, each side 320–3,840 px, and the long side at most
   twice the short side. **Captures from a 20:9 phone (1080 × 2400, Pixel 6a) and the Roborazzi baselines
