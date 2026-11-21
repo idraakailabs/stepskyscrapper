@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -58,7 +59,8 @@ fun SsCard(
 ) {
     Column(
         modifier
-            .background(color, shape)
+            .clip(shape)
+            .background(color)
             .then(if (onClick != null) Modifier.clickable(onClickLabel = onClickLabel, role = Role.Button, onClick = onClick) else Modifier)
             .padding(padding),
         content = content,
@@ -116,8 +118,10 @@ fun SsRadioCard(
     Row(
         modifier
             .fillMaxWidth()
-            .background(c.surface, shape)
+            // Border outside the clip keeps its anti-aliased edge; the clip only bounds the ripple.
             .border(if (selected) 2.dp else 1.dp, if (selected) c.ink else c.outlineCard, shape)
+            .clip(shape)
+            .background(c.surface)
             .selectable(selected, role = Role.RadioButton, onClick = onClick)
             .padding(padding),
         verticalAlignment = Alignment.CenterVertically,
@@ -167,7 +171,9 @@ fun SsSegmentedToggle(
                 Modifier
                     .then(if (large) Modifier.weight(1f) else Modifier)
                     .height(if (large) 40.dp else 30.dp)
-                    .background(if (isSelected) c.surface else Color.Transparent, SsRadius.shapeFull)
+                    // Clip first so the press ripple stays inside the capsule instead of a rectangle.
+                    .clip(SsRadius.shapeFull)
+                    .background(if (isSelected) c.surface else Color.Transparent)
                     .selectable(isSelected, role = Role.Tab) { onSelect(i) }
                     .padding(horizontal = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,

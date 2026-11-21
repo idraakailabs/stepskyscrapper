@@ -71,6 +71,7 @@ import ai.idraak.stepskyscraper.core.ui.component.SystemBarsEffect
 import ai.idraak.stepskyscraper.core.ui.format.Formats
 import ai.idraak.stepskyscraper.core.ui.mvi.Lce
 import ai.idraak.stepskyscraper.core.ui.platform.LocalPlatformActions
+import ai.idraak.stepskyscraper.core.ui.platform.awaitNotificationPermission
 import ai.idraak.stepskyscraper.core.ui.preview.PreviewSurface
 import ai.idraak.stepskyscraper.core.ui.preview.ScreenPreviews
 import ai.idraak.stepskyscraper.core.ui.tower.toSpec
@@ -91,8 +92,14 @@ fun CeremonyRoute(
         viewModel.effects.collect { e ->
             when (e) {
                 is CeremonyEffect.Share -> onShare(e.towerIndex)
-                is CeremonyEffect.StartNext -> onStartNext(e.showPaywall)
-                is CeremonyEffect.Close -> onClose(e.towerIndex, e.showPaywall)
+                is CeremonyEffect.StartNext -> {
+                    if (e.askNotifications) platform.awaitNotificationPermission()
+                    onStartNext(e.showPaywall)
+                }
+                is CeremonyEffect.Close -> {
+                    if (e.askNotifications) platform.awaitNotificationPermission()
+                    onClose(e.towerIndex, e.showPaywall)
+                }
             }
         }
     }

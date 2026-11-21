@@ -1,47 +1,141 @@
 # Play Console release checklist
 
-## Before the first upload
-- [ ] **Firebase**: create the project, add `app/google-services.json` (git-ignored). The Google Services and Crashlytics plugins apply automatically when the file exists. In Remote Config, create `tower_ladder` = `10,25,50,100,160,250`.
-- [ ] **AdMob**: create the app and one *Rewarded* unit; set `ADMOB_APP_ID` and `ADMOB_REWARDED_UNIT_ID` in `~/.gradle/gradle.properties` or CI (defaults are Google's public test ids). Configure the UMP consent message (GDPR + US states) in AdMob › Privacy & messaging.
-- [ ] **Billing products** (Monetize › Products):
-  - Subscription `architect_pass` with base plans `monthly` (P1M) and `annual` (P1Y); on `annual`, add an offer with a 7-day free-trial phase for new customers.
-  - One-time product `architect_pass_lifetime`.
-- [ ] **Signing**: create the upload key yourself (you choose the passwords; keep the file and passwords backed up
-  outside Git), copy `keystore.properties.example` to `keystore.properties` and fill it in, enrol in Play App
-  Signing, then `./gradlew :app:bundleRelease`. Key creation (JDK keytool):
-  `keytool -genkeypair -v -keystore keystore/upload-keystore.jks -alias upload -keyalg RSA -keysize 4096 -validity 10000`
-  CI: set `STEPSKY_KEYSTORE_FILE`, `STEPSKY_KEYSTORE_PASSWORD`, `STEPSKY_KEY_ALIAS`, `STEPSKY_KEY_PASSWORD`.
-- [ ] **Privacy policy**: host it (contents: see Help & privacy screen and the Data Safety answers below) and set `PRIVACY_POLICY_URL`; optionally `SUPPORT_EMAIL` for diagnostics.
-- [ ] **Baseline profile**: with a device or emulator attached, run `./gradlew :app:generateBaselineProfile` and commit the generated profile.
+> Practical steps for the first upload of `ai.idraak.stepskyscraper` 1.0.0 (versionCode 1). Overall status and
+> sign-off: [RELEASE-READINESS.md](RELEASE-READINESS.md). The answers below are drafts based on the code as of
+> 2026-11-21; check them against Play Console's current wording when you fill in the forms. Nothing here
+> guarantees Play acceptance.
 
-## Health apps declaration (App content › Health apps)
-- [ ] Category: *Fitness / Activity tracking*. Declare Health Connect use.
-- [ ] Permissions requested: `READ_STEPS` (core feature: steps build floors); `READ_HEALTH_DATA_IN_BACKGROUND` (widget and background sync keep the tower current; requested only when Health Connect reports the feature). No write permissions, no other data types.
-- [ ] Justification: steps are read only to compute floors on the device; no transfer off-device; no advertising or analytics use.
-- [ ] `ACTIVITY_RECOGNITION` is used only for the step-counter fallback when Health Connect is unavailable.
-- [ ] Health Connect rationale screen: the app handles `ACTION_SHOW_PERMISSIONS_RATIONALE` and the Android 14 `VIEW_PERMISSION_USAGE` alias.
+## 1. Before the first build (needs you)
+- [ ] **Firebase**: create the project with an Android app `ai.idraak.stepskyscraper`, download
+  `google-services.json` to `app/` (git-ignored). The Google Services and Crashlytics plugins apply automatically
+  when the file exists. In Remote Config add `tower_ladder` (String, `10,25,50,100,160,250`) and `ads_enabled`
+  (Boolean, default **false**), then publish. Set the Analytics data-retention period you name in the privacy policy.
+- [ ] **AdMob**: create the app and one *Rewarded* unit. Put the live ids in `~/.gradle/gradle.properties` (outside the
+  repo) or CI secrets: `ADMOB_APP_ID_PROD=ca-app-pub-…~…` and `ADMOB_REWARDED_UNIT_ID_PROD=ca-app-pub-…/…`.
+  In AdMob › Privacy & messaging, create and **publish** a GDPR message and a US-state regulations message. Register
+  your own phones as test devices (Settings › Test devices). After the listing is live, link the app to Play and host
+  `app-ads.txt` on the developer website named in the listing.
+- [ ] **Privacy policy**: fill in the placeholders in [privacy-policy.md](privacy-policy.md), host it at a public https
+  URL, and set `PRIVACY_POLICY_URL=https://…` in `gradle.properties` (this value is public, so committing it is fine).
+  Optionally set `SUPPORT_EMAIL` for the diagnostic email.
+- [ ] **Upload key**: create it yourself (you choose the passwords; back up the file and passwords outside Git):
+  `keytool -genkeypair -v -keystore keystore/upload-keystore.jks -alias upload -keyalg RSA -keysize 4096 -validity 10000`.
+  Copy `keystore.properties.example` to `keystore.properties` and fill it in. CI alternative: `STEPSKY_KEYSTORE_FILE`,
+  `STEPSKY_KEYSTORE_PASSWORD`, `STEPSKY_KEY_ALIAS`, `STEPSKY_KEY_PASSWORD`.
+- [ ] Optional: with a device attached, `./gradlew :app:generateBaselineProfile` and commit the profile
+  ([TECH-006](ROADMAP.md#tech-006)).
 
-## Data safety form
-| Question | Answer |
+## 2. Build the signed AAB
+1. Check the configuration (each fails with the reason if something is missing):
+
+   ```powershell
+   ./gradlew :app:verifyReleaseSigning :app:verifyReleaseAdMob :app:verifyReleasePrivacyPolicy
+   ```
+
+2. Build:
+
+   ```powershell
+   ./gradlew clean :app:bundleRelease
+   ```
+
+   Output: `app/build/outputs/bundle/release/app-release.aab`. With `google-services.json` present, the Crashlytics
+   plugin uploads the R8 mapping file during this build (needs network).
+3. Sanity checks:
+
+   ```powershell
+   jarsigner -verify app/build/outputs/bundle/release/app-release.aab
+   ```
+
+   The build log must not show `w: AdMob: … ads disabled`. Optionally install it on a phone with `bundletool` and
+   open every tab ([TECH-007](ROADMAP.md#tech-007)).
+
+## 3. Create the app and upload to internal testing
+1. Play Console › Create app: name "Step Skyscraper", default language, **App**, **Free** (with in-app purchases),
+   accept the declarations.
+2. Setup › App signing: use **Play App Signing** (Google-generated app signing key); your key above is the upload key.
+3. Testing › Internal testing › Create new release › upload `app-release.aab`. Release name `1.0.0 (1)`. Add release
+   notes. Add testers (email list) and save. Roll out to internal testing.
+4. Fix anything the pre-launch report flags. Every later upload needs a higher `versionCode` (`app/build.gradle.kts`).
+5. Monetize › Products: create the billing products (below), then add license testers (Setup › License testing).
+
+## 4. Billing products
+- Subscription `architect_pass` with base plans `monthly` (P1M) and `annual` (P1Y); on `annual`, an offer with a
+  7-day free-trial phase for new customers.
+- One-time product `architect_pass_lifetime`.
+- Products can only be created after an APK/AAB with the billing permission is uploaded (step 3).
+
+## 5. App content declarations
+| Declaration | Draft answer |
 |---|---|
-| Data collected or shared | **Yes**, collected (not shared): App activity (app interactions), App info and performance (crash logs, diagnostics), Device or other IDs (Firebase installation id; AdMob advertising id only after consent) |
-| Health and fitness data | **Not collected**: steps are processed on the device only and never transmitted |
-| Shared with third parties | Advertising: AdMob receives device/ad identifiers for the opt-in rewarded ad only; no step or health data |
-| Encrypted in transit | Yes (Firebase, AdMob over TLS) |
-| Users can request deletion | Data is on-device; uninstalling or clearing data deletes it. Analytics can be reset via Firebase installation deletion |
-| Account required | No |
-| Purpose | Analytics (app improvement), Advertising (rewarded ad only), App functionality |
+| Privacy policy | The hosted URL (same as `PRIVACY_POLICY_URL`) |
+| App access | **All functionality is available without special access** (no login, no account) |
+| Ads | **Yes, my app contains ads** (one opt-in rewarded ad on Skyline; none on Build, onboarding or the ceremony) |
+| Content rating | Complete the IARC questionnaire honestly: reference app/utility-type, no violence, no user-generated content shared in-app, digital purchases yes, ads yes. The resulting rating is set by IARC, not by us |
+| Target audience and content | **13+ only** (for example 13–15, 16–17, 18+, or 18+ alone). Don't select any under-13 group, or the Families policy and child-directed ad settings apply. Not designed for children; no appeal to children in the listing |
+| News app | No |
+| COVID-19 tracing / status | No |
+| Data safety | Section 7 below |
+| Government app | No |
+| Financial features | None |
+| Health | Health apps declaration, section 6 below |
+| Advertising ID | **Yes**, the app uses the advertising ID, for **Advertising or marketing** (Google Mobile Ads SDK merges `com.google.android.gms.permission.AD_ID`). Firebase Analytics ad-id collection is off |
 
-## Ads and families
-- [ ] Ads declaration: **Contains ads** (one opt-in rewarded ad on the Skyline tab; no ads on Build, onboarding or the topping-out ceremony).
-- [ ] Target audience: 13+ (not designed for children); set COPPA/child-directed tags accordingly.
-- [ ] Content rating questionnaire (IARC).
+## 6. Health apps declaration (App content › Health apps)
+- [ ] Category: *Fitness / Activity tracking*. Declare Health Connect use.
+- [ ] Permissions: `READ_STEPS` (core feature: steps build floors); `READ_HEALTH_DATA_IN_BACKGROUND` (widget and
+  periodic sync keep the tower current; requested only when Health Connect supports the feature). No write
+  permissions, no other data types.
+- [ ] Justification: steps are read only to compute floors on the device; never transferred off the device; never used
+  for advertising or analytics.
+- [ ] `ACTIVITY_RECOGNITION` is used only for the step-counter fallback when Health Connect is unavailable.
+- [ ] Privacy rationale: Health Connect's privacy link (`androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE`, Android
+  13 and lower) and permission-usage screen (`VIEW_PERMISSION_USAGE` alias, Android 14+) open the in-app Help &
+  privacy screen, which links the hosted policy. Verify on a device after setting `PRIVACY_POLICY_URL`
+  ([TECH-011](ROADMAP.md#tech-011) criterion 2).
 
-## Testing track requirements
-- [ ] **Closed testing**: new personal developer accounts must run a closed test with **at least 12 testers opted in for 14 consecutive days** before applying for production.
-- [ ] License testers for billing (Setup › License testing) to exercise purchase, trial and restore.
-- [ ] Test on: Android 8 (no Health Connect → sensor fallback), Android 13 (Health Connect app install path), Android 14+ (framework Health Connect), Samsung device with Samsung Health.
+## 7. Data safety form (draft)
+"Collected" includes data sent off the device by SDKs in the app. Step data is processed on the device only and
+isn't declared as collected.
 
-## Store listing
-- [ ] Screenshots (use the Roborazzi outputs in `feature/*/src/test/screenshots` as a starting point), feature graphic, short and full description.
-- [ ] Health Connect data-use disclosure in the listing description.
+| Data type | Collected / shared | Source | Purposes | Optional? |
+|---|---|---|---|---|
+| Health and fitness | **Not collected** | Steps stay on the device | — | — |
+| Location › Approximate location | Collected and shared | AdMob (IP-derived), only when an ad is requested | Advertising or marketing, Analytics, Fraud prevention | Optional (opt-in ad) |
+| App activity › App interactions | Collected (Analytics); collected and shared (AdMob ad interactions) | Firebase Analytics events (no step values); AdMob | Analytics; Advertising or marketing | Analytics: required. AdMob: optional |
+| App info and performance › Crash logs, Diagnostics | Collected (Crashlytics); collected and shared (AdMob diagnostics) | Firebase Crashlytics; AdMob | App functionality, Analytics; Advertising, Fraud prevention | Crashlytics: required |
+| Device or other IDs | Collected (Firebase installation / app-instance id); collected and shared (advertising ID via AdMob, after consent where required) | Firebase; AdMob | Analytics, App functionality; Advertising or marketing, Fraud prevention | Firebase: required. AdMob: optional |
+| Financial info / Purchase history | Not declared: payments are processed by Google Play; the app keeps only the entitlement on the device. Recheck Play's current guidance for Play Billing | Play Billing | — | — |
+| Personal info, messages, photos, contacts, calendar, files | Not collected (share images and the diagnostic email are sent only by the user through Android's share sheet) | — | — | — |
+
+| Question | Draft answer |
+|---|---|
+| Is data encrypted in transit? | Yes (Firebase, AdMob and Play over TLS) |
+| Can users request deletion? | Choose based on your support process. On-device data is deleted by clearing data or uninstalling; there's no account. Firebase data isn't linked to identity; if you answer Yes, offer deletion requests through the contact email in the policy |
+| Account creation | None |
+| Independent security review | No |
+| Families policy commitment | Not applicable (13+ audience) |
+
+Keep this table consistent with [privacy-policy.md](privacy-policy.md). If Firebase isn't configured for a build, its
+rows don't apply to that build, but declare what the published build does.
+
+## 8. Store listing
+- [ ] App name (≤ 30 characters), short description (≤ 80), full description (≤ 4,000) that explains Health Connect
+  use plainly ("reads your daily step count only; steps never leave your phone") and mentions the optional rewarded
+  ad and Architect Pass.
+- [ ] App icon 512 × 512 PNG (32-bit, ≤ 1 MB) from the launcher icon source.
+- [ ] Feature graphic 1024 × 500 JPEG or 24-bit PNG.
+- [ ] Phone screenshots: at least 2 (aim for 4–8), PNG or JPEG, each side 320–3,840 px, and the long side at most
+  twice the short side. **Captures from a 20:9 phone (1080 × 2400, Pixel 6a) and the Roborazzi baselines
+  (720 × 1600) are too tall**; use a 16:9 emulator (1080 × 1920) or crop. Show real app screens with demo data
+  (seeded debug database or the Roborazzi fixtures), never your own step history. Good set: tower growing on Build,
+  topping-out ceremony, Skyline, Customise, widget on a home screen. The Story share card (1080 × 1920) works as a
+  promotional image.
+- [ ] Category: Health & Fitness. Contact email (required) and, optionally, website.
+- [ ] Don't claim medical benefits; avoid implying an affiliation with Google or Health Connect.
+
+## 9. Testing track requirements
+- [ ] **Closed testing** (personal developer accounts created after 13 Nov 2023): at least **12 testers opted in for
+  14 consecutive days** before you can apply for production access. Check the current number in Play Console.
+- [ ] License testers for billing to exercise purchase, trial and restore ([TECH-004](ROADMAP.md#tech-004)).
+- [ ] Test on Android 8 or 9 (no Health Connect → sensor fallback; Save image permission), Android 13 (Health Connect
+  app install path), Android 14+ (framework Health Connect), and a Samsung device with Samsung Health.

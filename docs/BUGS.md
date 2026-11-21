@@ -3,7 +3,7 @@
 > **Scope:** defects in the current product, with evidence, impact, the proposed fix and acceptance
 > criteria. Scheduling: [ROADMAP.md](ROADMAP.md) · Context: [TECHNICAL.md](TECHNICAL.md).
 >
-> **Baseline:** version 1.0.0, commit `e5c003b` on `main`. **Last reviewed:** 2026-11-20.
+> **Baseline:** version 1.0.0, commit `e5c003b` on `main`. **Last reviewed:** 2026-11-21 (release-readiness review).
 
 ## How to read this file
 
@@ -25,13 +25,13 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 
 | ID | Title | Priority | Classification | Status |
 |---|---|---|---|---|
-| [BUG-001](#bug-001) | Notifications are "on" but never delivered on Android 13+ | P2 | Confirmed (code) | Open |
+| [BUG-001](#bug-001) | Notifications are "on" but never delivered on Android 13+ | P2 | Confirmed (code) | Fixed – unverified |
 | [BUG-002](#bug-002) | Blueprint bonuses can stack to 3× and Pass bonus applies retroactively | P2 | Confirmed (code) | Open |
-| [BUG-003](#bug-003) | "Save image" gives no feedback and silently fails on Android 8–9 | P2 | Confirmed (code) | Open |
+| [BUG-003](#bug-003) | "Save image" gives no feedback and silently fails on Android 8–9 | P2 | Confirmed (code) | Fixed – unverified |
 | [BUG-004](#bug-004) | Week card opens Goals instead of a weekly detail with "Pause goals" | P2 | Confirmed (code) | Open |
-| [BUG-005](#bug-005) | Skyline ignores the tower to highlight after the ceremony | P3 | Confirmed (code) | Open |
+| [BUG-005](#bug-005) | Skyline ignores the tower to highlight after the ceremony | P3 | Confirmed (code) | Fixed – unverified |
 | [BUG-006](#bug-006) | Onboarding payoff shows a 20% partial floor at 0 steps and rounds to segments | P3 | Confirmed (code) | Fixed – unverified |
-| [BUG-007](#bug-007) | Ad consent form may appear just by opening Skyline | P3 | Suspected | Open |
+| [BUG-007](#bug-007) | Ad consent form may appear just by opening Skyline | P3 | Suspected | Fixed – unverified |
 | [BUG-008](#bug-008) | The Build feature module was missing from the Git repository | P0 | Confirmed (reproduced) | Done |
 | [BUG-009](#bug-009) | Onboarding skips "Add widget" (1f) and jumps to Build | P2 | Confirmed (reproduced) | Done |
 | [BUG-010](#bug-010) | Under-construction towers on the real ladder render as a sliver | P1 | Confirmed (reproduced) | Done |
@@ -40,13 +40,16 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-013](#bug-013) | Tower stats sheet opens half-height with its buttons under the gesture bar | P2 | Confirmed (reproduced) | Done |
 | [BUG-014](#bug-014) | Me: "Today" label clipped when today is the tallest bar | P3 | Confirmed (reproduced) | Done |
 | [BUG-015](#bug-015) | Me scrolls under the transparent status bar | P3 | Confirmed (reproduced) | Done |
+| [BUG-016](#bug-016) | "Syncing…" icon wobbles while it rotates | P3 | Confirmed (reproduced) | Done |
+| [BUG-017](#bug-017) | Pressed tab / segment / chip shows a rectangular ripple, not the capsule | P3 | Confirmed (reproduced) | Done |
+| [BUG-018](#bug-018) | Health Connect privacy link opens Build instead of the privacy rationale | P1 | Confirmed (code) | Fixed – unverified |
 
 ---
 
 <a id="bug-001"></a>
 ## BUG-001 — Notifications are "on" but never delivered on Android 13+
 
-- **Priority:** P2 · **Classification:** Confirmed (code) · **Status:** Open
+- **Priority:** P2 · **Classification:** Confirmed (code) · **Status:** Fixed – unverified
 - **Evidence:** `UserSettings.Default` sets `notifyToppingOut = true` and `notifyWeeklySummary = true`
   (`core/domain/.../model/Settings.kt:29-30`). `POST_NOTIFICATIONS` is only requested when the user switches a
   toggle on in Settings (`feature/me/.../SubScreens.kt:348`, `:359`). `ProgressNotifier.onSynced` returns early
@@ -60,7 +63,18 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   1. Fresh install on API 33+: after the first topping-out, the permission prompt appears once (emulator).
   2. With permission denied, Me › Notifications shows "Off" (Compose UI test).
   3. With permission granted, a topping-out triggers a notification (emulator with seeded steps).
-- **Resolution:** — · **Verification:** —
+- **Resolution (2026-11-21, commit `a4b1e3d`):** `PlatformActions.notificationsAllowed()` (permission on 33+ and
+  `areNotificationsEnabled()`) and `rememberNotificationsAllowed()` in `core:ui`, re-checked on every resume. Me ›
+  Notifications reads "Off" and both Settings switches read off while delivery is blocked. One-time prompt after the
+  first topping-out: `CeremonyViewModel` asks on the first ceremony dismissal (Close or Start next) while either
+  preference is on, and `CeremonyRoute` waits for the system dialog before navigating, so it never stacks on the
+  paywall. New DataStore key `notify_prompt_handled` (`UserSettings.notificationPromptHandled`); no existing key changed.
+- **Verification:** AC 2: `MeTest.notificationsRowReadsOffWhenTheOsBlocksThem` / `notificationsRowReadsOnWhenAllowed`;
+  Pixel 6a (Android 16) with the permission denied: Me "Notifications · Off", both switches off; turning "Topping
+  out" on showed the system dialog, Allow → on (re-checked on the integrated build). AC 1: unit-tested
+  (`CeremonyViewModelTest`: first dismissal asks once and sets the flag; no prompt when both preferences are off) but
+  **not checked on a device** (needs a fresh topping-out). AC 3 not checked. Known follow-ups (not fixed): granting
+  from one switch also shows the other as on (both default on); no route to system settings after a permanent denial.
 
 <a id="bug-002"></a>
 ## BUG-002 — Blueprint bonuses can stack to 3× and Pass bonus applies retroactively
@@ -83,7 +97,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 <a id="bug-003"></a>
 ## BUG-003 — "Save image" gives no feedback and silently fails on Android 8–9
 
-- **Priority:** P2 · **Classification:** Confirmed (code) · **Status:** Open
+- **Priority:** P2 · **Classification:** Confirmed (code) · **Status:** Fixed – unverified
 - **Evidence:** `ShareScreen` ignores the `Boolean` from `platform.saveImage(...)`
   (`feature/share/.../ShareScreen.kt:272`); the strings `share_saved` / `share_save_failed` are unused. On
   API < 29 `AndroidPlatformActions.saveImage` requests `WRITE_EXTERNAL_STORAGE` and returns `false` without
@@ -93,7 +107,13 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Acceptance criteria:**
   1. Tapping Save shows "Saved to Pictures." on success and the failure copy otherwise (UI test with fake).
   2. API 28 emulator: granting the permission saves the image without a second tap.
-- **Resolution:** — · **Verification:** —
+- **Resolution (2026-11-21, commit `a4b1e3d`):** `PlatformActions.saveImage(image, onResult)` is callback-based; on
+  API < 29 without permission it launches `WRITE_EXTERNAL_STORAGE` and saves straight after the grant. The PNG is
+  written on `Dispatchers.IO`; a failed write deletes the empty MediaStore entry. `ShareUiState.saveResult` drives an
+  `SsSnackbar` above the sheet ("Saved to Pictures." / "Couldn't save the image. Please try again.").
+- **Verification:** AC 1: `ShareSaveFeedbackTest` (success, failure, nothing when idle); Pixel 6a: Save → "Saved to
+  Pictures." and a new PNG in `Pictures/Step Skyscraper/`. AC 2 (Android 8–9 grant-then-save) **not verified**: no
+  Android 8–9 device used.
 
 > **Device check (2026-11-21, Pixel 6a, Android 16):** "Save image" wrote the PNG to `Pictures/Step Skyscraper/`
 > with no on-screen confirmation — the missing feedback is reproduced; the Android 8–9 failure is not checked.
@@ -116,7 +136,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 <a id="bug-005"></a>
 ## BUG-005 — Skyline ignores the tower to highlight after the ceremony
 
-- **Priority:** P3 · **Classification:** Confirmed (code) · **Status:** Open
+- **Priority:** P3 · **Classification:** Confirmed (code) · **Status:** Fixed – unverified
 - **Evidence:** `SkylineRoute(val highlight: Int?)` (`feature/skyline/.../SkylineScreen.kt:88`) is passed by
   the ceremony's Close action but never read by `SkylineViewModel`; highlighting relies on the 24-hour "newest"
   pin instead.
@@ -125,12 +145,18 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Proposed fix:** read the route argument from `SavedStateHandle` and select that tower on first load.
 - **Acceptance criteria:**
   1. ViewModel test: `SkylineRoute(3)` selects tower 3 and moves the pin to it.
-- **Resolution:** — · **Verification:** —
+- **Resolution (2026-11-21, commit `a4b1e3d`):** `SkylineViewModel` reads the route with
+  `SavedStateHandle.toRoute<SkylineRoute>()`; `SkylineReducer.highlighted()` prefers the requested tower (if it is in
+  the shown district) over the 24 h newest. That tower gets the pin, the "New" chip and the reward card. Merged with the
+  AdMob gating in `fce3977` (card dropped when ads are `Disabled`).
+- **Verification:** AC 1: `SkylineTest.lateCeremonyHighlightsTheRequestedTower` (tower topped out 9 days ago: pinned
+  only with the argument) and `highlightIgnoresTowersOutsideTheDistrict`, passing on the merged code. Device check of
+  a late ceremony still outstanding.
 
 <a id="bug-006"></a>
 ## BUG-006 — Onboarding payoff shows a 20% partial floor at 0 steps and rounds to segments
 
-- **Priority:** P3 · **Classification:** Confirmed (code) · **Status:** Open
+- **Priority:** P3 · **Classification:** Confirmed (code) · **Status:** Fixed – unverified
 - **Evidence:** `progress = (state.segmentsFilled / 10f).coerceAtLeast(0.2f).takeIf { … } ?: 0.2f`
   (`feature/onboarding/.../OnboardingScreen.kt:289`). With 0 steps into the next floor the tower still draws a
   20% partial floor; otherwise progress is rounded down to whole segments.
@@ -146,7 +172,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 <a id="bug-007"></a>
 ## BUG-007 — Ad consent form may appear just by opening Skyline
 
-- **Priority:** P3 · **Classification:** Suspected · **Status:** Open
+- **Priority:** P3 · **Classification:** Suspected · **Status:** Fixed – unverified
 - **Evidence:** `LaunchedEffect(showReward) { if (showReward) onIntent(SkylineIntent.PrepareAd(host)) }`
   (`feature/skyline/.../SkylineScreen.kt:138`) runs UMP `loadAndShowConsentFormIfRequired` as soon as the reward
   card is visible, not when the user taps the ad button.
@@ -157,7 +183,15 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Proposed fix:** gather consent only when the user taps "Watch a short ad…", then load and show.
 - **Acceptance criteria:**
   1. EEA debug geography: no consent form appears until the ad button is tapped (device).
-- **Resolution:** — · **Verification:** —
+- **Resolution (2026-11-21, commit `280e1b3`):** `AdMobRewardedGateway.prepare()` (card visible) only refreshes the
+  consent status without UI and preloads only if consent already allows requests. The form is shown only from
+  `show()`, i.e. the tap on "Watch a short ad to double Blueprints", followed by `MobileAds.initialize` (background
+  thread) → load → show. The button is tappable in every enabled state except `Loading`.
+- **Verification:** `AdsGatingTest` "prepare never shows the consent form…" and "tap gathers consent before
+  initialising and loading" (pass). Pixel 6a (debug): opening Skyline showed no form and no `consent` / `load request`
+  lines, but no reward card was visible, so `prepare()` and the tap path weren't exercised. **Outstanding:** the
+  acceptance case needs a tower topped out within 24 h, a published GDPR message and `ADMOB_UMP_DEBUG_EEA=true`
+  ([TECHNICAL.md §5.1](TECHNICAL.md#51-admob-and-the-ads_enabled-switch)).
 
 <a id="bug-008"></a>
 ## BUG-008 — The Build feature module was missing from the Git repository
@@ -272,3 +306,55 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   under the clock and icons.
 - **Resolution:** padding applied outside the scroll (this branch). · **Verification:** Pixel 6a: scrolled Me
   content stops below the status bar.
+
+<a id="bug-016"></a>
+## BUG-016 — "Syncing…" icon wobbles while it rotates
+
+- **Priority:** P3 · **Classification:** Confirmed (reproduced) · **Status:** Done
+- **Evidence (user report, 2026-11-21):** the sync chip rotated a Material Symbols font glyph. The glyph sits in a text
+  line box built from the font metrics (ascent 1056 / descent 96 on a 960 em, rounded to whole pixels), so it was not
+  centred in its 16dp box and the rotation pivot was off the glyph's centre.
+- **Files:** `core/designsystem/.../icon/SyncVector.kt` (new), `icon/SsIcon.kt`, `component/Chips.kt`.
+- **Acceptance criteria:** the icon turns about its own centre during "Syncing…" (device recording).
+- **Resolution (commit `a4b1e3d`):** `SsSyncIcon` draws the same outline as a vector (path from the bundled font,
+  viewport = the 960×960 em, outline 160..800 on both axes) in a square 16dp box, rotated in `graphicsLayer` about the
+  default centre; the angle is read in the draw phase only. Reduce motion still disables the spin.
+- **Verification:** Pixel 6a, `screenrecord` during pull-to-refresh, centroid measured per frame: drift < 0.25 px on
+  the bug-fix branch and < 0.1 px on the integrated build.
+
+<a id="bug-017"></a>
+## BUG-017 — Pressed tab / segment / chip shows a rectangular ripple, not the capsule
+
+- **Priority:** P3 · **Classification:** Confirmed (reproduced) · **Status:** Done
+- **Evidence (user report, 2026-11-21):** the resting 64×32 pill already matched the design, but the touch feedback
+  came from `selectable()` on the whole cell, so pressing a bottom-bar tab, a segmented toggle or a Customise chip
+  showed a rectangular state layer over the full touch target.
+- **Files:** `core/designsystem/.../component/Navigation.kt`, `Surfaces.kt`, `Chips.kt`.
+- **Acceptance criteria:** the pressed state is confined to the visible capsule; resting visuals unchanged.
+- **Resolution (commit `a4b1e3d`):** bottom bar and filter chips keep the 48dp touch target with `indication = null`
+  and draw the ripple with `.indication(interaction, ripple())` on the pill clipped to `SsRadius.shapeFull`; segmented
+  toggles clip before `background`/`selectable`; clickable `SsCard` / `SsRadioCard` ripples clipped to their shape.
+- **Verification:** Pixel 6a, long-press captures: Me tab state layer only within the 64×32 dp pill; Share segment and
+  Customise chip pressed states stay inside the capsule. Roborazzi baselines re-recorded (anti-aliasing differences only).
+
+<a id="bug-018"></a>
+## BUG-018 — Health Connect privacy link opens Build instead of the privacy rationale
+
+- **Priority:** P1 · **Classification:** Confirmed (code) · **Status:** Fixed – unverified
+- **Evidence (release-readiness review, 2026-11-21):** the manifest routes
+  `androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE` (Android 13 and lower) and the Android 14 `VIEW_PERMISSION_USAGE`
+  alias to `MainActivity`, but nothing read `intent.action`: Health Connect's privacy link opened onboarding or Build.
+  Health Connect expects that link to show the app's privacy rationale / policy.
+- **Files:** `app/.../MainActivity.kt`, `feature/me/.../SubScreens.kt`.
+- **Impact:** Play review risk for the Health apps declaration ([TECH-011](ROADMAP.md#tech-011)).
+- **Acceptance criteria:** from Health Connect's app-permission screen (Android 13 and 14+), the privacy link opens
+  Help & privacy on its own; back returns to Health Connect.
+- **Resolution:** launched with either action, `MainActivity` shows `PrivacyRoute` (Help & privacy: the in-app privacy
+  summary, Health Connect access and, once `PRIVACY_POLICY_URL` is set, the hosted policy link) instead of the app;
+  back finishes the activity. The step-help button is hidden there (no app navigation).
+- **Verification:** `build test lint` green. Pixel 6a (Android 16, debug build):
+  `adb shell am start -a androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE -n …debug/ai.idraak.stepskyscraper.MainActivity`
+  opened Help & privacy alone (no step-help button, no tabs); back returned to the launcher; a normal launch still
+  opens Build / Skyline / Me. The Android 14+ alias can't be started from adb (protected by
+  `START_VIEW_PERMISSION_USAGE`, as intended) and runs the same `intent.action` check. **Outstanding:** tap the privacy
+  link from Health Connect itself, with `PRIVACY_POLICY_URL` set so the policy link shows.

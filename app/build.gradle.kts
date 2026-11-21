@@ -1,3 +1,4 @@
+import com.android.build.api.variant.BuildConfigField
 import java.util.Properties
 
 plugins {
@@ -35,6 +36,31 @@ val releaseKeyPassword = signingValue("keyPassword", "STEPSKY_KEY_PASSWORD")
 val hasReleaseSigning = listOf(releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword).all { it != null } &&
     rootProject.file(releaseStoreFile!!).exists()
 
+// AdMob ids per variant. Debug (and every non-release variant) always uses Google's published test ids,
+// hard-coded here and never read from properties. Only the `release` variant (Prod Release) uses live ids, from
+// the Gradle properties or environment variables ADMOB_APP_ID_PROD / ADMOB_REWARDED_UNIT_ID_PROD
+// (~/.gradle/gradle.properties or CI secrets, never committed). Without valid live ids, assembleRelease still
+// builds for local smoke tests with ads disabled at runtime, and bundleRelease fails (verifyReleaseAdMob).
+val admobTestAppId = "ca-app-pub-3940256099942544~3347511713"
+val admobSamplePublisher = "ca-app-pub-3940256099942544"
+
+fun adProperty(name: String): String? =
+    providers.gradleProperty(name).orNull?.trim()?.takeIf { it.isNotBlank() }
+        ?: providers.environmentVariable(name).orNull?.trim()?.takeIf { it.isNotBlank() }
+
+val admobLiveAppId = adProperty("ADMOB_APP_ID_PROD")
+val admobLiveRewardedUnitId = adProperty("ADMOB_REWARDED_UNIT_ID_PROD")
+val admobLiveIdsProblem: String? = when {
+    admobLiveAppId == null || admobLiveRewardedUnitId == null -> "ADMOB_APP_ID_PROD and ADMOB_REWARDED_UNIT_ID_PROD are not both set"
+    admobLiveAppId.startsWith(admobSamplePublisher) || admobLiveRewardedUnitId.startsWith(admobSamplePublisher) ->
+        "the live AdMob ids are Google's sample ids"
+    !Regex("""ca-app-pub-\d{16}~\d{10}""").matches(admobLiveAppId) -> "ADMOB_APP_ID_PROD is not an app id (ca-app-pub-…~…)"
+    !Regex("""ca-app-pub-\d{16}/\d{10}""").matches(admobLiveRewardedUnitId) ->
+        "ADMOB_REWARDED_UNIT_ID_PROD is not an ad unit id (ca-app-pub-…/…)"
+    else -> null
+}
+val admobLiveConfigured = admobLiveIdsProblem == null
+
 android {
     namespace = "ai.idraak.stepskyscraper"
 
@@ -42,7 +68,9 @@ android {
         applicationId = "ai.idraak.stepskyscraper"
         versionCode = 1
         versionName = "1.0.0"
-        manifestPlaceholders["admobAppId"] = providers.gradleProperty("ADMOB_APP_ID").get()
+        // Default for components without variant placeholders (unit-test manifests); every app variant overrides
+        // it in androidComponents.onVariants below.
+        manifestPlaceholders["admobAppId"] = admobTestAppId
         buildConfigField("String", "PRIVACY_POLICY_URL", "\"${providers.gradleProperty("PRIVACY_POLICY_URL").getOrElse("")}\"")
         buildConfigField("String", "SUPPORT_EMAIL", "\"${providers.gradleProperty("SUPPORT_EMAIL").getOrElse("")}\"")
     }
@@ -71,6 +99,68 @@ android {
         }
     }
 }
+
+androidComponents {
+    onVariants { variant ->
+        val prodRelease = variant.name == "release"
+        val live = prodRelease && admobLiveConfigured
+        // The manifest always needs a well-formed APPLICATION_ID; without live ids the release build keeps the
+        // test app id but the runtime never initialises the SDK or requests an ad (AdSetup.NotConfigured).
+        variant.manifestPlaceholders.put("admobAppId", if (live) admobLiveAppId!! else admobTestAppId)
+        val fields = variant.buildConfigFields ?: return@onVariants
+        fun str(value: String) = BuildConfigField("String", "\"$value\"", null)
+        fields.put("ADS_PROD_RELEASE", BuildConfigField("boolean", prodRelease.toString(), "Live-ad variant"))
+        fields.put("ADMOB_LIVE_APP_ID", str(if (live) admobLiveAppId!! else ""))
+        fields.put("ADMOB_LIVE_REWARDED_UNIT_ID", str(if (live) admobLiveRewardedUnitId!! else ""))
+        // Debug-only helpers for consent testing (ignored by the release variant at runtime).
+        fields.put("ADMOB_TEST_DEVICE_ID", str(if (prodRelease) "" else adProperty("ADMOB_TEST_DEVICE_ID").orEmpty()))
+        fields.put(
+            "ADMOB_UMP_DEBUG_EEA",
+            BuildConfigField("boolean", (!prodRelease && adProperty("ADMOB_UMP_DEBUG_EEA") == "true").toString(), null),
+        )
+    }
+}
+
+// A Play upload must carry real AdMob ids: fail instead of shipping sample ids or a build with ads disabled.
+val verifyReleaseAdMob = tasks.register("verifyReleaseAdMob") {
+    group = "verification"
+    description = "Fails unless live AdMob ids are configured for the release variant."
+    val problem = admobLiveIdsProblem
+    doLast {
+        if (problem != null) {
+            throw GradleException(
+                "AdMob live ids are not configured: $problem. Set ADMOB_APP_ID_PROD and ADMOB_REWARDED_UNIT_ID_PROD " +
+                    "in ~/.gradle/gradle.properties or as environment variables (CI secrets). " +
+                    "See docs/TECHNICAL.md §6.",
+            )
+        }
+    }
+}
+tasks.matching { it.name == "bundleRelease" }.configureEach { dependsOn(verifyReleaseAdMob) }
+// assembleRelease stays usable for smoke tests; say loudly that its ads are off.
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    val problem = admobLiveIdsProblem
+    doFirst {
+        if (problem != null) logger.warn("w: AdMob: $problem; this release build has ads disabled (no ad requests).")
+    }
+}
+
+// Health Connect apps (and apps with ads) need a hosted privacy policy, linked in-app from Help & privacy:
+// fail the Play bundle instead of shipping a build whose policy link is hidden.
+val verifyReleasePrivacyPolicy = tasks.register("verifyReleasePrivacyPolicy") {
+    group = "verification"
+    description = "Fails unless PRIVACY_POLICY_URL is an https URL."
+    val url = providers.gradleProperty("PRIVACY_POLICY_URL").getOrElse("").trim()
+    doLast {
+        if (!url.startsWith("https://")) {
+            throw GradleException(
+                "PRIVACY_POLICY_URL is not set to an https URL. Host docs/privacy-policy.md and set PRIVACY_POLICY_URL " +
+                    "in gradle.properties (or pass -PPRIVACY_POLICY_URL=…). See docs/play-console-checklist.md.",
+            )
+        }
+    }
+}
+tasks.matching { it.name == "bundleRelease" }.configureEach { dependsOn(verifyReleasePrivacyPolicy) }
 
 // A Play upload must be signed with the upload key: fail early with instructions instead of producing an
 // unsigned bundle. assembleRelease (part of `build`) still works and yields app-release-unsigned.apk.

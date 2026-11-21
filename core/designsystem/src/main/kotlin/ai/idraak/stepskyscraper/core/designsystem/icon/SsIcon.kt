@@ -1,15 +1,28 @@
 package ai.idraak.stepskyscraper.core.designsystem.icon
 
 import ai.idraak.stepskyscraper.core.designsystem.R
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -74,3 +87,41 @@ fun SsIcon(
         )
     }
 }
+
+/**
+ * The "sync" icon, optionally spinning (Build "Syncing…" chip). Drawn from [SyncVector] in a square box so the
+ * rotation pivots exactly on the icon's centre; the rotation lives in `graphicsLayer` (default centre origin) and
+ * the rotated layer holds nothing but the square glyph, so outer padding or offsets never move the pivot.
+ * Rotation is read in the draw phase only, so the spin doesn't recompose. Static when [spinning] is false.
+ */
+@Composable
+fun SsSyncIcon(
+    spinning: Boolean,
+    modifier: Modifier = Modifier,
+    size: Dp = IconSize.l,
+    tint: Color = LocalContentColor.current,
+) {
+    val painter = rememberVectorPainter(SyncVector)
+    val rotation: State<Float> = if (spinning) {
+        rememberInfiniteTransition(label = "sync").animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable(tween(SYNC_SPIN_MS, easing = LinearEasing), RepeatMode.Restart),
+            label = "spin",
+        )
+    } else {
+        remember { mutableFloatStateOf(0f) }
+    }
+    Box(modifier.size(size).clearAndSetSemantics { }) {
+        Image(
+            painter = painter,
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(tint),
+            modifier = Modifier
+                .matchParentSize()
+                .graphicsLayer { rotationZ = rotation.value },
+        )
+    }
+}
+
+private const val SYNC_SPIN_MS = 1_000

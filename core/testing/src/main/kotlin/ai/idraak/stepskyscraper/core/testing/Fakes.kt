@@ -22,6 +22,7 @@ import ai.idraak.stepskyscraper.core.domain.model.UiHost
 import ai.idraak.stepskyscraper.core.domain.model.UserSettings
 import ai.idraak.stepskyscraper.core.domain.model.WalletEntry
 import ai.idraak.stepskyscraper.core.domain.repository.AchievementRepository
+import ai.idraak.stepskyscraper.core.domain.repository.AdPrivacyChoices
 import ai.idraak.stepskyscraper.core.domain.repository.AnalyticsTracker
 import ai.idraak.stepskyscraper.core.domain.repository.EntitlementRepository
 import ai.idraak.stepskyscraper.core.domain.repository.LadderRepository
@@ -174,6 +175,8 @@ class FakeSettingsRepository(initial: UserSettings = UserSettings.Default) : Set
     override suspend fun setShareShowStats(show: Boolean) = edit { it.copy(shareShowStats = show) }
 
     override suspend fun setCeremonySound(enabled: Boolean) = edit { it.copy(ceremonySound = enabled) }
+
+    override suspend fun setNotificationPromptHandled() = edit { it.copy(notificationPromptHandled = true) }
 }
 
 class FakeSyncStatusRepository : SyncStatusRepository {
@@ -280,6 +283,16 @@ class FakeRewardedAdGateway : RewardedAdGateway {
     override suspend fun show(host: UiHost): Outcome<Unit> {
         shows++
         return result
+    }
+}
+
+class FakeAdPrivacyChoices(var required: Boolean = false) : AdPrivacyChoices {
+    var shows = 0
+
+    override suspend fun isRequired(host: UiHost): Boolean = required
+
+    override suspend fun show(host: UiHost) {
+        shows++
     }
 }
 

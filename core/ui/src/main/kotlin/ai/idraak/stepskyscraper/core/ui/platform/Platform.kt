@@ -1,8 +1,16 @@
 package ai.idraak.stepskyscraper.core.ui.platform
 
 import ai.idraak.stepskyscraper.core.domain.model.UiHost
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import kotlin.coroutines.resume
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 /**
  * System integrations a screen can trigger (Health Connect permission sheet, deep links, widget pinning,
@@ -28,10 +36,16 @@ interface PlatformActions {
 
     fun requestNotificationPermission(onResult: (granted: Boolean) -> Unit)
 
+    /** True when the app may post notifications (POST_NOTIFICATIONS on Android 13+ and not blocked in system settings). */
+    fun notificationsAllowed(): Boolean
+
     fun shareImage(image: ImageBitmap, caption: String)
 
-    /** Saves to Pictures/Step Skyscraper; returns false if saving failed. */
-    fun saveImage(image: ImageBitmap): Boolean
+    /**
+     * Saves to Pictures/Step Skyscraper and reports the result on the main thread. On Android 8–9 it asks for
+     * WRITE_EXTERNAL_STORAGE first and saves straight after the grant (no second tap).
+     */
+    fun saveImage(image: ImageBitmap, onResult: (saved: Boolean) -> Unit)
 
     fun openPlaySubscriptions()
 
@@ -64,9 +78,11 @@ object PreviewPlatformActions : PlatformActions {
 
     override fun requestNotificationPermission(onResult: (Boolean) -> Unit) = onResult(true)
 
+    override fun notificationsAllowed(): Boolean = true
+
     override fun shareImage(image: ImageBitmap, caption: String) = Unit
 
-    override fun saveImage(image: ImageBitmap): Boolean = true
+    override fun saveImage(image: ImageBitmap, onResult: (Boolean) -> Unit) = onResult(true)
 
     override fun openPlaySubscriptions() = Unit
 
@@ -80,6 +96,27 @@ object PreviewPlatformActions : PlatformActions {
 }
 
 val LocalPlatformActions = staticCompositionLocalOf<PlatformActions> { PreviewPlatformActions }
+
+/**
+ * Whether notifications can actually be delivered, re-checked every time the screen resumes (the user may change
+ * the permission in system settings while the app is in the background). Screens use it so a notification
+ * preference never reads "on" while the OS blocks delivery (BUG-001).
+ */
+@Composable
+fun rememberNotificationsAllowed(): Boolean {
+    val platform = LocalPlatformActions.current
+    var allowed by remember(platform) { mutableStateOf(platform.notificationsAllowed()) }
+    LifecycleResumeEffect(platform) {
+        allowed = platform.notificationsAllowed()
+        onPauseOrDispose { }
+    }
+    return allowed
+}
+
+/** Suspending form of [PlatformActions.requestNotificationPermission]. */
+suspend fun PlatformActions.awaitNotificationPermission(): Boolean = suspendCancellableCoroutine { cont ->
+    requestNotificationPermission { granted -> if (cont.isActive) cont.resume(granted) }
+}
 
 /** The Activity, as the opaque [UiHost] purchase / ad flows need. */
 val LocalUiHost = staticCompositionLocalOf<UiHost> { object : UiHost {} }

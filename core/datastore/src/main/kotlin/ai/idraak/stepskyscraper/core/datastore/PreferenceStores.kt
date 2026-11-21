@@ -69,6 +69,7 @@ private object Keys {
     val connectSkipped = booleanPreferencesKey("steps_connect_skipped")
     val shareStats = booleanPreferencesKey("share_show_stats")
     val sound = booleanPreferencesKey("ceremony_sound")
+    val notifyPrompt = booleanPreferencesKey("notify_prompt_handled")
 
     val syncing = booleanPreferencesKey("sync_running")
     val lastSuccess = longPreferencesKey("sync_last_success")
@@ -119,6 +120,7 @@ class PreferencesSettingsRepository @Inject constructor(
             stepsConnectSkipped = p[Keys.connectSkipped] ?: false,
             shareShowStats = p[Keys.shareStats] ?: true,
             ceremonySound = p[Keys.sound] ?: true,
+            notificationPromptHandled = p[Keys.notifyPrompt] ?: false,
         )
     }
 
@@ -176,6 +178,8 @@ class PreferencesSettingsRepository @Inject constructor(
     override suspend fun setShareShowStats(show: Boolean) = store.write { it[Keys.shareStats] = show }
 
     override suspend fun setCeremonySound(enabled: Boolean) = store.write { it[Keys.sound] = enabled }
+
+    override suspend fun setNotificationPromptHandled() = store.write { it[Keys.notifyPrompt] = true }
 }
 
 @Singleton

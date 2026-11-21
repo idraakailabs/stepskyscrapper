@@ -92,6 +92,8 @@ interface SettingsRepository {
     suspend fun setShareShowStats(show: Boolean): Outcome<Unit>
 
     suspend fun setCeremonySound(enabled: Boolean): Outcome<Unit>
+
+    suspend fun setNotificationPromptHandled(): Outcome<Unit>
 }
 
 /** Sync bookkeeping (last success / last data change) persisted locally. */
@@ -155,11 +157,39 @@ interface EntitlementRepository {
 interface RewardedAdGateway {
     val availability: Flow<AdAvailability>
 
-    /** Gathers UMP consent (if required) and preloads. Never called on Build, onboarding or the ceremony. */
+    /**
+     * Warm-up when the reward card becomes visible: refreshes the UMP consent status (no UI) and preloads only if
+     * consent already allows ad requests. Never shows a consent form and does nothing while ads are disabled.
+     * Never called on Build, onboarding or the ceremony.
+     */
     suspend fun prepare(host: UiHost)
 
-    /** Shows the ad; Success means the user earned the reward. */
+    /**
+     * Called only from the user's tap on the ad button: gathers consent (showing the UMP form if required), loads
+     * if needed and shows the ad. Success means the SDK reported `onUserEarnedReward`.
+     */
     suspend fun show(host: UiHost): Outcome<Unit>
+}
+
+/**
+ * UMP "privacy options" (GDPR / US-state messages): lets the user change an earlier ad-consent choice from
+ * Help & privacy. Only offered while ads are enabled and UMP reports that privacy options are required.
+ */
+interface AdPrivacyChoices {
+    /** Refreshes the consent status (no UI) and reports whether the entry point must be shown. */
+    suspend fun isRequired(host: UiHost): Boolean
+
+    /** Shows the UMP privacy options form. Only from the user's tap. */
+    suspend fun show(host: UiHost)
+}
+
+/**
+ * Remote kill switch for ads in the Prod Release build: Firebase Remote Config boolean `ads_enabled`. Emits
+ * false until a fetched value says otherwise, and stays false when Firebase is not configured. Debug builds
+ * ignore it (they always serve Google test ads).
+ */
+interface AdsRemoteSwitch {
+    val adsEnabled: Flow<Boolean>
 }
 
 interface AnalyticsTracker {

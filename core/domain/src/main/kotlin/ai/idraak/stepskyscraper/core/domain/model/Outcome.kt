@@ -62,4 +62,4 @@ sealed interface DomainError {
 
 enum class BillingFailure { UserCancelled, ServiceUnavailable, ItemUnavailable, AlreadyOwned, Pending, Developer, Unknown }
 
-enum class AdFailure { NoConsent, NotLoaded, NoFill, Dismissed, Premium, Offline }
+enum class AdFailure { NoConsent, NotLoaded, NoFill, Dismissed, Premium, Offline, Disabled }

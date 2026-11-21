@@ -52,10 +52,13 @@ sealed interface CeremonyIntent {
 sealed interface CeremonyEffect {
     data class Share(val towerIndex: Int) : CeremonyEffect
 
-    /** [showPaywall]: only after the first finished tower, once, after the ceremony is dismissed. */
-    data class StartNext(val showPaywall: Boolean) : CeremonyEffect
+    /**
+     * [showPaywall]: only after the first finished tower, once, after the ceremony is dismissed.
+     * [askNotifications]: ask for POST_NOTIFICATIONS before leaving, once, after the first topping-out (BUG-001).
+     */
+    data class StartNext(val showPaywall: Boolean, val askNotifications: Boolean = false) : CeremonyEffect
 
-    data class Close(val towerIndex: Int, val showPaywall: Boolean) : CeremonyEffect
+    data class Close(val towerIndex: Int, val showPaywall: Boolean, val askNotifications: Boolean = false) : CeremonyEffect
 }
 
 /** Topping-out ceremony. Shown once per tower; no ads here, ever. */
@@ -93,16 +96,20 @@ class CeremonyViewModel @Inject constructor(
         when (intent) {
             CeremonyIntent.RevealSheet -> reduce { it.copy(sheetVisible = true) }
             CeremonyIntent.Share -> emit(CeremonyEffect.Share(towerIndex))
-            CeremonyIntent.StartNext -> dismiss { emit(CeremonyEffect.StartNext(it)) }
-            CeremonyIntent.Close -> dismiss { emit(CeremonyEffect.Close(towerIndex, it)) }
+            CeremonyIntent.StartNext -> dismiss { paywall, ask -> emit(CeremonyEffect.StartNext(paywall, ask)) }
+            CeremonyIntent.Close -> dismiss { paywall, ask -> emit(CeremonyEffect.Close(towerIndex, paywall, ask)) }
         }
     }
 
-    private fun dismiss(then: (Boolean) -> Unit) = viewModelScope.launch {
+    private fun dismiss(then: (showPaywall: Boolean, askNotifications: Boolean) -> Unit) = viewModelScope.launch {
         towers.markCeremonySeen(towerIndex)
         val s = progress().first()
         val showPaywall = !s.settings.paywallShownAfterFirstTower && !s.entitlement.isPremium
         if (showPaywall) settings.setPaywallShownAfterFirstTower()
-        then(showPaywall)
+        // The notifications that matter (topping out, weekly summary) start here: ask once, at the first ceremony,
+        // and only while the user still wants them. Android shows nothing if the permission is already granted.
+        val prompt = !s.settings.notificationPromptHandled
+        if (prompt) settings.setNotificationPromptHandled()
+        then(showPaywall, prompt && (s.settings.notifyToppingOut || s.settings.notifyWeeklySummary))
     }
 }

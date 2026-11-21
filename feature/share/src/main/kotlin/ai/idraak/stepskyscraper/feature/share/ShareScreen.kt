@@ -4,6 +4,7 @@ import ai.idraak.stepskyscraper.core.designsystem.component.SsIconButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsIconCircleButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsPrimaryButton
 import ai.idraak.stepskyscraper.core.designsystem.component.SsSegmentedToggle
+import ai.idraak.stepskyscraper.core.designsystem.component.SsSnackbar
 import ai.idraak.stepskyscraper.core.designsystem.component.SsSwitchRow
 import ai.idraak.stepskyscraper.core.designsystem.component.ssShadow
 import ai.idraak.stepskyscraper.core.designsystem.icon.Symbol
@@ -47,7 +48,10 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,6 +72,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -83,6 +88,8 @@ data class ShareUiState(
     val tower: TowerCardData? = null,
     val skyline: SkylineCardData? = null,
     val kitNameRes: Int = 0,
+    /** Result of the last "Save image" tap, shown as a snackbar until [ShareIntent.MessageShown] (BUG-003). */
+    val saveResult: Boolean? = null,
 )
 
 sealed interface ShareIntent {
@@ -93,6 +100,10 @@ sealed interface ShareIntent {
     data class Stats(val show: Boolean) : ShareIntent
 
     data object Shared : ShareIntent
+
+    data class Saved(val success: Boolean) : ShareIntent
+
+    data object MessageShown : ShareIntent
 }
 
 @HiltViewModel
@@ -149,6 +160,8 @@ class ShareViewModel @Inject constructor(
                 reduce { it.copy(showStats = intent.show) }
                 settings.setShareShowStats(intent.show)
             }
+            is ShareIntent.Saved -> reduce { it.copy(saveResult = intent.success) }
+            ShareIntent.MessageShown -> reduce { it.copy(saveResult = null) }
             ShareIntent.Shared -> viewModelScope.launch {
                 analytics.track(AnalyticsEvent.ShareCard(currentState.subject.name, currentState.format.name))
                 achievements.increment(CalculateCityStatsUseCase.COUNTER_SHARES)
@@ -243,6 +256,22 @@ fun ShareScreen(state: ShareUiState, onClose: () -> Unit, onIntent: (ShareIntent
                         },
                     )
                 }
+                val saved = state.saveResult
+                LaunchedEffect(saved) {
+                    if (saved != null) {
+                        delay(SsMotion.SNACKBAR_VISIBLE_MS)
+                        onIntent(ShareIntent.MessageShown)
+                    }
+                }
+                // Keep the last result while the snackbar slides out, so the text doesn't blank mid-animation.
+                val lastSaved = remember { mutableStateOf(true) }
+                if (saved != null) lastSaved.value = saved
+                SsSnackbar(
+                    saved != null,
+                    stringResource(if (lastSaved.value) R.string.share_saved else R.string.share_save_failed),
+                    Modifier.align(Alignment.BottomCenter).padding(SsSpacing.l),
+                    icon = if (lastSaved.value) Symbol.Download else Symbol.Info,
+                )
             }
             Column(
                 Modifier
@@ -269,7 +298,11 @@ fun ShareScreen(state: ShareUiState, onClose: () -> Unit, onIntent: (ShareIntent
                     SsIconCircleButton(
                         Symbol.Download,
                         stringResource(R.string.share_save),
-                        { scope.launch { platform.saveImage(exportLayer.toImageBitmap()) } },
+                        {
+                            scope.launch {
+                                platform.saveImage(exportLayer.toImageBitmap()) { onIntent(ShareIntent.Saved(it)) }
+                            }
+                        },
                         size = SsSpacing.primaryButtonHeight,
                     )
                     SsPrimaryButton(

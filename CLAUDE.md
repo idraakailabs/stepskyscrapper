@@ -15,7 +15,9 @@ MVI, Hilt, Room, DataStore, WorkManager, Glance, Play Billing, AdMob and Firebas
 | [docs/PRODUCT.md](docs/PRODUCT.md) | Vision, audience, current feature baseline, product analysis |
 | [docs/design-inventory.md](docs/design-inventory.md) | Checklist of every design token, component, screen and state, with implementation status |
 | [docs/design-deviations.md](docs/design-deviations.md) | Every intentional difference from the design and why |
-| [docs/play-console-checklist.md](docs/play-console-checklist.md) | Release steps, Health apps declaration, Data safety answers |
+| [docs/RELEASE-READINESS.md](docs/RELEASE-READINESS.md) | Release Readiness Sheet: every pre-upload check with its status and what the user still has to do |
+| [docs/play-console-checklist.md](docs/play-console-checklist.md) | Release steps, signed AAB, Health apps declaration, Data safety answers |
+| [docs/privacy-policy.md](docs/privacy-policy.md) | Privacy policy draft to host (keep in step with the Data safety answers) |
 
 The "Current position" table in `docs/ROADMAP.md` is the source of truth for the active phase and next task.
 The design source files are in `design/source/` (`Step Skyscraper All.dc.html`, `tower.js`).
@@ -81,9 +83,13 @@ This is a permanent project rule for every session.
 - AGP is pinned to **9.2.1**, the newest version Android Studio accepts; don't upgrade it past what Studio
   supports. Build needs JDK 17+ (21 used) and Android SDK platform **37.2** (Compose 1.13 requires compileSdk ≥ 37.1).
 - Without `app/google-services.json`, Firebase is skipped: analytics are dropped and the bundled ladder is used.
-- AdMob ids default to Google's sample ids (`gradle.properties`). Release signing needs `keystore.properties` or
-  the `STEPSKY_*` env vars; without them the release APK is unsigned and `bundleRelease` fails by design
-  ([TECH-005](docs/ROADMAP.md#tech-005)).
-- Git: `main`, remote `origin` = `https://github.com/idraakailabs/stepskyscrapper.git`. Line endings are LF
+- AdMob: debug (and every non-`release` variant) always uses Google's test ids, hard-coded. Only `release` uses live
+  ids from `ADMOB_APP_ID_PROD` / `ADMOB_REWARDED_UNIT_ID_PROD` (`~/.gradle/gradle.properties` or CI env, never in Git);
+  the old `ADMOB_APP_ID` / `ADMOB_REWARDED_UNIT_ID` properties are gone. Remote Config `ads_enabled` (default false)
+  switches live ads on. See [docs/TECHNICAL.md §5.1](docs/TECHNICAL.md#51-admob-and-the-ads_enabled-switch).
+- `bundleRelease` fails by design unless the upload key (`keystore.properties` or `STEPSKY_*` env vars), valid live
+  AdMob ids and an https `PRIVACY_POLICY_URL` are configured (`verifyReleaseSigning`, `verifyReleaseAdMob`,
+  `verifyReleasePrivacyPolicy`); `assembleRelease` still builds an unsigned, ads-off APK for smoke tests.
+- Git: `develop` is the integration branch and `main` is release-only (the user decides merges); remote `origin` = `https://github.com/idraakailabs/stepskyscrapper.git`. Line endings are LF
   (`.gitattributes`). Commit email for this repo: zabiirana27@gmail.com (local git config).
 - Component gallery: Settings › "Component gallery (debug)" in debug builds.

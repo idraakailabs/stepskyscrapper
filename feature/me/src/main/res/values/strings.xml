@@ -86,6 +86,7 @@
     <string name="privacy_p2">Steps, floors, towers and achievements are stored only on this phone and included in your Android backup. There is no account and no server.</string>
     <string name="privacy_p3">We use anonymous product analytics and crash reports (Firebase) to improve the app. They never contain step counts, floors or any health data.</string>
     <string name="privacy_p4">One optional rewarded ad on the Skyline tab is served by Google AdMob after you make a privacy choice. Ads never receive step data.</string>
+    <string name="privacy_ad_choices">Ad privacy choices</string>
     <string name="privacy_policy">Read the full privacy policy</string>
     <string name="privacy_step_help">Steps not arriving?</string>
     <string name="privacy_manage_access">Manage step access in Health Connect</string>

@@ -2,20 +2,18 @@ package ai.idraak.stepskyscraper.core.designsystem.component
 
 import ai.idraak.stepskyscraper.core.designsystem.icon.IconSize
 import ai.idraak.stepskyscraper.core.designsystem.icon.SsIcon
+import ai.idraak.stepskyscraper.core.designsystem.icon.SsSyncIcon
 import ai.idraak.stepskyscraper.core.designsystem.icon.Symbol
 import ai.idraak.stepskyscraper.core.designsystem.theme.SsMotion
 import ai.idraak.stepskyscraper.core.designsystem.theme.SsRadius
 import ai.idraak.stepskyscraper.core.designsystem.theme.SsSpacing
 import ai.idraak.stepskyscraper.core.designsystem.theme.SsTheme
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
@@ -23,13 +21,13 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
@@ -56,17 +54,21 @@ fun SsFilterChip(
     val bg = container ?: if (selected) c.ink else Color.Transparent
     val fg = content ?: if (selected) c.onInk else c.onSurface
     val shape = SsRadius.shapeFull
+    // 48dp touch target, but the press ripple stays inside the visible capsule.
+    val interaction = remember { MutableInteractionSource() }
     Row(
         modifier
             .heightIn(min = SsSpacing.touchTarget)
-            .selectable(selected = selected, role = Role.Tab, onClick = onClick),
+            .selectable(selected = selected, interactionSource = interaction, indication = null, role = Role.Tab, onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
             Modifier
                 .height(height)
                 .then(if (!selected && container == null) Modifier.border(1.dp, c.outlineStrong, shape) else Modifier)
-                .background(bg, shape)
+                .clip(shape)
+                .background(bg)
+                .indication(interaction, ripple())
                 .padding(horizontal = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -114,25 +116,14 @@ fun SsStatusChip(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(SsSpacing.xs),
     ) {
-        if (icon != null) {
-            val rotation = if (spinning && !reduce) {
-                val t = rememberInfiniteTransition(label = "sync")
-                val r by t.animateFloat(
-                    0f,
-                    360f,
-                    infiniteRepeatable(tween(1_000, easing = LinearEasing), RepeatMode.Restart),
-                    label = "spin",
-                )
-                r
-            } else {
-                0f
-            }
+        if (kind == StatusChipKind.Sync) {
+            SsSyncIcon(spinning = spinning && !reduce, size = IconSize.s, tint = fg)
+        } else if (icon != null) {
             SsIcon(
                 icon,
                 size = IconSize.s,
                 tint = fg,
                 filled = kind == StatusChipKind.Pass || kind == StatusChipKind.TargetMet,
-                modifier = Modifier.rotate(rotation),
             )
         }
         Text(

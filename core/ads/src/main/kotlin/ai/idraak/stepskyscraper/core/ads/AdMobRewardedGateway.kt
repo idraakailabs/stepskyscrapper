@@ -6,124 +6,135 @@ import ai.idraak.stepskyscraper.core.domain.model.DomainError
 import ai.idraak.stepskyscraper.core.domain.model.Outcome
 import ai.idraak.stepskyscraper.core.domain.model.UiHost
 import ai.idraak.stepskyscraper.core.domain.repository.RewardedAdGateway
-import android.app.Activity
-import android.content.Context
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.google.android.ump.ConsentInformation
-import com.google.android.ump.ConsentRequestParameters
-import com.google.android.ump.UserMessagingPlatform
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.resume
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
- * The single opt-in rewarded ad. Consent is gathered with UMP before the SDK is initialised or any ad is
- * requested; the ad request carries no custom targeting (step data never reaches AdMob). Only the Skyline
- * reward card calls [prepare]; Build, onboarding and the topping-out ceremony never do.
+ * The single opt-in rewarded ad (doubles a finished tower's Blueprints; never floors).
+ *
+ * - Every SDK call is behind [AdsGate]: while ads are disabled there is no consent request, no SDK init and no
+ *   ad request, and [availability] reports [AdAvailability.Disabled] so the UI hides the offer.
+ * - [prepare] (reward card visible) never shows the consent form (BUG-007): it refreshes the consent status and
+ *   preloads only if consent already allows requests.
+ * - [show] (user tap) gathers consent first, initialises the SDK after consent, loads if needed, and succeeds
+ *   only when the SDK reported `onUserEarnedReward`.
+ * - Requests carry no custom targeting. Only the Skyline reward card calls this; Build, onboarding and the
+ *   topping-out ceremony never do.
  */
 @Singleton
-class AdMobRewardedGateway @Inject constructor(
-    @ApplicationContext private val context: Context,
+class AdMobRewardedGateway internal constructor(
+    private val gate: AdsGate,
+    private val sdk: AdSdk,
+    private val nanoTime: () -> Long,
 ) : RewardedAdGateway {
-    private val consent: ConsentInformation = UserMessagingPlatform.getConsentInformation(context)
-    private val initialized = AtomicBoolean(false)
+    @Inject constructor(gate: AdsGate, sdk: AdSdk) : this(gate, sdk, System::nanoTime)
+
     private val state = MutableStateFlow(AdAvailability.Unavailable)
-    private var ad: RewardedAd? = null
+    private val mutex = Mutex()
+    private var initialized = false
+    private var ad: RewardedHandle? = null
+    private var loadedAt = 0L
 
-    override val availability: Flow<AdAvailability> = state.asStateFlow()
+    override val availability: Flow<AdAvailability> =
+        combine(gate.enabled, state) { on, s -> if (on) s else AdAvailability.Disabled }.distinctUntilChanged()
 
-    override suspend fun prepare(host: UiHost) {
-        val activity = host as? Activity ?: return
-        if (!gatherConsent(activity)) {
-            state.value = AdAvailability.ConsentRequired
-            return
+    override suspend fun prepare(host: UiHost): Unit = mutex.withLock {
+        val unit = gate.currentUnitId()
+        if (unit == null) {
+            discard()
+            AdsLog.i("prepare skipped: ads disabled")
+            return@withLock
         }
-        if (initialized.compareAndSet(false, true)) {
-            suspendCancellableCoroutine { cont -> MobileAds.initialize(context) { cont.resume(Unit) } }
+        if (cachedAd() != null) {
+            state.value = AdAvailability.Ready
+            return@withLock
         }
-        load()
+        sdk.updateConsentInfo(host)
+        if (!sdk.canRequestAds()) {
+            // No form here: consent is gathered only when the user taps the ad button (BUG-007).
+            AdsLog.i("prepare: consent not given yet; waiting for tap")
+            state.value = AdAvailability.Unavailable
+            return@withLock
+        }
+        ensureInitialized()
+        load(unit)
     }
 
-    private suspend fun gatherConsent(activity: Activity): Boolean {
-        val updated = suspendCancellableCoroutine { cont ->
-            consent.requestConsentInfoUpdate(
-                activity,
-                ConsentRequestParameters.Builder().build(),
-                { cont.resume(true) },
-                { cont.resume(false) },
-            )
-        }
-        if (updated) {
-            suspendCancellableCoroutine { cont ->
-                UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { cont.resume(Unit) }
+    override suspend fun show(host: UiHost): Outcome<Unit> = mutex.withLock {
+        val unit = gate.currentUnitId() ?: return@withLock disabled()
+        if (!sdk.canRequestAds()) {
+            sdk.updateConsentInfo(host)
+            sdk.showConsentFormIfRequired(host)
+            if (!sdk.canRequestAds()) {
+                AdsLog.i("show: consent does not allow ad requests")
+                state.value = AdAvailability.ConsentRequired
+                return@withLock Outcome.Failure(DomainError.AdUnavailable(AdFailure.NoConsent))
             }
         }
-        return consent.canRequestAds()
-    }
-
-    private suspend fun load() {
-        if (ad != null) {
-            state.value = AdAvailability.Ready
-            return
-        }
-        state.value = AdAvailability.Loading
-        ad = suspendCancellableCoroutine { cont ->
-            RewardedAd.load(
-                context,
-                BuildConfig.REWARDED_UNIT_ID,
-                AdRequest.Builder().build(),
-                object : RewardedAdLoadCallback() {
-                    override fun onAdLoaded(loaded: RewardedAd) {
-                        cont.resume(loaded)
-                    }
-
-                    override fun onAdFailedToLoad(error: LoadAdError) {
-                        cont.resume(null)
-                    }
-                },
-            )
-        }
-        state.value = if (ad != null) AdAvailability.Ready else AdAvailability.Unavailable
-    }
-
-    override suspend fun show(host: UiHost): Outcome<Unit> {
-        val activity = host as? Activity ?: return Outcome.Failure(DomainError.AdUnavailable(AdFailure.NotLoaded))
-        if (!consent.canRequestAds()) return Outcome.Failure(DomainError.AdUnavailable(AdFailure.NoConsent))
-        val current = ad ?: return Outcome.Failure(DomainError.AdUnavailable(AdFailure.NotLoaded))
+        ensureInitialized()
+        val current = cachedAd() ?: load(unit)
+            ?: return@withLock Outcome.Failure(DomainError.AdUnavailable(AdFailure.NoFill))
+        // The switch may have flipped while loading or while the consent form was open.
+        if (gate.currentUnitId() == null) return@withLock disabled()
         ad = null
         state.value = AdAvailability.Unavailable
-        var earned = false
-        val result = suspendCancellableCoroutine { cont ->
-            current.fullScreenContentCallback = object : FullScreenContentCallback() {
-                override fun onAdDismissedFullScreenContent() {
-                    if (cont.isActive) {
-                        cont.resume(if (earned) Outcome.Success(Unit) else Outcome.Failure(DomainError.AdUnavailable(AdFailure.Dismissed)))
-                    }
-                }
-
-                override fun onAdFailedToShowFullScreenContent(error: AdError) {
-                    if (cont.isActive) cont.resume(Outcome.Failure(DomainError.AdUnavailable(AdFailure.NoFill)))
-                }
-            }
-            current.show(activity) { earned = true }
+        AdsLog.i("show")
+        when (sdk.show(current, host)) {
+            ShowResult.Earned -> Outcome.Success(Unit)
+            ShowResult.Dismissed -> Outcome.Failure(DomainError.AdUnavailable(AdFailure.Dismissed))
+            ShowResult.Failed -> Outcome.Failure(DomainError.AdUnavailable(AdFailure.NoFill))
         }
-        return result
+    }
+
+    private fun disabled(): Outcome<Unit> {
+        discard()
+        AdsLog.i("show refused: ads disabled")
+        return Outcome.Failure(DomainError.AdUnavailable(AdFailure.Disabled))
+    }
+
+    private fun discard() {
+        ad = null
+        state.value = AdAvailability.Unavailable
+    }
+
+    /** A loaded ad younger than [AD_TTL_NANOS]; rewarded ads expire an hour after loading. */
+    private fun cachedAd(): RewardedHandle? {
+        val current = ad ?: return null
+        if (nanoTime() - loadedAt < AD_TTL_NANOS) return current
+        ad = null
+        return null
+    }
+
+    private suspend fun ensureInitialized() {
+        if (initialized) return
+        AdsLog.i("MobileAds.initialize (after consent)")
+        sdk.initialize()
+        initialized = true
+    }
+
+    private suspend fun load(unit: String): RewardedHandle? {
+        state.value = AdAvailability.Loading
+        AdsLog.i("load request unit=$unit")
+        val loaded = sdk.loadRewarded(unit)
+        ad = loaded
+        loadedAt = nanoTime()
+        state.value = if (loaded != null) AdAvailability.Ready else AdAvailability.Unavailable
+        AdsLog.i(if (loaded != null) "loaded" else "no ad loaded")
+        return loaded
+    }
+
+    private companion object {
+        const val AD_TTL_NANOS = 55L * 60 * 1_000_000_000
     }
 }
 
@@ -132,4 +143,7 @@ class AdMobRewardedGateway @Inject constructor(
 abstract class AdsModule {
     @Binds
     abstract fun rewarded(impl: AdMobRewardedGateway): RewardedAdGateway
+
+    @Binds
+    abstract fun sdk(impl: GoogleAdSdk): AdSdk
 }

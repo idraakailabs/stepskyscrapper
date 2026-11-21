@@ -23,7 +23,9 @@ import ai.idraak.stepskyscraper.core.ui.mvi.MviViewModel
 import ai.idraak.stepskyscraper.core.ui.mvi.UiText
 import ai.idraak.stepskyscraper.core.ui.mvi.toUiText
 import androidx.compose.runtime.Immutable
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import javax.inject.Inject
@@ -120,6 +122,14 @@ object SkylineReducer {
     fun newest(towers: List<Tower>, today: LocalDate): Int? =
         towers.lastOrNull()?.takeIf { t -> t.toppedOutOn?.let { !it.isBefore(today.minusDays(1)) } == true }?.index
 
+    /**
+     * The tower that gets the amber pin, "New" chip and reward card: the one the ceremony asked to highlight
+     * (route argument, so a ceremony shown days after topping out still closes onto its tower — BUG-005), else
+     * the 24-hour newest.
+     */
+    fun highlighted(towers: List<Tower>, today: LocalDate, requested: Int?): Int? =
+        requested?.takeIf { r -> towers.any { it.index == r } } ?: newest(towers, today)
+
     fun step(selected: Int?, towers: List<Tower>, delta: Int): Int? {
         val idx = towers.indexOfFirst { it.index == selected }
         if (idx < 0) return selected
@@ -129,6 +139,7 @@ object SkylineReducer {
 
 @HiltViewModel
 class SkylineViewModel @Inject constructor(
+    savedState: SavedStateHandle,
     private val progress: GetTowerProgressUseCase,
     private val towersRepo: TowerRepository,
     private val ads: RewardedAdGateway,
@@ -137,6 +148,8 @@ class SkylineViewModel @Inject constructor(
     private val analytics: AnalyticsTracker,
     private val clock: AppClock,
 ) : MviViewModel<SkylineUiState, SkylineIntent, SkylineEffect>(SkylineUiState()) {
+    private val highlight: Int? = savedState.toRoute<SkylineRoute>().highlight
+
     init {
         viewModelScope.launch {
             combine(progress(), ads.availability) { s, a -> s to a }
@@ -160,19 +173,19 @@ class SkylineViewModel @Inject constructor(
 
     private suspend fun build(s: CitySnapshot, ad: AdAvailability): SkylineContent {
         val (district, towers) = SkylineReducer.districtTowers(s)
-        val newest = SkylineReducer.newest(towers, s.today)
-        val last = towers.lastOrNull()
-        val reward = last?.let { t ->
+        val newest = SkylineReducer.highlighted(towers, s.today, highlight)
+        val reward = towers.firstOrNull { it.index == newest }?.let { t ->
             val claimed = t.record.rewardedAdClaimed || wallet.hasEntry(CompleteTowerUseCase.adKey(t.index))
             RewardCard(
                 t.index,
                 t.name,
                 BlueprintLadder.blueprintsFor(t.target),
-                ad == AdAvailability.Ready,
+                // Tappable unless a load is in flight: a tap gathers consent and loads if nothing is ready yet.
+                ad != AdAvailability.Loading,
                 claimed,
                 s.entitlement.isPremium,
             )
-        }?.takeIf { newest != null }
+        }?.takeIf { ad != AdAvailability.Disabled } // ads switched off: no offer at all
         return SkylineContent(
             districtIndex = district,
             districtName = DistrictNames.forDistrict(district - 1),
@@ -241,7 +254,8 @@ class SkylineViewModel @Inject constructor(
                     },
                 )
             }
-            ads.prepare(host)
+            // Preload again only after a failed attempt; a claimed card never shows another ad.
+            if (result is Outcome.Failure) ads.prepare(host)
         }
     }
 }

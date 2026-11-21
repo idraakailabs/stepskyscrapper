@@ -28,6 +28,7 @@ import ai.idraak.stepskyscraper.core.ui.component.boldText
 import ai.idraak.stepskyscraper.core.ui.format.Formats
 import ai.idraak.stepskyscraper.core.ui.format.updatedAgoLower
 import ai.idraak.stepskyscraper.core.ui.mvi.Lce
+import ai.idraak.stepskyscraper.core.ui.platform.rememberNotificationsAllowed
 import ai.idraak.stepskyscraper.core.ui.preview.PreviewSurface
 import ai.idraak.stepskyscraper.core.ui.preview.ScreenPreviews
 import androidx.compose.foundation.background
@@ -459,7 +460,8 @@ private fun SettingsList(content: MeContent, nav: MeNavigation, onIntent: (MeInt
             },
             nav.stepSource,
         )
-        val notify = content.settings.notifyToppingOut || content.settings.notifyWeeklySummary
+        // "Off" whenever the OS blocks delivery, whatever the stored preference (BUG-001).
+        val notify = (content.settings.notifyToppingOut || content.settings.notifyWeeklySummary) && rememberNotificationsAllowed()
         SsSettingsRow(
             Symbol.Notifications,
             stringResource(R.string.me_notifications),

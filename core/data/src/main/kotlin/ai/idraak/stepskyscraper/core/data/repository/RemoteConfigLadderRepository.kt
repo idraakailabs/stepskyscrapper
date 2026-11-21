@@ -1,62 +1,29 @@
 package ai.idraak.stepskyscraper.core.data.repository
 
-import ai.idraak.stepskyscraper.core.domain.model.DomainError
 import ai.idraak.stepskyscraper.core.domain.model.Outcome
 import ai.idraak.stepskyscraper.core.domain.repository.LadderRepository
 import ai.idraak.stepskyscraper.core.domain.usecase.BlueprintLadder
-import android.content.Context
-import android.util.Log
-import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseException
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.remoteConfigSettings
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 
 /**
  * Blueprint ladder from Firebase Remote Config key `tower_ladder` ("10,25,50,100,160,250").
  * The bundled default is used offline, on malformed values, and when Firebase is not configured.
- * Only the ladder is fetched; nothing about the user is sent.
+ * [refresh] fetches all Remote Config values (including the `ads_enabled` switch) through [RemoteConfigSource].
  */
 @Singleton
 class RemoteConfigLadderRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+    private val source: RemoteConfigSource,
 ) : LadderRepository {
-    private val state = MutableStateFlow(BlueprintLadder.DEFAULT)
-    override val ladder: Flow<List<Int>> = state.asStateFlow()
+    override val ladder: Flow<List<Int>> = source.values.map { parse(it.ladderRaw) }.distinctUntilChanged()
 
-    private val config: FirebaseRemoteConfig? by lazy {
-        if (FirebaseApp.getApps(context).isEmpty()) {
-            null
-        } else {
-            FirebaseRemoteConfig.getInstance().apply {
-                setConfigSettingsAsync(remoteConfigSettings { minimumFetchIntervalInSeconds = FETCH_INTERVAL_S })
-                setDefaultsAsync(mapOf(KEY to BlueprintLadder.DEFAULT.joinToString(",")))
-            }
-        }
-    }
-
-    override suspend fun refresh(): Outcome<Unit> {
-        val rc = config ?: return Outcome.Success(Unit)
-        return try {
-            rc.fetchAndActivate().await()
-            state.value = parse(rc.getString(KEY))
-            Outcome.Success(Unit)
-        } catch (e: FirebaseException) {
-            Log.w(TAG, "Remote Config fetch failed; keeping ladder", e)
-            Outcome.Failure(DomainError.StepSourceFailed("Remote Config unavailable"))
-        }
-    }
+    override suspend fun refresh(): Outcome<Unit> = source.refresh()
 
     companion object {
-        const val KEY = "tower_ladder"
-        private const val TAG = "LadderConfig"
-        private const val FETCH_INTERVAL_S = 12L * 60 * 60
+        const val KEY = RemoteConfigSource.KEY_LADDER
 
         fun parse(raw: String?): List<Int> =
             BlueprintLadder.sanitize(raw?.split(',')?.mapNotNull { it.trim().toIntOrNull() })

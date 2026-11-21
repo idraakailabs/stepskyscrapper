@@ -15,6 +15,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,10 +33,13 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.liveRegion
@@ -62,18 +67,23 @@ fun SsBottomBar(items: List<NavItem>, selectedKey: String, onSelect: (String) ->
         ) {
             items.forEach { item ->
                 val selected = item.key == selectedKey
+                // The whole column is the touch target, but the press ripple draws only inside the 64 × 32
+                // capsule (as SSNav's pill), never as a rectangle over the full 80dp cell.
+                val interaction = remember { MutableInteractionSource() }
                 Column(
                     Modifier
                         .weight(1f)
                         .heightIn(min = SsSpacing.touchTarget)
-                        .selectable(selected, role = Role.Tab) { onSelect(item.key) },
+                        .selectable(selected, interaction, indication = null, role = Role.Tab) { onSelect(item.key) },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(SsSpacing.xs, Alignment.CenterVertically),
                 ) {
                     Box(
                         Modifier
                             .size(SsSpacing.navPillWidth, SsSpacing.navPillHeight)
-                            .background(if (selected) c.navPill else androidx.compose.ui.graphics.Color.Transparent, SsRadius.shapeFull),
+                            .clip(SsRadius.shapeFull)
+                            .background(if (selected) c.navPill else androidx.compose.ui.graphics.Color.Transparent)
+                            .indication(interaction, ripple()),
                         contentAlignment = Alignment.Center,
                     ) {
                         SsIcon(item.symbol, size = IconSize.l, tint = if (selected) c.onSurface else c.onSurfaceVariant, filled = selected)

@@ -3,9 +3,10 @@
 > **Scope:** how the system is built today (the Phase 1 baseline), important technical decisions, and the
 > index of technical concerns. Defects: [BUGS.md](BUGS.md) · Planned work: [ROADMAP.md](ROADMAP.md) ·
 > Product: [PRODUCT.md](PRODUCT.md) · Design deviations: [design-deviations.md](design-deviations.md) ·
-> Release checklist: [play-console-checklist.md](play-console-checklist.md).
+> Release checklist: [play-console-checklist.md](play-console-checklist.md) · Release status:
+> [RELEASE-READINESS.md](RELEASE-READINESS.md).
 >
-> **Baseline:** version 1.0.0, commit `e5c003b` on `main`. **Last reviewed:** 2026-11-20.
+> **Baseline:** version 1.0.0, commit `e5c003b` on `main`. **Last reviewed:** 2026-11-21 (release-readiness review).
 
 ---
 
@@ -71,9 +72,12 @@ City (every screen)
     → CityCalculator: floors = steps / 1000 per day, flowing into towers in order (overflow to next tower)
     → CitySnapshot (today, week, stats, level, achievements, Blueprints)
 
-Rewarded ad
-  Skyline reward card visible → RewardedAdGateway.prepare (UMP consent, then load)  // see BUG-007
-  tap → ClaimRewardedBonusUseCase → show → wallet "tower_ad:N"                       // never grants floors
+Rewarded ad (core:ads, every SDK call behind AdsGate; see §5.1)
+  Skyline reward card visible → RewardedAdGateway.prepare        // consent status refresh only, no UI; preload if consent allows
+  tap → ClaimRewardedBonusUseCase → show                          // consent form if required → MobileAds.initialize → load → show
+      → wallet "tower_ad:N" only when onUserEarnedReward fired     // never grants floors
+  ads disabled (AdAvailability.Disabled) → no reward card, no consent request, no SDK init, no ad request
+  Help & privacy → AdPrivacyChoices.isRequired → "Ad privacy choices" row → UMP privacy options form
 ```
 
 ## 4. Storage map
@@ -81,7 +85,7 @@ Rewarded ad
 | Store | Location | Contents | Survives restart? |
 |---|---|---|---|
 | Room `step_skyscraper.db` | `core/database` | `day_steps` (totals), `floor_events`, `towers` (name, look, frozen target, ceremony/ad flags), `wallet` (keyed Blueprint ledger), `unlocks`, `achievements`, `counters` | Yes; Android backup |
-| DataStore `user_prefs` | `core/datastore/.../PreferenceStores.kt` | Onboarding, start date, goals, pause, appearance, notifications, sync timestamps, sensor baseline, entitlement cache | Yes; Android backup |
+| DataStore `user_prefs` | `core/datastore/.../PreferenceStores.kt` | Onboarding, start date, goals, pause, appearance, notifications (+ `notify_prompt_handled`, the one-time permission prompt), sync timestamps, sensor baseline, entitlement cache | Yes; Android backup |
 | In memory | `PreferencesSyncStatusRepository.running` | "Syncing…" flag | No (by design) |
 | Cache dir `share/` | `AndroidPlatformActions.shareImage` | Last exported share PNG | Until cleared |
 
@@ -92,27 +96,110 @@ Backup rules: `app/src/main/res/xml/backup_rules.xml`, `data_extraction_rules.xm
 
 | Key / variable | Default | Used by |
 |---|---|---|
-| `ADMOB_APP_ID` (gradle property) | Google sample id | Manifest `com.google.android.gms.ads.APPLICATION_ID` |
-| `ADMOB_REWARDED_UNIT_ID` | Google sample rewarded unit | `core:ads` BuildConfig |
-| `PRIVACY_POLICY_URL` | empty (link hidden) | `AndroidPlatformActions.openPrivacyPolicy` |
+| `ADMOB_APP_ID_PROD` / `ADMOB_REWARDED_UNIT_ID_PROD` (Gradle property or env var, never committed) | absent → `release` has ads disabled; `bundleRelease` fails (`verifyReleaseAdMob`) | `release` variant only: manifest `APPLICATION_ID`, `BuildConfig.ADMOB_LIVE_*` (§5.1) |
+| `ADMOB_TEST_DEVICE_ID`, `ADMOB_UMP_DEBUG_EEA` | empty / false | Debug only: UMP debug geography and test device for consent testing; release always empty |
+| Remote Config `ads_enabled` | `false` | Prod Release kill switch for the rewarded ad (§5.1); debug ignores it |
+| `PRIVACY_POLICY_URL` (`gradle.properties`, public) | empty (link hidden) → `bundleRelease` fails (`verifyReleasePrivacyPolicy`, needs `https://`) | `AndroidPlatformActions.openPrivacyPolicy`; draft text in [privacy-policy.md](privacy-policy.md) |
 | `SUPPORT_EMAIL` | empty (generic share sheet) | Diagnostic draft |
 | `app/google-services.json` | absent | Applies Google Services + Crashlytics plugins only if present |
 | Remote Config `tower_ladder` | `10,25,50,100,160,250` (bundled) | `RemoteConfigLadderRepository`; malformed values fall back |
 | `keystore.properties` or `STEPSKY_KEYSTORE_FILE` / `STEPSKY_KEYSTORE_PASSWORD` / `STEPSKY_KEY_ALIAS` / `STEPSKY_KEY_PASSWORD` | absent → release **unsigned**, `bundleRelease` fails | `app/build.gradle.kts` (template `keystore.properties.example`) |
 
-Live values (Firebase, AdMob, Play Console) weren't available; they are unverified.
+Live values (Firebase, AdMob, Play Console) weren't available; they are unverified. The old `ADMOB_APP_ID` /
+`ADMOB_REWARDED_UNIT_ID` properties were removed and are no longer read.
+
+### 5.1 AdMob and the `ads_enabled` switch
+
+One opt-in rewarded ad (Skyline reward card, doubles a finished tower's Blueprints) with UMP consent. Classes in
+`core:ads`: `AdsEnvironment` (from per-variant `BuildConfig`, provided by `app/.../ads/AdsEnvironmentModule.kt`),
+`AdsConfigResolver` → `AdSetup.Test` / `Live(unit)` / `NotConfigured`, `AdsGate`, `AdSdk` (`GoogleAdSdk` is the only
+class that calls Google Mobile Ads / UMP), `AdMobRewardedGateway`, `AdMobPrivacyChoices`. Logcat tag `StepSkyAds`
+(no step or floor values); gate line: `gate mode=<Test|Live|NotConfigured> enabled=<bool> ids=<test|live|none> unit=<id or ->`.
+
+| Variant | Manifest app id | Rewarded unit | `ads_enabled` | Ads |
+|---|---|---|---|---|
+| `debug` (`.debug`), `benchmarkRelease`, `nonMinifiedRelease` | Google test `ca-app-pub-3940256099942544~3347511713` | Google test `…/5224354917` | Never read | Always on, test ads only |
+| `release` with valid live ids (Play build) | `ADMOB_APP_ID_PROD` | `ADMOB_REWARDED_UNIT_ID_PROD` | `true` → on; `false` / unset / never fetched / no Firebase → off | Live ads only while the switch is on |
+| `release` without valid live ids (local `assembleRelease`) | Google test (SDK start-up check only) | none | Irrelevant | Off: no consent request, init or ad request; build log `w: AdMob: … ads disabled` |
+| `bundleRelease` without valid live ids (missing, malformed or Google sample) | — | — | — | **Build fails** (`verifyReleaseAdMob`) |
+
+Test ids are hard-coded in `app/build.gradle.kts` and `core:ads` `AdMobIds`, never read from properties or Remote Config.
+
+**Remote Config `ads_enabled`:** Boolean, in-app default `false`. Fetched with `tower_ladder` by the single
+`RemoteConfigSource` client (`core:data`) at app start (`MainActivity` → `LadderRepository.refresh()`) and in the sync
+worker, with a 12-hour minimum fetch interval. The last **activated** value is used, so a `true` from an earlier session
+stays in effect offline, and turning ads off in the console reaches a device on its next successful fetch (up to ~12 h
+plus the next launch; real-time updates aren't implemented). When the switch turns off, a loaded ad is discarded and
+nothing more is requested. Safe default: anything other than a fetched `true` means no ads.
+
+**Policy-relevant behaviour:** consent is gathered only on the user's tap (BUG-007); `MobileAds.initialize` runs on
+`Dispatchers.IO` once, after consent; `DELAY_APP_MEASUREMENT_INIT=true`; requests carry no custom targeting; the
+reward needs `onUserEarnedReward`; once per finished tower (wallet key `tower_ad:N`), hidden for Architect Pass
+members; no preload after a successful claim; a loaded ad expires after 55 minutes; no ads on Build, onboarding, the
+ceremony, the paywall or widgets. Help & privacy shows **Ad privacy choices** (UMP `showPrivacyOptionsForm`) while
+ads are enabled and UMP reports `PrivacyOptionsRequirementStatus.REQUIRED`.
+
+**Testing ads safely**
+- Never tap a live ad or create live impressions on your own devices. Use the debug build: it can only request
+  Google's test unit, whatever the properties or Remote Config say (the ad shows a "Test Ad" label).
+- To exercise a release build with live ids, first register the phone in AdMob › Settings › Test devices, or keep
+  `ads_enabled` false for it (Remote Config condition).
+- Consent form in debug: run once, tap the ad button, copy the hashed id from
+  `adb logcat | findstr /i "addTestDeviceHashedId"`, then set `ADMOB_TEST_DEVICE_ID=<hash>` and
+  `ADMOB_UMP_DEBUG_EEA=true` in `~/.gradle/gradle.properties`, reinstall, and reset consent with
+  `adb shell pm clear ai.idraak.stepskyscraper.debug` (also clears app data). The form appears only once a GDPR message
+  is published for the AdMob app.
+- Watch `adb logcat -s StepSkyAds`. The reward card shows only for a tower topped out in the last 24 h, for non-Pass
+  users who haven't claimed it.
+- Checks: `./gradlew :app:verifyReleaseAdMob` fails without live ids and with Google's sample ids;
+  `./gradlew --dry-run :app:bundleRelease` lists `verifyReleaseAdMob`, `verifyReleasePrivacyPolicy` and `verifyReleaseSigning`.
 
 ## 6. Build, signing and release
 
 - Application id / namespace: `ai.idraak.stepskyscraper` (renamed from `com.idraak.stepskyscraper` on
   2026-11-20, before any store release); library namespaces follow `ai.idraak.stepskyscraper.<module path>`.
-- Variants: `debug` (`.debug` suffix) and `release` (R8 minify + resource shrinking, `app/proguard-rules.pro`).
+- Version: `versionCode = 1`, `versionName = "1.0.0"` (`app/build.gradle.kts` `defaultConfig`); raise `versionCode`
+  for every upload. minSdk 26, targetSdk 37 (Play requires API 36+ for new apps and updates since 31 Aug 2026).
+- Variants: `debug` (`.debug` suffix) and `release` (R8 minify + resource shrinking, `app/proguard-rules.pro`: keep
+  rules for `@Serializable` navigation routes and Glance receivers; `SourceFile,LineNumberTable` kept for Crashlytics).
+  With `google-services.json` present the Crashlytics Gradle plugin (3.0.8) uploads the R8 mapping file for minified
+  builds by default. Without it, Firebase is skipped (no analytics, crash reports or Remote Config).
+- Release guards wired into `bundleRelease`: `verifyReleaseSigning` (upload key), `verifyReleaseAdMob` (live ids,
+  §5.1), `verifyReleasePrivacyPolicy` (`PRIVACY_POLICY_URL` starts with `https://`). `assembleRelease` (part of
+  `build`) still produces `app-release-unsigned.apk` for smoke tests.
+- Building the upload: put `keystore.properties`, `ADMOB_*_PROD`, `PRIVACY_POLICY_URL` and `app/google-services.json` in
+  place, then `./gradlew clean :app:bundleRelease` → `app/build/outputs/bundle/release/app-release.aab`. Step-by-step:
+  [play-console-checklist.md §2](play-console-checklist.md#2-build-the-signed-aab).
+- Permissions in the merged release manifest (checked with `aapt2 dump permissions`, 2026-11-21):
+
+  | Permission | Source | Why |
+  |---|---|---|
+  | `health.READ_STEPS`, `health.READ_HEALTH_DATA_IN_BACKGROUND` | app | Daily step totals; background read for widget and periodic sync |
+  | `ACTIVITY_RECOGNITION` | app | `TYPE_STEP_COUNTER` fallback without Health Connect |
+  | `POST_NOTIFICATIONS` | app | Topping-out and weekly-summary notifications (requested after the first topping-out or from Settings) |
+  | `INTERNET`, `ACCESS_NETWORK_STATE` | app | Firebase, Remote Config, ads, billing |
+  | `WRITE_EXTERNAL_STORAGE` (maxSdk 28) | app | Save share image on Android 8–9 |
+  | `com.google.android.gms.permission.AD_ID`, `ACCESS_ADSERVICES_AD_ID` / `_ATTRIBUTION` / `_TOPICS` | Google Mobile Ads | Rewarded ad (declare "uses advertising ID" in Play Console) |
+  | `com.android.vending.BILLING` | Play Billing | Architect Pass |
+  | `BIND_GET_INSTALL_REFERRER_SERVICE` | Firebase Analytics / Ads | Install attribution |
+  | `WAKE_LOCK` | WorkManager, Firebase | Background sync and measurement |
+  | `<package>.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | AndroidX core | Signature-level, internal receivers |
+
+  `FOREGROUND_SERVICE` (merged from WorkManager) is removed with `tools:node="remove"`: the app never runs foreground
+  work. No exact-alarm, location or foreground-service-type permissions are declared.
+- Health Connect privacy rationale: `ACTION_SHOW_PERMISSIONS_RATIONALE` (intent filter on `MainActivity`) and the
+  Android 14 `ViewPermissionUsageActivity` alias (`VIEW_PERMISSION_USAGE` + `HEALTH_PERMISSIONS`, guarded by
+  `START_VIEW_PERMISSION_USAGE`) open Help & privacy as a standalone screen (`MainActivity` checks `intent.action`).
+- Backup: `allowBackup=true`; `backup_rules.xml` (Android 11 and lower) and `data_extraction_rules.xml` (12+: cloud
+  backup and device transfer) include only `step_skyscraper.db` and `datastore/user_prefs.preferences_pb`.
 - Signing: upload key from `keystore.properties` (git-ignored, `storeFile` relative to the root, e.g. under the
   ignored `keystore/` folder) or the `STEPSKY_*` environment variables in CI. Never the debug key: without a key
   the release APK is unsigned and `bundleRelease` stops at `verifyReleaseSigning`.
 - Baseline profile: hand-seeded `app/src/main/baseline-prof.txt`; generator in `:baselineprofile` needs a
   device ([TECH-006](ROADMAP.md#tech-006)).
-- Git: `main`, remote `origin` = `github.com/idraakailabs/stepskyscrapper`; baseline commit `e5c003b`. `.gitattributes` pins LF line endings. No CI configuration yet.
+- Git: `develop` is the integration branch and `main` is release-only (merges are the user's call); remote
+  `origin` = `github.com/idraakailabs/stepskyscrapper`; baseline commit `e5c003b`. `.gitattributes` pins LF line
+  endings. No CI configuration yet.
 
 ### Debug-only device tools
 
@@ -128,7 +215,10 @@ Live values (Firebase, AdMob, Play Console) weren't available; they are unverifi
 ### Verification commands
 
 Run on 2026-11-20 with JDK 21: `build test lint` passed; the release APK (6.3 MB) launched on an Android 16
-emulator, through onboarding with the real Health Connect sheet, to Build and Me.
+emulator, through onboarding with the real Health Connect sheet, to Build and Me. 2026-11-21 (integration, Pixel 6a,
+Android 16): the R8 release APK (throwaway signing key, ads `NotConfigured`) opened onboarding, Build, Skyline,
+Customise, Me and Share with no crash, and made no consent, SDK-init or ad request. 2026-11-21 (release-readiness
+review): `ktlintFormat build test lint` green after the review fixes.
 
 ```powershell
 ./gradlew build test lint
@@ -146,8 +236,10 @@ emulator, through onboarding with the real Health Connect sheet, to Build and Me
 
 84 tests: domain logic (floor maths, ladder, city derivation, weekly goal, adaptive target, levels, sky clock,
 achievements, cosmetics, step-counter reboot handling), Room DAOs, sync use case, ViewModel reducers, Compose UI
-tests for Onboarding and Build, and Roborazzi screenshots (tower renderer, key screens, gallery). Gaps: no tests
-for `core:steps`, `core:billing`, `core:ads`, `widget`; screenshots are recorded but not verified in the build
+tests for Onboarding and Build, and Roborazzi screenshots (tower renderer, key screens, gallery). Since then:
+ad gating (`AdsGatingTest`, `AdMobPrivacyChoicesTest` in `core:ads`), `RemoteConfigAdsSwitchTest`,
+`SkylineRewardGatingTest`, `CeremonyViewModelTest`, `ShareSaveFeedbackTest`, and more `MeTest` / `SkylineTest` cases.
+Gaps: no tests for `core:steps`, `core:billing`, `widget`; screenshots are recorded but not verified in the build
 ([TECH-008](ROADMAP.md#tech-008), [TECH-009](ROADMAP.md#tech-009)).
 
 ## 7. Technical concerns
@@ -158,7 +250,7 @@ Index only; details live in the linked card.
 |---|---|---|
 | [TECH-001](ROADMAP.md#tech-001) | Process | No version control; docs can't cite commits |
 | [TECH-002](ROADMAP.md#tech-002) | Observability | Firebase not configured: no analytics, crash reports or Remote Config |
-| [TECH-003](ROADMAP.md#tech-003) | Ads | Google sample AdMob ids by default |
+| [TECH-003](ROADMAP.md#tech-003) | Ads | Code side done (per-variant ids, `verifyReleaseAdMob`, `ads_enabled`, privacy options); live ids and UMP messages pending |
 | [TECH-004](ROADMAP.md#tech-004) | Billing | Play products not created; purchase flows unverified |
 | [TECH-005](ROADMAP.md#tech-005) | Release | Upload key not created yet; build side fixed (no debug fallback) |
 | [TECH-006](ROADMAP.md#tech-006) | Performance | Baseline profile hand-seeded, startup not measured |
@@ -166,7 +258,8 @@ Index only; details live in the linked card.
 | [TECH-008](ROADMAP.md#tech-008) | Tests | Screenshot tests not verified; no CI |
 | [TECH-009](ROADMAP.md#tech-009) | Tests | Steps, billing, ads, widget untested |
 | [TECH-010](ROADMAP.md#tech-010) | Observability | `CrashReporter` unused; non-fatal errors not recorded |
-| [TECH-011](ROADMAP.md#tech-011) | Compliance | Privacy policy URL, Health apps declaration, Data safety |
+| [TECH-011](ROADMAP.md#tech-011) | Compliance | Privacy policy drafted, not hosted; Health apps declaration, Data safety |
+| [TECH-013](ROADMAP.md#tech-013) | Release | Play readiness review: findings and fixes |
 
 ## 8. Implementation guidelines
 
@@ -176,7 +269,8 @@ Index only; details live in the linked card.
   rewards need a new key prefix to stay idempotent.
 - **Room changes** need a version bump and a migration; schemas are exported to `core/database/schemas/`.
 - **No step values** in `AnalyticsEvent` params, ad requests or logs.
-- **No ads** on Build, onboarding or the ceremony; `RewardedAdGateway.prepare` is only called from Skyline.
+- **No ads** on Build, onboarding or the ceremony; `RewardedAdGateway` is only injected by `SkylineViewModel`.
+  Every Google Mobile Ads / UMP call goes through `AdSdk` behind `AdsGate`; never show a consent form without a tap.
 - **Strings** in each module's `res/values/strings.xml`; bold spans use escaped `&lt;b>` and `boldText()`.
 - **Design tokens only** (`SsTheme.colors/type`, `SsSpacing`, `SsRadius`, `SsMotion`); no raw colours or dp
   in features.
@@ -184,5 +278,8 @@ Index only; details live in the linked card.
   ≈1.3em for DM Sans) gets `Modifier.cssLineBox(style)`; Android otherwise keeps the font's full ascent/descent
   and the text sits up to 15dp taller than the design. Rows that pair a number with a unit use
   `alignByBaseline()`; `RollingNumber` reports its own baseline.
+- **Permission callbacks:** `AndroidPlatformActions` uses one `permissionLauncher` for ACTIVITY_RECOGNITION,
+  POST_NOTIFICATIONS and WRITE_EXTERNAL_STORAGE and runs every pending callback on any result. Safe while only one
+  request is pending at a time; split it before adding concurrent requests.
 - **Release-only risks:** kotlinx-serialization routes and Glance receivers need the keep rules in
   `app/proguard-rules.pro`.

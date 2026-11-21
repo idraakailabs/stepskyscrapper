@@ -3,12 +3,8 @@ plugins {
     alias(libs.plugins.stepsky.android.hilt)
 }
 
-android {
-    buildFeatures { buildConfig = true }
-    defaultConfig {
-        buildConfigField("String", "REWARDED_UNIT_ID", "\"${providers.gradleProperty("ADMOB_REWARDED_UNIT_ID").get()}\"")
-    }
-}
+// Ad unit ids are chosen at runtime from AdsEnvironment, which :app provides per variant (see
+// app/build.gradle.kts): debug variants always get Google's test ids, only the release variant gets live ids.
 
 dependencies {
     implementation(projects.core.domain)

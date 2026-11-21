@@ -1,6 +1,7 @@
 package ai.idraak.stepskyscraper.core.data.di
 
 import ai.idraak.stepskyscraper.core.data.notify.ProgressNotifier
+import ai.idraak.stepskyscraper.core.data.repository.RemoteConfigAdsSwitch
 import ai.idraak.stepskyscraper.core.data.repository.RemoteConfigLadderRepository
 import ai.idraak.stepskyscraper.core.data.repository.RoomAchievementRepository
 import ai.idraak.stepskyscraper.core.data.repository.RoomStepsRepository
@@ -12,6 +13,7 @@ import ai.idraak.stepskyscraper.core.datastore.PreferencesSettingsRepository
 import ai.idraak.stepskyscraper.core.datastore.PreferencesSyncStatusRepository
 import ai.idraak.stepskyscraper.core.domain.AppClock
 import ai.idraak.stepskyscraper.core.domain.repository.AchievementRepository
+import ai.idraak.stepskyscraper.core.domain.repository.AdsRemoteSwitch
 import ai.idraak.stepskyscraper.core.domain.repository.LadderRepository
 import ai.idraak.stepskyscraper.core.domain.repository.SettingsRepository
 import ai.idraak.stepskyscraper.core.domain.repository.StepsRepository
@@ -72,6 +74,8 @@ abstract class DataModule {
     @Binds abstract fun achievements(impl: RoomAchievementRepository): AchievementRepository
 
     @Binds abstract fun ladder(impl: RemoteConfigLadderRepository): LadderRepository
+
+    @Binds abstract fun adsSwitch(impl: RemoteConfigAdsSwitch): AdsRemoteSwitch
 
     @Binds abstract fun settings(impl: PreferencesSettingsRepository): SettingsRepository
 

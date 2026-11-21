@@ -13,6 +13,10 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
+    <!-- Merged from WorkManager for setForeground(); the app never runs foreground work, so drop it. -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE"
+        tools:node="remove" />
 
     <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
 
@@ -88,9 +92,13 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="${admobAppId}" />
-        <!-- Ads initialise only after UMP consent, from the Skyline reward card. -->
+        <!-- Ads initialise only after UMP consent, from a tap on the Skyline reward card (core:ads AdsGate). -->
         <meta-data
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
+            android:value="true" />
+        <!-- No Mobile Ads app-measurement events before MobileAds.initialize, which runs only after consent. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT"
             android:value="true" />
         <!-- Analytics: anonymous only; no advertising id, no ad personalisation signals. -->
         <meta-data

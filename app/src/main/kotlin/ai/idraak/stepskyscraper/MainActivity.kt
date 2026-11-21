@@ -11,6 +11,7 @@ import ai.idraak.stepskyscraper.core.steps.HealthConnectStepSource
 import ai.idraak.stepskyscraper.core.steps.SensorStepSource
 import ai.idraak.stepskyscraper.core.ui.platform.LocalPlatformActions
 import ai.idraak.stepskyscraper.core.ui.platform.LocalUiHost
+import ai.idraak.stepskyscraper.feature.me.PrivacyRoute
 import ai.idraak.stepskyscraper.navigation.StepSkyscraperApp
 import ai.idraak.stepskyscraper.platform.AndroidPlatformActions
 import android.os.Bundle
@@ -64,6 +65,9 @@ class MainActivity : ComponentActivity(), UiHost {
         enableEdgeToEdge()
         splash.setKeepOnScreenCondition { viewModel.settings.value == null }
         val platform = AndroidPlatformActions(this, healthConnect, sensor)
+        // Health Connect's "privacy policy" link (Android 13 and lower) and permission-usage screen (Android 14+)
+        // open Help & privacy on its own: the in-app privacy summary plus the hosted policy link.
+        val privacyRationale = intent?.action in PRIVACY_RATIONALE_ACTIONS
         setContent {
             val settings by viewModel.settings.collectAsStateWithLifecycle()
             val current = settings ?: return@setContent
@@ -74,9 +78,20 @@ class MainActivity : ComponentActivity(), UiHost {
             }
             SsTheme(darkTheme = dark) {
                 CompositionLocalProvider(LocalPlatformActions provides platform, LocalUiHost provides this) {
-                    StepSkyscraperApp(onboardingComplete = current.onboardingComplete)
+                    if (privacyRationale) {
+                        PrivacyRoute(onBack = ::finish, onStepHelp = null)
+                    } else {
+                        StepSkyscraperApp(onboardingComplete = current.onboardingComplete)
+                    }
                 }
             }
         }
+    }
+
+    private companion object {
+        val PRIVACY_RATIONALE_ACTIONS = setOf(
+            "androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE",
+            "android.intent.action.VIEW_PERMISSION_USAGE",
+        )
     }
 }

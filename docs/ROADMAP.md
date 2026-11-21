@@ -5,16 +5,16 @@
 > [BUGS.md](BUGS.md); this file only schedules them. Rationale: [PRODUCT.md](PRODUCT.md) · Context:
 > [TECHNICAL.md](TECHNICAL.md).
 >
-> **Last updated:** 2026-11-21
+> **Last updated:** 2026-11-21 (release-readiness review)
 
 ## Current position
 
 | | |
 |---|---|
-| **Live baseline** | Phase 1, version 1.0.0, commit `e5c003b` on `main` (not published) |
-| **Active phase** | Phase 2, Release blockers (not started) |
-| **In progress** | [TECH-012](#tech-012) design parity pass on a Pixel 6a: all screens checked; open: widgets / font scale / TalkBack on device (need the user's phone settings) |
-| **Recommended next task** | Finish [TECH-005](#tech-005) by creating the upload key and uploading to internal testing (needs you), then [TECH-002](#tech-002) (Firebase). |
+| **Live baseline** | Phase 1, version 1.0.0 (versionCode 1), commit `e5c003b` on `main` (not published). Release-prep work is on the release branches, not yet merged into `develop` |
+| **Active phase** | Phase 2, Release blockers: every code-side item is done; what remains are your console and key actions (see [RELEASE-READINESS.md](RELEASE-READINESS.md)) |
+| **In progress** | [TECH-005](#tech-005) (upload key), [TECH-003](#tech-003) (live AdMob ids, UMP messages), [TECH-011](#tech-011) (host the policy, declarations), [TECH-012](#tech-012) (on-device checks that need your phone settings) |
+| **Recommended next task** | You: create the upload key, Firebase project and AdMob app, host [privacy-policy.md](privacy-policy.md), then build the AAB and upload it to internal testing ([play-console-checklist.md](play-console-checklist.md)). Then [TECH-004](#tech-004) billing products and [TECH-007](#tech-007) release smoke test. |
 
 Update this table whenever a task starts, finishes or the active phase changes.
 
@@ -44,6 +44,7 @@ Architecture: [TECHNICAL.md](TECHNICAL.md). Known defects: [BUGS.md](BUGS.md). D
 - Clean modular architecture (MVI, Hilt, Room, DataStore, WorkManager); 84 passing tests; green
   `build test lint` and an R8 release APK.
 - Gaps: Firebase/AdMob/Play not configured, debug-signed release, no CI, six small design gaps (inventory items marked `[~]`).
+  (Release prep since then: signing guard, AdMob hardening, bug fixes and the Play readiness review; see Phase 2.)
 
 ---
 
@@ -58,10 +59,12 @@ testing track with crash reports, analytics, real ads and working purchases.
 | [TECH-001](#tech-001) | Put the project under version control | Technical task | P1 | Done | — |
 | [BUG-008](BUGS.md#bug-008) | Build feature module missing from Git | Confirmed bug | P0 | Done | — |
 | [TECH-002](#tech-002) | Configure Firebase (Analytics, Crashlytics, Remote Config) | Technical task | P0 | Planned | Firebase console |
-| [TECH-003](#tech-003) | Real AdMob ids and UMP consent message | Technical task | P0 | Planned | AdMob console |
+| [TECH-003](#tech-003) | Real AdMob ids and UMP consent message | Technical task | P0 | In Progress (code done; ids and console pending you) | AdMob console |
 | [TECH-004](#tech-004) | Create Play billing products and test purchases | Technical task | P0 | Planned | Play Console |
 | [TECH-005](#tech-005) | Release signing | Technical task | P0 | In Progress | Upload key |
-| [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | Planned | Hosted policy, Play Console |
+| [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | In Progress (drafts done; hosting and console pending you) | Hosted policy, Play Console |
+| [TECH-013](#tech-013) | Play release readiness review | Technical task | P0 | Done | — |
+| [BUG-018](BUGS.md#bug-018) | Health Connect privacy link opens Build | Confirmed bug | P1 | Fixed – unverified | — |
 
 ## Phase 3 — Reliability and release quality
 
@@ -80,11 +83,13 @@ measured, regressions caught automatically.
 | [BUG-014](BUGS.md#bug-014) | Me "Today" label clipped | Confirmed bug | P3 | Done | — |
 | [BUG-015](BUGS.md#bug-015) | Me scrolls under the status bar | Confirmed bug | P3 | Done | — |
 | [TECH-006](#tech-006) | Generate the baseline profile and measure startup | Technical task | P1 | Planned | Device |
-| [BUG-001](BUGS.md#bug-001) | Notifications "on" but never delivered on Android 13+ | Confirmed bug | P2 | Open | — |
-| [BUG-003](BUGS.md#bug-003) | "Save image" gives no feedback | Confirmed bug | P2 | Open | — |
+| [BUG-001](BUGS.md#bug-001) | Notifications "on" but never delivered on Android 13+ | Confirmed bug | P2 | Fixed – unverified | — |
+| [BUG-003](BUGS.md#bug-003) | "Save image" gives no feedback | Confirmed bug | P2 | Fixed – unverified | — |
+| [BUG-016](BUGS.md#bug-016) | "Syncing…" icon wobbles while rotating | Confirmed bug | P3 | Done | — |
+| [BUG-017](BUGS.md#bug-017) | Rectangular ripple on capsule tabs | Confirmed bug | P3 | Done | — |
 | [TECH-008](#tech-008) | CI with screenshot verification | Technical task | P2 | Planned | TECH-001 |
-| [TECH-009](#tech-009) | Tests for steps, billing, ads and widget | Technical task | P2 | Planned | — |
-| [BUG-007](BUGS.md#bug-007) | Ad consent form may appear on Skyline open | Suspected issue | P3 | Open | TECH-003 |
+| [TECH-009](#tech-009) | Tests for steps, billing, ads and widget | Technical task | P2 | In Progress (ads done) | — |
+| [BUG-007](BUGS.md#bug-007) | Ad consent form may appear on Skyline open | Suspected issue | P3 | Fixed – unverified | TECH-003 |
 | [TECH-010](#tech-010) | Record non-fatal errors in Crashlytics | Technical task | P3 | Planned | TECH-002 |
 
 ## Phase 4 — Core product value
@@ -119,7 +124,7 @@ Goal: finish the remaining design details. Each item is optional.
 | [PROD-003](#prod-003) | Remaining motion details from the design | Product improvement | P3 | Planned | — |
 | [PROD-004](#prod-004) | "Equip" shortcut and Customise sticky thumbnail | Product improvement | P3 | Planned | — |
 | [PROD-005](#prod-005) | Localise cosmetic and achievement names | Technical task | P3 | Planned | — |
-| [BUG-005](BUGS.md#bug-005) | Skyline ignores the highlight argument | Confirmed bug | P3 | Open | — |
+| [BUG-005](BUGS.md#bug-005) | Skyline ignores the highlight argument | Confirmed bug | P3 | Fixed – unverified | — |
 | [BUG-006](BUGS.md#bug-006) | Payoff partial floor at 0 steps | Confirmed bug | P3 | Fixed – unverified | — |
 
 ## Not planned
@@ -171,8 +176,8 @@ Bug cards are in [BUGS.md](BUGS.md).
 
 <a id="tech-003"></a>
 ### TECH-003 — Real AdMob ids and UMP consent message
-- **Type:** Technical task · **Priority:** P0 · **Status:** Planned · **Effort:** S
-- **Problem (verified):** `gradle.properties` defaults `ADMOB_APP_ID` / `ADMOB_REWARDED_UNIT_ID` to Google's
+- **Type:** Technical task · **Priority:** P0 · **Status:** In Progress (code side done; live ids and console steps pending the user) · **Effort:** S
+- **Problem (verified):** `gradle.properties` defaulted `ADMOB_APP_ID` / `ADMOB_REWARDED_UNIT_ID` to Google's
   public sample ids; shipping them earns nothing and breaks ad policy.
 - **Solution:** create the app and a rewarded unit; set the ids in `~/.gradle/gradle.properties` or CI; create
   GDPR and US-state consent messages; fail the release build when sample ids are used.
@@ -182,6 +187,18 @@ Bug cards are in [BUGS.md](BUGS.md).
   1. `./gradlew :app:assembleRelease` fails if the sample app id is configured.
   2. On a device in EEA debug geography, consent is collected before the first ad request (logcat).
   3. Watching the ad doubles the newest tower's Blueprints once; a second claim shows "already doubled".
+- **Progress (2026-11-21, commits `280e1b3`, `fce3977` and the release-readiness review):** per-variant ids (debug and
+  baseline-profile variants always use Google's test ids; only `release` reads `ADMOB_APP_ID_PROD` /
+  `ADMOB_REWARDED_UNIT_ID_PROD`); `verifyReleaseAdMob` fails `bundleRelease` when the live ids are missing, malformed or
+  Google's sample ids (criterion 1 is met for `bundleRelease`, the upload path; `assembleRelease` deliberately still
+  builds with ads disabled for smoke tests); Remote Config `ads_enabled` (default false) gates every SDK call; consent
+  only on tap (BUG-007); UMP privacy options row in Help & privacy (`AdMobPrivacyChoices`). Details:
+  [TECHNICAL.md §5.1](TECHNICAL.md#51-admob-and-the-ads_enabled-switch). Verified: `AdsGatingTest` (20 tests incl.
+  privacy choices), `RemoteConfigAdsSwitchTest`, `SkylineRewardGatingTest`; Pixel 6a debug logs only the test unit;
+  R8 release without ids logs `gate mode=NotConfigured` and makes no consent, init or ad request.
+- **Outstanding (user):** create the AdMob app and rewarded unit, set the `_PROD` ids, publish GDPR and US-state
+  messages, register test devices, `app-ads.txt`, `ads_enabled` in Remote Config; then criteria 2–3 on a device
+  (a tower topped out within 24 h is needed for the reward card).
 
 <a id="tech-004"></a>
 ### TECH-004 — Create Play billing products and test purchases
@@ -231,7 +248,7 @@ Bug cards are in [BUGS.md](BUGS.md).
   1. A generated profile is committed under `app/src/release/generated/`.
   2. Cold-startup median with the profile is reported and at least 10% better than `CompilationMode.None`.
 
-<a id="tech-007"></a>
+<a id="tech-012"></a>
 ### TECH-012 — Design parity pass on a physical phone
 - **Type:** Technical task · **Priority:** P1 · **Status:** In Progress · **Effort:** M
 - **Problem (verified):** parity with the Claude Design had only been checked with Robolectric screenshots and an
@@ -253,6 +270,7 @@ Bug cards are in [BUGS.md](BUGS.md).
   2. Differences fixed or listed in [design-deviations.md](design-deviations.md).
   3. `build test lint` green; Roborazzi baselines re-recorded where UI changed.
 
+<a id="tech-007"></a>
 ### TECH-007 — Release-build smoke test of every screen on devices
 - **Type:** Technical task · **Priority:** P1 · **Status:** Planned · **Effort:** S
 - **Problem (verified):** the R8 release build was exercised only through onboarding, Build and Me on one
@@ -283,8 +301,10 @@ Bug cards are in [BUGS.md](BUGS.md).
 
 <a id="tech-009"></a>
 ### TECH-009 — Tests for steps, billing, ads and widget
-- **Type:** Technical task · **Priority:** P2 · **Status:** Planned · **Effort:** M
-- **Problem (verified):** `core:steps`, `core:billing`, `core:ads` and `:widget` have no tests (their test
+- **Type:** Technical task · **Priority:** P2 · **Status:** In Progress · **Effort:** M
+- **Progress (2026-11-21):** `core:ads` now has `AdsGatingTest` / `AdMobPrivacyChoicesTest` behind the `AdSdk` seam.
+  `core:steps`, `core:billing` and `:widget` still have none.
+- **Problem (verified):** `core:steps`, `core:billing`, `core:ads` and `:widget` had no tests (their test
   folders only hold `robolectric.properties`).
 - **Solution:** tests for Health Connect result mapping and source selection, entitlement mapping from purchase
   lists (lifetime, subscription, pending), ad gateway state transitions with fakes, widget model loading.
@@ -308,7 +328,7 @@ Bug cards are in [BUGS.md](BUGS.md).
 
 <a id="tech-011"></a>
 ### TECH-011 — Privacy policy, Health apps declaration, Data safety
-- **Type:** Technical task · **Priority:** P0 · **Status:** Planned · **Effort:** S
+- **Type:** Technical task · **Priority:** P0 · **Status:** In Progress (drafts done; hosting and console steps pending the user) · **Effort:** S
 - **Problem (verified):** `PRIVACY_POLICY_URL` is empty, so the policy link is hidden; Health Connect apps
   need a hosted policy and the Health apps declaration before release. Answers are drafted in
   [play-console-checklist.md](play-console-checklist.md).
@@ -320,6 +340,33 @@ Bug cards are in [BUGS.md](BUGS.md).
   1. Help & privacy shows "Read the full privacy policy" and it opens the hosted page (device).
   2. The Health Connect permission screen's privacy link opens the in-app rationale (device).
   3. Play Console shows no outstanding policy declarations.
+- **Progress (2026-11-21):** policy text drafted in [privacy-policy.md](privacy-policy.md) from the final code;
+  Data safety, ads, advertising-ID, target-audience and Health apps answers updated in
+  [play-console-checklist.md](play-console-checklist.md); `verifyReleasePrivacyPolicy` makes `bundleRelease` fail
+  until `PRIVACY_POLICY_URL` is an https URL; the Health Connect rationale intents now open Help & privacy
+  ([BUG-018](BUGS.md#bug-018)). Outstanding: fill the placeholders, host the policy, set the URL, complete the forms,
+  then criteria 1–3 on a device and in Play Console.
+
+<a id="tech-013"></a>
+### TECH-013 — Play release readiness review
+- **Type:** Technical task · **Priority:** P0 · **Status:** Done · **Effort:** S
+- **Problem:** before the first upload, the integrated release-prep code had not been checked against current Google
+  Play requirements as a whole.
+- **Solution:** review target API, version, R8 rules, signing and AdMob guards, the merged-manifest permissions, Health
+  Connect rationale, privacy policy, declarations, listing and backup; fix what is detectable in code; record the
+  rest for the user in [RELEASE-READINESS.md](RELEASE-READINESS.md).
+- **Acceptance criteria:**
+  1. Every area above has a status and verification steps in RELEASE-READINESS.md.
+  2. Detectable code blockers fixed; `ktlintFormat build test lint` green.
+- **Resolution (2026-11-21):** target API 37 meets Play's API 36 requirement (Play Console Help, checked 2026-11-21);
+  fixed: Health Connect rationale intents ignored ([BUG-018](BUGS.md#bug-018)); missing UMP privacy options entry
+  point (Help & privacy › Ad privacy choices, `AdPrivacyChoices`); unused `FOREGROUND_SERVICE` removed from the merged
+  manifest; `verifyReleasePrivacyPolicy` added to `bundleRelease`; `verifyReleaseAdMob` message pointed at the docs.
+  Drafted [privacy-policy.md](privacy-policy.md) and updated the console answers.
+- **Verification:** `aapt2 dump permissions` / `badging` on the release APK (targetSdk 37, versionCode 1, permission list
+  in [TECHNICAL.md §6](TECHNICAL.md#6-build-signing-and-release)); new unit tests `AdMobPrivacyChoicesTest` (2) and
+  `MeTest.adPrivacyChoicesFollowTheUmpRequirement`; `ktlintFormat build test lint` green. Device checks of the two
+  UI changes are listed in RELEASE-READINESS.md.
 
 <a id="prod-001"></a>
 ### PROD-001 — Browse every district in Skyline

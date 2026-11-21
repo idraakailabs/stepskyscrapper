@@ -19,6 +19,8 @@ data class UserSettings(
     val stepsConnectSkipped: Boolean,
     val shareShowStats: Boolean,
     val ceremonySound: Boolean,
+    /** The one-time POST_NOTIFICATIONS prompt after the first topping-out has been shown (or wasn't needed). */
+    val notificationPromptHandled: Boolean = false,
 ) {
     companion object {
         val Default = UserSettings(

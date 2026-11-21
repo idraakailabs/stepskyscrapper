@@ -48,7 +48,7 @@ behaviour was chosen while keeping the look. Every such decision is listed here.
 | P10 | Notifications: "Topping out and weekly summary only" | Both are local notifications posted after syncs (weekly summary on Sunday from 18:00) | No backend |
 | P11 | Paywall prices `$2.99 / $14.99 / $29.99` | Prices come from Google Play (`ProductDetails`); the design prices are only previews/test values | Localised, real prices |
 | P12 | "Still stuck? Send a diagnostic" | Opens an email/share draft with sync timestamps and source status only (never step data); address from `SUPPORT_EMAIL` | No backend |
-| P13 | Privacy policy link | Shown only when `PRIVACY_POLICY_URL` is configured; the full policy summary is in-app (Help & privacy) | URL must be provided by the publisher |
+| P13 | Privacy policy link | Shown only when `PRIVACY_POLICY_URL` is configured (required for `bundleRelease`); the full policy summary is in-app (Help & privacy), which also gains an "Ad privacy choices" row when Google's consent message requires it | URL must be provided by the publisher; UMP requires a way to change consent |
 | P14 | Firebase (Analytics, Crashlytics, Remote Config) | Applied only when `app/google-services.json` exists; otherwise the app runs with the bundled ladder and drops analytics locally | No Firebase project is available in the repo |
-| P15 | AdMob ids | Google's public sample app/unit ids by default (`gradle.properties`); real ids must be set before release | Real ids belong to the publisher |
+| P15 | AdMob ids | Debug always uses Google's test ids; only the `release` variant uses live ids (`ADMOB_APP_ID_PROD` / `ADMOB_REWARDED_UNIT_ID_PROD`, outside Git) and the reward card is hidden while Remote Config `ads_enabled` is off (default) | Real ids belong to the publisher; ads must be switchable remotely |
 | P16 | Cosmetic item names | English names from the domain catalogue (not yet in `strings.xml`) | Catalogue is shared with domain logic |

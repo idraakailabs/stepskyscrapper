@@ -27,6 +27,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.health.connect.client.HealthConnectClient
@@ -34,7 +35,9 @@ import androidx.health.connect.client.PermissionController
 import androidx.lifecycle.lifecycleScope
 import java.io.File
 import java.io.IOException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * The single place that talks to the Android system on behalf of the screens. Activity-result launchers are
@@ -47,6 +50,7 @@ class AndroidPlatformActions(
 ) : PlatformActions {
     private var stepCallback: ((Boolean) -> Unit)? = null
     private var notifyCallback: ((Boolean) -> Unit)? = null
+    private var storageCallback: ((Boolean) -> Unit)? = null
 
     private val hcLauncher: ActivityResultLauncher<Set<String>> =
         activity.registerForActivityResult(PermissionController.createRequestPermissionResultContract()) { granted ->
@@ -60,6 +64,8 @@ class AndroidPlatformActions(
             stepCallback = null
             notifyCallback?.invoke(granted)
             notifyCallback = null
+            storageCallback?.invoke(granted)
+            storageCallback = null
         }
 
     override fun requestStepAccess(onResult: (granted: Boolean) -> Unit) {
@@ -131,6 +137,12 @@ class AndroidPlatformActions(
         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
+    override fun notificationsAllowed(): Boolean {
+        val permission = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(activity, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        return permission && NotificationManagerCompat.from(activity).areNotificationsEnabled()
+    }
+
     override fun shareImage(image: ImageBitmap, caption: String) {
         activity.lifecycleScope.launch {
             val dir = File(activity.cacheDir, "share").apply { mkdirs() }
@@ -151,27 +163,48 @@ class AndroidPlatformActions(
         }
     }
 
-    override fun saveImage(image: ImageBitmap): Boolean {
+    override fun saveImage(image: ImageBitmap, onResult: (saved: Boolean) -> Unit) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
+            ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // BUG-003: save as soon as the permission is granted instead of dropping the first tap.
+            storageCallback = { granted -> if (granted) writeImage(image, onResult) else onResult(false) }
+            permissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            return
+        }
+        writeImage(image, onResult)
+    }
+
+    private fun writeImage(image: ImageBitmap, onResult: (Boolean) -> Unit) {
+        activity.lifecycleScope.launch {
+            val saved = withContext(Dispatchers.IO) { insertImage(image) }
+            onResult(saved)
+        }
+    }
+
+    private fun insertImage(image: ImageBitmap): Boolean {
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, "step-skyscraper-${System.currentTimeMillis()}.png")
             put(MediaStore.Images.Media.MIME_TYPE, "image/png")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Step Skyscraper")
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
-            ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            return false
-        }
         val resolver = activity.contentResolver
-        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: return false
-        return try {
+        val uri = try {
+            resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        } catch (e: SecurityException) {
+            Log.w(TAG, "Could not create image entry", e)
+            null
+        } ?: return false
+        val written = try {
             resolver.openOutputStream(uri)?.use { image.asAndroidBitmap().compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) } ==
                 true
         } catch (e: IOException) {
             Log.w(TAG, "Could not save image", e)
             false
         }
+        // Don't leave an empty picture behind when the write failed.
+        if (!written) runCatching { resolver.delete(uri, null, null) }
+        return written
     }
 
     override fun openPlaySubscriptions() {

@@ -7,7 +7,7 @@
 >
 > **Baseline:** version 1.0.0 (versionCode 1), commit `e5c003b` on `main`
 > ([github.com/idraakailabs/stepskyscrapper](https://github.com/idraakailabs/stepskyscrapper)). Not published.
-> **Last reviewed:** 2026-11-20.
+> **Last reviewed:** 2026-11-21 (release-readiness review; release-prep changes not yet merged into `develop`).
 
 ---
 
@@ -51,15 +51,16 @@ included here. Screen-by-screen design coverage: [design-inventory.md](design-in
 | Onboarding (1a–1f) | Promise → step-access rationale → Health Connect permission sheet (Steps, plus background read when available) → payoff with today's real steps → style + name → daily target with a 7-day suggestion → widget pin prompt. "Not now" skips to style with a "Connect steps" card on Build. |
 | Build tab | Sky header (sky follows the clock), tower with crane and partial floor, "Next floor in N steps" with 10 segments, week ring card, pull-to-refresh, "Synced. N floors added." snackbar, tap to zoom, long-press to mirror. Week card opens **Goals**, not a weekly detail ([BUG-004](BUGS.md#bug-004)). |
 | Topping-out ceremony | Full screen once per tower: crown lift, lit windows, beams, Blueprints count-up, Share / Start next tower / Close; paywall once after the first tower. |
-| Skyline tab | Finished towers of the current district on a model base, pinch/pan, stats sheet with rename and swipe, opt-in rewarded ad card for the newest tower, next-district progress. Earlier districts can't be browsed ([PROD-001](ROADMAP.md#prod-001)). |
+| Skyline tab | Finished towers of the current district on a model base, pinch/pan, stats sheet with rename and swipe, opt-in rewarded ad card for the newest (or ceremony-highlighted) tower, shown only while ads are enabled (debug: always, with Google test ads; Play build: only with live ids and Remote Config `ads_enabled` on, which defaults to off), and the consent form appears only after tapping it; next-district progress. Earlier districts can't be browsed ([PROD-001](ROADMAP.md#prod-001)). |
 | Customise | Facade, palette, crown, lights and ground tabs; three lock types (progress, Blueprints, Architect Pass); 3 s locked preview then unlock sheet; buying with Blueprints. Opened from Build only. |
-| Me tab | Next-floor pill, architect level, Build Days / floors / towers, week and month bars, last 4 weeks, achievements, Architect Pass card, Goals, Pause goals, Step source, Settings, Help & privacy. |
+| Me tab | Next-floor pill, architect level, Build Days / floors / towers, week and month bars, last 4 weeks, achievements, Architect Pass card, Goals, Pause goals, Step source, Settings, Help & privacy. "Notifications" reads "Off" whenever the OS blocks delivery. |
 | Achievements | 24 cumulative achievements with progress and rewards; "Equip" chip is a label only. |
-| Share | Tower or skyline card, Story 9:16 / Square 1:1, stats toggle, share sheet with caption, save to Pictures (no feedback, [BUG-003](BUGS.md#bug-003)). |
+| Share | Tower or skyline card, Story 9:16 / Square 1:1, stats toggle, share sheet with caption, save to Pictures with a "Saved to Pictures." / failure snackbar (on Android 8–9 the save runs right after the storage permission is granted). |
 | Paywall | Architect Pass: yearly with 7-day trial, monthly, lifetime, prices from Play; restore. |
 | Step-source help | Last data time, source status, three steps (reordered for Samsung), deep links, "Check again", diagnostic draft without step data. |
 | Widgets | Small 2×2 and medium 4×2 Glance widgets, light and dark, refreshed after each sync. |
-| Notifications | Local "topping out" and Sunday weekly summary; on by default but the Android 13+ permission is never requested by default ([BUG-001](BUGS.md#bug-001)). |
+| Notifications | Local "topping out" and Sunday weekly summary, on by default. On Android 13+ the permission is asked once, after the first topping-out ceremony is dismissed; Me and both Settings switches show "Off" while the OS blocks notifications. |
+| Help & privacy | Privacy summary, step help, Health Connect access, "Ad privacy choices" (only while ads are on and Google's consent message requires it), hosted policy link once `PRIVACY_POLICY_URL` is set. Health Connect's privacy link opens this screen on its own. |
 | Persistence | All progress on the device (Room + DataStore), included in Android backup. |
 | Debug only | Component gallery from Settings. |
 
@@ -79,7 +80,7 @@ Facts (verified in code):
 1. No social or multi-user element; growth relies on share cards only.
 2. Premium is cosmetic only (by design); conversion depends on how much users care about looks.
 3. Earlier districts aren't viewable once a new district starts ([PROD-001](ROADMAP.md#prod-001)).
-4. Notifications are effectively off on Android 13+ until the user visits Settings ([BUG-001](BUGS.md#bug-001)).
+4. Notifications were effectively off on Android 13+ until the user visited Settings ([BUG-001](BUGS.md#bug-001), fixed; the post-ceremony prompt is still to be checked on a device).
 5. Firebase, AdMob and billing products aren't configured, so analytics, crash reports and payments don't work
    yet ([ROADMAP Phase 2](ROADMAP.md#phase-2--release-blockers)).
 
@@ -92,7 +93,7 @@ users return without notifications; real Health Connect behaviour across OEMs.
 |---|---|
 | Steps don't arrive (permissions, battery) | Step-source help, "Updated X min ago", widgets |
 | Long towers feel slow after the first 10 floors | Ceremony and Blueprints; tune ladder via Remote Config ([PROD-006](ROADMAP.md#prod-006)) |
-| Nothing pulls the user back | Topping-out and weekly-summary notifications once permission is requested ([BUG-001](BUGS.md#bug-001)) |
+| Nothing pulls the user back | Topping-out and weekly-summary notifications; permission asked after the first topping-out ([BUG-001](BUGS.md#bug-001)) |
 | Novelty of cosmetics wears off | Districts, achievements, premium styles |
 
 ## 8. Opportunities

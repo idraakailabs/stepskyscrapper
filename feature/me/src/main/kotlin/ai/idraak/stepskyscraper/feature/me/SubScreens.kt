@@ -18,7 +18,9 @@ import ai.idraak.stepskyscraper.core.domain.model.Appearance
 import ai.idraak.stepskyscraper.core.domain.model.Outcome
 import ai.idraak.stepskyscraper.core.domain.model.TargetPreset
 import ai.idraak.stepskyscraper.core.domain.model.TargetSuggestion
+import ai.idraak.stepskyscraper.core.domain.model.UiHost
 import ai.idraak.stepskyscraper.core.domain.model.UserSettings
+import ai.idraak.stepskyscraper.core.domain.repository.AdPrivacyChoices
 import ai.idraak.stepskyscraper.core.domain.repository.EntitlementRepository
 import ai.idraak.stepskyscraper.core.domain.repository.SettingsRepository
 import ai.idraak.stepskyscraper.core.domain.repository.StepsRepository
@@ -28,6 +30,8 @@ import ai.idraak.stepskyscraper.core.ui.mvi.MviViewModel
 import ai.idraak.stepskyscraper.core.ui.mvi.UiText
 import ai.idraak.stepskyscraper.core.ui.mvi.toUiText
 import ai.idraak.stepskyscraper.core.ui.platform.LocalPlatformActions
+import ai.idraak.stepskyscraper.core.ui.platform.LocalUiHost
+import ai.idraak.stepskyscraper.core.ui.platform.rememberNotificationsAllowed
 import ai.idraak.stepskyscraper.core.ui.preview.PreviewSurface
 import ai.idraak.stepskyscraper.core.ui.preview.ScreenPreviews
 import androidx.compose.foundation.background
@@ -343,8 +347,10 @@ fun SettingsScreen(state: SettingsUiState, onBack: () -> Unit, onIntent: (Settin
             SsRadioCard(appearanceLabel(a), "", state.settings.appearance == a, { onIntent(SettingsIntent.SetAppearance(a)) })
         }
         SsSectionLabel(stringResource(R.string.me_notifications))
+        // A switch reads "on" only when notifications can actually be delivered (BUG-001).
+        val allowed = rememberNotificationsAllowed()
         SsCard {
-            SsSwitchRow(stringResource(R.string.settings_notify_top), state.settings.notifyToppingOut, { on ->
+            SsSwitchRow(stringResource(R.string.settings_notify_top), state.settings.notifyToppingOut && allowed, { on ->
                 if (on) {
                     platform.requestNotificationPermission { granted ->
                         onIntent(
@@ -355,7 +361,7 @@ fun SettingsScreen(state: SettingsUiState, onBack: () -> Unit, onIntent: (Settin
                     onIntent(SettingsIntent.SetToppingOut(false))
                 }
             })
-            SsSwitchRow(stringResource(R.string.settings_notify_week), state.settings.notifyWeeklySummary, { on ->
+            SsSwitchRow(stringResource(R.string.settings_notify_week), state.settings.notifyWeeklySummary && allowed, { on ->
                 if (on) {
                     platform.requestNotificationPermission { granted ->
                         onIntent(
@@ -379,8 +385,53 @@ fun SettingsScreen(state: SettingsUiState, onBack: () -> Unit, onIntent: (Settin
 
 // ---- Help & privacy ----------------------------------------------------------------------------------
 
+@Immutable
+data class PrivacyUiState(val adPrivacyChoices: Boolean = false)
+
+sealed interface PrivacyIntent {
+    /** Screen shown: check whether UMP requires the "Ad privacy choices" entry point. */
+    data class Check(val host: UiHost) : PrivacyIntent
+
+    data class OpenAdPrivacyChoices(val host: UiHost) : PrivacyIntent
+}
+
+@HiltViewModel
+class PrivacyViewModel @Inject constructor(
+    private val adPrivacy: AdPrivacyChoices,
+) : MviViewModel<PrivacyUiState, PrivacyIntent, Unit>(PrivacyUiState()) {
+    override fun onIntent(intent: PrivacyIntent) {
+        viewModelScope.launch {
+            when (intent) {
+                is PrivacyIntent.Check -> {
+                    val required = adPrivacy.isRequired(intent.host)
+                    reduce { it.copy(adPrivacyChoices = required) }
+                }
+                is PrivacyIntent.OpenAdPrivacyChoices -> {
+                    adPrivacy.show(intent.host)
+                    val required = adPrivacy.isRequired(intent.host)
+                    reduce { it.copy(adPrivacyChoices = required) }
+                }
+            }
+        }
+    }
+}
+
 @Composable
-fun PrivacyScreen(onBack: () -> Unit, onStepHelp: () -> Unit) {
+fun PrivacyRoute(onBack: () -> Unit, onStepHelp: (() -> Unit)?, viewModel: PrivacyViewModel = hiltViewModel()) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val host = LocalUiHost.current
+    LaunchedEffect(Unit) { viewModel.onIntent(PrivacyIntent.Check(host)) }
+    PrivacyScreen(state, onBack, onStepHelp, onAdPrivacyChoices = { viewModel.onIntent(PrivacyIntent.OpenAdPrivacyChoices(host)) })
+}
+
+@Composable
+fun PrivacyScreen(
+    state: PrivacyUiState,
+    onBack: () -> Unit,
+    /** null when opened from Health Connect (standalone rationale screen, no app navigation). */
+    onStepHelp: (() -> Unit)?,
+    onAdPrivacyChoices: () -> Unit,
+) {
     val c = SsTheme.colors
     val platform = LocalPlatformActions.current
     SubScreen(stringResource(R.string.privacy_title), onBack) {
@@ -388,8 +439,14 @@ fun PrivacyScreen(onBack: () -> Unit, onStepHelp: () -> Unit) {
         listOf(R.string.privacy_p1, R.string.privacy_p2, R.string.privacy_p3, R.string.privacy_p4).forEach {
             Text(stringResource(it), style = SsTheme.type.bodyS, color = c.bodySecondary)
         }
-        SsTonalButton(stringResource(R.string.privacy_step_help), onStepHelp, Modifier.fillMaxWidth(), icon = Symbol.DirectionsWalk)
+        if (onStepHelp != null) {
+            SsTonalButton(stringResource(R.string.privacy_step_help), onStepHelp, Modifier.fillMaxWidth(), icon = Symbol.DirectionsWalk)
+        }
         SsTextButton(stringResource(R.string.privacy_manage_access), platform::openHealthConnect, Modifier.fillMaxWidth())
+        // UMP privacy options: shown only while ads are enabled and Google's consent message requires it.
+        if (state.adPrivacyChoices) {
+            SsTextButton(stringResource(R.string.privacy_ad_choices), onAdPrivacyChoices, Modifier.fillMaxWidth())
+        }
         if (platform.hasPrivacyPolicy) {
             SsTextButton(
                 stringResource(R.string.privacy_policy),
@@ -412,4 +469,4 @@ private fun SettingsPreview() = PreviewSurface { SettingsScreen(SettingsUiState(
 
 @ScreenPreviews
 @Composable
-private fun PrivacyPreview() = PreviewSurface { PrivacyScreen({}, {}) }
+private fun PrivacyPreview() = PreviewSurface { PrivacyScreen(PrivacyUiState(), {}, {}, {}) }

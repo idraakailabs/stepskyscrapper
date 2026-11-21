@@ -27,7 +27,13 @@ data class Entitlement(
 /** Marker for the UI host a purchase / ad flow needs (implemented by the Activity in :app). */
 interface UiHost
 
-enum class AdAvailability { Ready, Loading, Unavailable, ConsentRequired }
+/**
+ * State of the single rewarded ad. [Disabled] means ads are switched off for this build (Prod Release with the
+ * Remote Config `ads_enabled` switch off, unreachable or unset, or live ids not configured): no ad requests are
+ * made and the UI must not offer the ad at all. [Unavailable] means ads are on but nothing is loaded yet (or the
+ * last load had no fill); a tap still starts consent and a load.
+ */
+enum class AdAvailability { Ready, Loading, Unavailable, ConsentRequired, Disabled }
 
 data class WalletEntry(
     val key: String,

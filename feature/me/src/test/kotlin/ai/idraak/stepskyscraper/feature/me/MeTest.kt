@@ -3,14 +3,22 @@ package ai.idraak.stepskyscraper.feature.me
 import ai.idraak.stepskyscraper.core.designsystem.theme.SsTheme
 import ai.idraak.stepskyscraper.core.domain.model.GoalPause
 import ai.idraak.stepskyscraper.core.domain.model.StepSourceStatus
+import ai.idraak.stepskyscraper.core.domain.model.UiHost
 import ai.idraak.stepskyscraper.core.domain.usecase.PauseOption
+import ai.idraak.stepskyscraper.core.testing.FakeAdPrivacyChoices
 import ai.idraak.stepskyscraper.core.testing.MainDispatcherRule
 import ai.idraak.stepskyscraper.core.testing.TestGraph
 import ai.idraak.stepskyscraper.core.ui.mvi.Lce
+import ai.idraak.stepskyscraper.core.ui.platform.LocalPlatformActions
+import ai.idraak.stepskyscraper.core.ui.platform.PlatformActions
+import ai.idraak.stepskyscraper.core.ui.platform.PreviewPlatformActions
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
@@ -39,6 +47,21 @@ class MeTest {
     }
 
     @Test
+    fun adPrivacyChoicesFollowTheUmpRequirement() = runTest {
+        val host = object : UiHost {}
+        val hidden = PrivacyViewModel(FakeAdPrivacyChoices(required = false))
+        hidden.onIntent(PrivacyIntent.Check(host))
+        assertThat(hidden.state.value.adPrivacyChoices).isFalse()
+
+        val ads = FakeAdPrivacyChoices(required = true)
+        val vm = PrivacyViewModel(ads)
+        vm.onIntent(PrivacyIntent.Check(host))
+        assertThat(vm.state.value.adPrivacyChoices).isTrue()
+        vm.onIntent(PrivacyIntent.OpenAdPrivacyChoices(host))
+        assertThat(ads.shows).isEqualTo(1)
+    }
+
+    @Test
     fun pauseAndResumeGoals() = runTest {
         val g = TestGraph()
         g.onboarded()
@@ -59,6 +82,30 @@ class MeTest {
         }
         compose.onNodeWithText("Site Architect").assertIsDisplayed()
         compose.onNode(isRoot()).captureRoboImage("src/test/screenshots/me_6a.png")
+    }
+
+    @Test
+    fun notificationsRowReadsOffWhenTheOsBlocksThem() {
+        // BUG-001: the stored preference is "on", but without POST_NOTIFICATIONS the row must say "Off".
+        val blocked = object : PlatformActions by PreviewPlatformActions {
+            override fun notificationsAllowed() = false
+        }
+        compose.setContent {
+            CompositionLocalProvider(LocalPlatformActions provides blocked) {
+                SsTheme(reduceMotion = true) { MeScreen(MeUiState(Lce.Content(previewMe())), MeNavigation({}, {}, {}, {}, {}, {})) {} }
+            }
+        }
+        compose.onNodeWithText("Topping out and weekly summary only").assertDoesNotExist()
+        compose.onNodeWithText("Notifications").performScrollTo().assertIsDisplayed()
+        assertThat(compose.onAllNodesWithText("Off").fetchSemanticsNodes()).isNotEmpty()
+    }
+
+    @Test
+    fun notificationsRowReadsOnWhenAllowed() {
+        compose.setContent {
+            SsTheme(reduceMotion = true) { MeScreen(MeUiState(Lce.Content(previewMe())), MeNavigation({}, {}, {}, {}, {}, {})) {} }
+        }
+        compose.onNodeWithText("Topping out and weekly summary only").performScrollTo().assertIsDisplayed()
     }
 
     @Test

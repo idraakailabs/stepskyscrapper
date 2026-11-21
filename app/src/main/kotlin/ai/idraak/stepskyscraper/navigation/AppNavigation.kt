@@ -16,7 +16,6 @@ import ai.idraak.stepskyscraper.feature.me.GoalsRoute
 import ai.idraak.stepskyscraper.feature.me.MeNavigation
 import ai.idraak.stepskyscraper.feature.me.MeRoute
 import ai.idraak.stepskyscraper.feature.me.PrivacyRoute
-import ai.idraak.stepskyscraper.feature.me.PrivacyScreen
 import ai.idraak.stepskyscraper.feature.me.SettingsRoute
 import ai.idraak.stepskyscraper.feature.me.StepHelpRoute
 import ai.idraak.stepskyscraper.feature.onboarding.OnboardingRoute
@@ -182,7 +181,7 @@ private fun AppNavHost(nav: NavHostController, onboardingComplete: Boolean) {
                 onOpenGallery = if (BuildConfig.DEBUG) ({ nav.navigate(GalleryRoute) }) else null,
             )
         }
-        composable<PrivacyRoute> { PrivacyScreen(onBack = { nav.popBackStack() }, onStepHelp = { nav.navigate(StepHelpRoute) }) }
+        composable<PrivacyRoute> { PrivacyRoute(onBack = { nav.popBackStack() }, onStepHelp = { nav.navigate(StepHelpRoute) }) }
         composable<GalleryRoute> { ComponentGallery(onBack = { nav.popBackStack() }) }
     }
 }
