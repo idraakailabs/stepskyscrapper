@@ -65,6 +65,7 @@ testing track with crash reports, analytics, real ads and working purchases.
 | [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | In Progress (drafts done; hosting and console pending you) | Hosted policy, Play Console |
 | [TECH-013](#tech-013) | Play release readiness review | Technical task | P0 | Done | — |
 | [TECH-014](#tech-014) | Architect Pass purchases through RevenueCat | Technical task | P0 | In Progress | Play service account, TECH-004 |
+| [TECH-015](#tech-015) | Device smoke test, crash fixes, pressed-state polish, paywall speed | Technical task | P0 | In Progress | — |
 | [BUG-019](BUGS.md#bug-019) | Paywall promises a trial reminder the app never sends | Confirmed bug | P1 | Done | — |
 | [BUG-018](BUGS.md#bug-018) | Health Connect privacy link opens Build | Confirmed bug | P1 | Done | — |
 
@@ -388,6 +389,27 @@ Bug cards are in [BUGS.md](BUGS.md).
   in [TECHNICAL.md §6](TECHNICAL.md#6-build-signing-and-release)); new unit tests `AdMobPrivacyChoicesTest` (2) and
   `MeTest.adPrivacyChoicesFollowTheUmpRequirement`; `ktlintFormat build test lint` green. Device checks of the two
   UI changes are listed in RELEASE-READINESS.md.
+
+<a id="tech-015"></a>
+### TECH-015 — Device smoke test, crash fixes, pressed-state polish, paywall speed
+- **Type:** Technical task · **Priority:** P0 · **Status:** In Progress · **Effort:** M
+- **Problem:** user report (2026-11-21): two Health Connect buttons crash; some pressed states show square shadows on
+  rounded shapes; the paywall feels slow; no full smoke test since the RevenueCat and legal-link changes.
+- **Solution:** reproduce on the Pixel 6a with logcat, fix root causes, audit every pressed state / ripple / shadow,
+  speed up the paywall, then smoke-test every screen and re-test the fixes.
+- **Acceptance criteria:**
+  1. Both Health Connect buttons open Health Connect without a crash ([BUG-020](BUGS.md#bug-020)).
+  2. The paywall shows its plans without waiting on the network when plans were seen before
+     ([BUG-021](BUGS.md#bug-021)).
+  3. No pressed state draws a shape that doesn't match the control's rounded corners.
+  4. Every major screen and navigation path opens on the device with no crash in the crash buffer.
+- **Progress (2026-11-21, branch `fix/smoke-test`):**
+  - Done: BUG-020 fixed and verified on the device; BUG-021 fixed (parallel fetch, cached plans, `OffersCacheTest`),
+    device cold-start check outstanding. Paywall measurements: warm open fully drawn < 0.5 s, slowest frame 24 ms.
+  - Smoke-tested so far (Pixel 6a, debug): Build, week card → This week, Me, Step source, Help & privacy (from the app and
+    from Health Connect), paywall (plans, legal links), Skyline reward card, Share save; no other crash seen.
+  - Not started: the pressed-state / ripple / shadow audit (AC 3) and the rest of the smoke test (onboarding, Customise,
+    Achievements, Settings, ceremony, widgets) and the final re-test (AC 4).
 
 <a id="tech-014"></a>
 ### TECH-014 — Architect Pass purchases through RevenueCat

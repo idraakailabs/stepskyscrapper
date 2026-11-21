@@ -81,12 +81,10 @@ class AndroidPlatformActions(
     }
 
     override fun openHealthConnect() {
-        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            Intent(ACTION_MANAGE_HEALTH_PERMISSIONS).putExtra(Intent.EXTRA_PACKAGE_NAME, activity.packageName)
-        } else {
-            Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS)
-        }
-        if (!start(intent)) installHealthConnect()
+        // The public Health Connect settings entry point. The per-app MANAGE_HEALTH_PERMISSIONS screen needs the
+        // system-only GRANT_RUNTIME_PERMISSIONS on Android 14+ and threw a SecurityException (BUG-020); the help copy
+        // already guides the user to App permissions › Step Skyscraper from here.
+        if (!start(Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS))) installHealthConnect()
     }
 
     override fun installHealthConnect() {
@@ -258,11 +256,14 @@ class AndroidPlatformActions(
     } catch (e: ActivityNotFoundException) {
         Log.w(TAG, "No activity for ${intent.action}", e)
         false
+    } catch (e: SecurityException) {
+        // A protected system screen must never crash the app: report "not opened" so callers fall back.
+        Log.w(TAG, "Not allowed to start ${intent.action}", e)
+        false
     }
 
     private companion object {
         const val TAG = "PlatformActions"
         const val SAMSUNG_HEALTH = "com.sec.android.app.shealth"
-        const val ACTION_MANAGE_HEALTH_PERMISSIONS = "android.health.connect.action.MANAGE_HEALTH_PERMISSIONS"
     }
 }

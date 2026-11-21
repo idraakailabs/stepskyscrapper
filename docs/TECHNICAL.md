@@ -182,7 +182,9 @@ API key". The SDK crashes if a Test Store key reaches a production build, which 
 The plan comes from the active entitlement's product (`architect_pass_lifetime` → Lifetime, base plan `monthly` →
 Monthly, else Annual); the trial length comes from the package's default subscription option. A failed offerings fetch
 (e.g. products not yet in Play Console) is logged as `StepSkyBilling: Offerings unavailable` and does not block the
-entitlement refresh. Only RevenueCat's anonymous app user id and purchase data leave the device. Real Google Play purchases
+entitlement refresh; offerings and customer info are fetched in parallel, and the last plans are cached in DataStore
+(`pass_offers_cache`) so the paywall shows them at once on the next launch ([BUG-021](BUGS.md#bug-021)). Only
+RevenueCat's anonymous app user id and purchase data leave the device. Real Google Play purchases
 need the release package on a testing track with license testers; the debug build uses the Test Store instead.
 
 ## 6. Build, signing and release

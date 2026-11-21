@@ -12,6 +12,7 @@ import ai.idraak.stepskyscraper.core.domain.model.UiHost
 import ai.idraak.stepskyscraper.core.domain.repository.EntitlementRepository
 import android.app.Activity
 import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Package
@@ -33,9 +34,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -87,7 +90,8 @@ class RevenueCatRepository @Inject constructor(
 
     override val entitlement: Flow<Entitlement> = cache.cached
 
-    override val offers: Flow<List<PlanOffer>> = offersState.asStateFlow()
+    /** Live offers once loaded; until then the last ones seen, so the paywall shows its plans without waiting. */
+    override val offers: Flow<List<PlanOffer>> = combine(offersState, cache.cachedOffers) { live, cached -> live.ifEmpty { cached } }
 
     /** Configures the SDK once; false when no key is set for this build. */
     private suspend fun ready(): Boolean = configureMutex.withLock {
@@ -100,19 +104,29 @@ class RevenueCatRepository @Inject constructor(
 
     override suspend fun refresh(): Outcome<Unit> {
         if (!ready()) return unavailable()
-        // Offers and entitlement are independent: a store/product problem must not hide an active Pass.
-        val offersError = try {
-            loadOfferings()
-            null
-        } catch (e: PurchasesException) {
-            Log.w(TAG, "Offerings unavailable: ${e.error.code}")
-            e.error
-        }
-        return try {
-            cache.save(toEntitlement(Purchases.sharedInstance.awaitCustomerInfo()))
-            offersError?.let(::failure) ?: Outcome.Success(Unit)
-        } catch (e: PurchasesException) {
-            failure(e.error)
+        // Offers and entitlement are independent: fetch them in parallel so the paywall's plans appear as soon as
+        // the offerings arrive (they used to wait for the customer-info call too), and a store/product problem
+        // never hides an active Pass.
+        val started = SystemClock.elapsedRealtime()
+        return coroutineScope {
+            val offers = async {
+                try {
+                    loadOfferings()
+                    Log.i(TAG, "Offerings loaded in ${SystemClock.elapsedRealtime() - started} ms")
+                    null
+                } catch (e: PurchasesException) {
+                    Log.w(TAG, "Offerings unavailable: ${e.error.code}")
+                    e.error
+                }
+            }
+            val entitlementResult = try {
+                cache.save(toEntitlement(Purchases.sharedInstance.awaitCustomerInfo()))
+                null
+            } catch (e: PurchasesException) {
+                e.error
+            }
+            val offersError = offers.await()
+            (entitlementResult ?: offersError)?.let(::failure) ?: Outcome.Success(Unit)
         }
     }
 
@@ -124,7 +138,9 @@ class RevenueCatRepository @Inject constructor(
             current?.lifetime?.let { put(PassPlan.Lifetime, it) }
         }
         packages.value = map
-        offersState.value = PassPlan.entries.mapNotNull { plan -> map[plan]?.let { toOffer(plan, it) } }
+        val offers = PassPlan.entries.mapNotNull { plan -> map[plan]?.let { toOffer(plan, it) } }
+        offersState.value = offers
+        if (offers.isNotEmpty()) cache.saveOffers(offers)
     }
 
     private fun toOffer(plan: PassPlan, pkg: Package): PlanOffer {

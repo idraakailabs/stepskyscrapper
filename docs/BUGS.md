@@ -44,6 +44,8 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-017](#bug-017) | Pressed tab / segment / chip shows a rectangular ripple, not the capsule | P3 | Confirmed (reproduced) | Done |
 | [BUG-018](#bug-018) | Health Connect privacy link opens Build instead of the privacy rationale | P1 | Confirmed (code) | Done |
 | [BUG-019](#bug-019) | Paywall promises a trial reminder the app never sends | P1 | Confirmed (code) | Done |
+| [BUG-020](#bug-020) | "Open Health Connect" buttons crash the app on Android 14+ | P0 | Confirmed (reproduced) | Done |
+| [BUG-021](#bug-021) | Paywall plans wait for two network calls before appearing | P2 | Confirmed (measured) | Fixed – unverified |
 
 ---
 
@@ -419,3 +421,47 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   sentence. No reminder is built; that stays out of scope unless planned as a new task.
 - **Verification:** `grep -r "remind you"` over the sources finds nothing; paywall screenshots re-recorded with
   `:feature:paywall:recordRoborazziDebug`; `ktlintFormat build test lint` green.
+
+<a id="bug-020"></a>
+## BUG-020 — "Open Health Connect" buttons crash the app on Android 14+
+
+- **Priority:** P0 · **Classification:** Confirmed (reproduced) · **Status:** Done
+- **Evidence (smoke test 2026-11-21, Pixel 6a, Android 16, debug):** Me › Step source › "Open Health Connect" and
+  Help & privacy › "Manage step access in Health Connect" both closed the app. Logcat: `java.lang.SecurityException:
+  Permission Denial: starting Intent { act=android.health.connect.action.MANAGE_HEALTH_PERMISSIONS … } … requires
+  android.permission.GRANT_RUNTIME_PERMISSIONS` at `AndroidPlatformActions.openHealthConnect` → `start()`.
+- **Root cause:** on Android 14+ `openHealthConnect()` launched the per-app `MANAGE_HEALTH_PERMISSIONS` screen, which
+  only the system may start; `start()` caught `ActivityNotFoundException` only, so the `SecurityException` was fatal.
+  Both buttons share `PlatformActions.openHealthConnect()`.
+- **Files:** `app/.../platform/AndroidPlatformActions.kt`.
+- **Acceptance criteria:**
+  1. Both buttons open Health Connect without a crash on Android 14+ (device).
+  2. A protected or missing activity never crashes any `PlatformActions` call.
+- **Resolution (2026-11-21):** `openHealthConnect()` opens the public Health Connect settings entry point
+  (`HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS`) on every version, falling back to the install flow; the
+  on-screen help already guides the user to App permissions › Step Skyscraper. `start()` now also catches
+  `SecurityException` (logged, returns false) so no launched screen can crash the app.
+- **Verification:** Pixel 6a debug: Help & privacy › "Manage step access in Health Connect" opens Health Connect
+  (`com.google.android.healthconnect.controller/.MainActivity`), crash buffer empty (AC 1). The Step source button uses
+  the same function. AC 2 by code review of `start()`.
+
+<a id="bug-021"></a>
+## BUG-021 — Paywall plans wait for two network calls before appearing
+
+- **Priority:** P2 · **Classification:** Confirmed (measured) · **Status:** Fixed – unverified
+- **Evidence (2026-11-21, Pixel 6a, debug, RevenueCat Test Store):** with plans already loaded the paywall is fully drawn
+  within ~0.5 s of the tap (the 220 ms screen fade plus first composition; slowest frame 24 ms, first open ~80 ms).
+  On a cold start the plans aren't loaded yet: `RevenueCatRepository.refresh()` fetched the offerings and then the
+  customer info one after the other, and nothing was cached across launches, so the plan cards waited for both calls.
+  Offerings alone took 0.9–1.3 s after launch (`StepSkyBilling: Offerings loaded in … ms`, 3 runs).
+- **Root cause:** sequential network calls and no persisted plans.
+- **Files:** `core/billing/.../RevenueCatRepository.kt`, `core/datastore/.../PreferenceStores.kt`.
+- **Acceptance criteria:**
+  1. On a cold start the paywall shows plan cards immediately when plans were seen before (device).
+  2. Fresh prices replace cached ones once loaded; purchases always use freshly loaded packages.
+- **Resolution (2026-11-21):** `refresh()` now loads offerings and customer info in parallel, so plans appear as soon
+  as the offerings arrive. The last plans and prices are kept in DataStore (new key `pass_offers_cache`, no existing
+  key changed; `EntitlementCacheStore.cachedOffers` / `saveOffers`), and `offers` shows them until live offers load.
+  `purchase()` still loads the packages first when they aren't in memory.
+- **Verification:** `OffersCacheTest` (round trip; empty and malformed data decode to nothing). Builds and installs.
+  **Outstanding:** the cold-start device check (AC 1); two attempts missed the Pass card with scripted taps.

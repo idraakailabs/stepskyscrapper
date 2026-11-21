@@ -7,6 +7,7 @@ import ai.idraak.stepskyscraper.core.domain.model.GoalPause
 import ai.idraak.stepskyscraper.core.domain.model.Goals
 import ai.idraak.stepskyscraper.core.domain.model.Outcome
 import ai.idraak.stepskyscraper.core.domain.model.PassPlan
+import ai.idraak.stepskyscraper.core.domain.model.PlanOffer
 import ai.idraak.stepskyscraper.core.domain.model.SyncState
 import ai.idraak.stepskyscraper.core.domain.model.SyncStatus
 import ai.idraak.stepskyscraper.core.domain.model.TargetPreset
@@ -84,6 +85,7 @@ private object Keys {
     val premium = booleanPreferencesKey("entitlement_premium")
     val plan = stringPreferencesKey("entitlement_plan")
     val verified = longPreferencesKey("entitlement_verified")
+    val offers = stringPreferencesKey("pass_offers_cache")
 }
 
 private fun DataStore<Preferences>.safeData(): Flow<Preferences> =
@@ -268,5 +270,26 @@ class EntitlementCacheStore @Inject constructor(private val store: DataStore<Pre
         it[Keys.premium] = entitlement.isPremium
         entitlement.plan?.let { plan -> it[Keys.plan] = plan.name } ?: it.remove(Keys.plan)
         entitlement.verifiedAt?.let { v -> it[Keys.verified] = v.toEpochMilli() }
+    }
+
+    /** Last plans and store prices, shown instantly on the next paywall while fresh ones load. */
+    val cachedOffers: Flow<List<PlanOffer>> = store.safeData().map { p -> decodeOffers(p[Keys.offers]) }
+
+    suspend fun saveOffers(offers: List<PlanOffer>): Outcome<Unit> = store.write { it[Keys.offers] = encodeOffers(offers) }
+
+    companion object {
+        private const val FIELD = ''
+        private const val RECORD = ''
+
+        fun encodeOffers(offers: List<PlanOffer>): String = offers.joinToString(RECORD.toString()) { o ->
+            listOf(o.plan.name, o.formattedPrice, o.priceMicros, o.currencyCode, o.freeTrialDays).joinToString(FIELD.toString())
+        }
+
+        /** Unknown or malformed records are dropped, never thrown. */
+        fun decodeOffers(raw: String?): List<PlanOffer> = raw.orEmpty().split(RECORD).mapNotNull { record ->
+            val f = record.split(FIELD)
+            if (f.size != 5) return@mapNotNull null
+            runCatching { PlanOffer(PassPlan.valueOf(f[0]), f[1], f[2].toLong(), f[3], f[4].toInt()) }.getOrNull()
+        }
     }
 }
