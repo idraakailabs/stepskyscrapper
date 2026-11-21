@@ -13,7 +13,7 @@
 |---|---|
 | **Live baseline** | Phase 1, version 1.0.0, commit `e5c003b` on `main` (not published) |
 | **Active phase** | Phase 2, Release blockers (not started) |
-| **In progress** | [TECH-012](#tech-012) design parity pass on a Pixel 6a: all screens checked; open: [BUG-010](BUGS.md#bug-010) (needs a decision), widgets / font scale / TalkBack on device |
+| **In progress** | [TECH-012](#tech-012) design parity pass on a Pixel 6a: all screens checked; open: widgets / font scale / TalkBack on device (need the user's phone settings) |
 | **Recommended next task** | Finish [TECH-005](#tech-005) by creating the upload key and uploading to internal testing (needs you), then [TECH-002](#tech-002) (Firebase). |
 
 Update this table whenever a task starts, finishes or the active phase changes.
@@ -73,7 +73,7 @@ measured, regressions caught automatically.
 | [TECH-007](#tech-007) | Release-build smoke test of every screen on devices | Technical task | P1 | Planned | TECH-002…005 |
 | [TECH-012](#tech-012) | Design parity pass on a physical phone | Technical task | P1 | In Progress | — |
 | [BUG-009](BUGS.md#bug-009) | Onboarding skips "Add widget" (1f) | Confirmed bug | P2 | Done | — |
-| [BUG-010](BUGS.md#bug-010) | Under-construction towers render as a sliver | Confirmed bug | P1 | Open | Product decision |
+| [BUG-010](BUGS.md#bug-010) | Under-construction towers render as a sliver | Confirmed bug | P1 | Done | — |
 | [BUG-011](BUGS.md#bug-011) | Build tab dead after closing a ceremony | Confirmed bug | P1 | Done | — |
 | [BUG-012](BUGS.md#bug-012) | 48h step-help link never appears | Confirmed bug | P2 | Done | — |
 | [BUG-013](BUGS.md#bug-013) | Tower stats sheet cut off | Confirmed bug | P2 | Done | — |
@@ -244,7 +244,7 @@ Bug cards are in [BUGS.md](BUGS.md).
   [design-inventory.md](design-inventory.md)). Fixed: CSS line boxes for numbers / names / headlines
   (`cssLineBox`), number + unit baseline, card line heights, ceremony reward sentence, step-help card heights,
   achievement lock copy, BUG-006, BUG-009, BUG-011…015. Deviations D18–D23 recorded.
-- **Outstanding:** [BUG-010](BUGS.md#bug-010) (product decision); on-device checks not done because they need
+- **Outstanding:** ([BUG-010](BUGS.md#bug-010) fixed: outline capped 10 floors ahead.) On-device checks not done because they need
   changes to the user's phone: widgets 11a on the home screen, font scale 200%, TalkBack, Health Connect missing /
   permission revoked; 9a plan cards (Play products, TECH-004); the "Synced. N floors added." snackbar (needs real
   new steps); BUG-006 at exactly 0 steps.

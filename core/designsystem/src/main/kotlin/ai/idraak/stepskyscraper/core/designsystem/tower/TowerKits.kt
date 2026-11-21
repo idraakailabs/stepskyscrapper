@@ -10,6 +10,13 @@ internal object TowerConst {
     const val LOB = 13f
     const val FH = 8f
 
+    /**
+     * The dashed "still to build" outline reaches at most this many floors above the built ones (BUG-010).
+     * tower.js draws it to the target, which on the 100–250-floor ladder shrinks the built floors to a sliver;
+     * every design frame shows 10 or fewer floors ahead, so those render unchanged.
+     */
+    const val GHOST_FLOORS_AHEAD = 10
+
     const val AMBER = 0xE8A23A
     const val AMBER_D = 0x7A5212
     const val PLANT = 0x7EA26A

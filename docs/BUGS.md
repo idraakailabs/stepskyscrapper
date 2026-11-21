@@ -34,7 +34,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-007](#bug-007) | Ad consent form may appear just by opening Skyline | P3 | Suspected | Open |
 | [BUG-008](#bug-008) | The Build feature module was missing from the Git repository | P0 | Confirmed (reproduced) | Done |
 | [BUG-009](#bug-009) | Onboarding skips "Add widget" (1f) and jumps to Build | P2 | Confirmed (reproduced) | Done |
-| [BUG-010](#bug-010) | Under-construction towers on the real ladder render as a sliver | P1 | Confirmed (reproduced) | Open |
+| [BUG-010](#bug-010) | Under-construction towers on the real ladder render as a sliver | P1 | Confirmed (reproduced) | Done |
 | [BUG-011](#bug-011) | Build tab does nothing after closing a ceremony | P1 | Confirmed (reproduced) | Done |
 | [BUG-012](#bug-012) | "Steps not arriving?" link never appears while syncs run | P2 | Confirmed (reproduced) | Done |
 | [BUG-013](#bug-013) | Tower stats sheet opens half-height with its buttons under the gesture bar | P2 | Confirmed (reproduced) | Done |
@@ -201,7 +201,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 <a id="bug-010"></a>
 ## BUG-010 — Under-construction towers on the real ladder render as a sliver
 
-- **Priority:** P1 · **Classification:** Confirmed (reproduced) · **Status:** Open (needs a product decision)
+- **Priority:** P1 · **Classification:** Confirmed (reproduced) · **Status:** Done
 - **Evidence:** Pixel 6a, tower 4 at 19 of 100 floors: the dashed ghost outline runs to floor 100 and the view
   fits that height, so the built floors fill ~10% of the Build hero (also the Customise preview and the
   in-progress share card). `tower.js` behaves the same; the design simply uses 12–24-floor targets, while the
@@ -209,9 +209,15 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Impact:** from tower 4 on, the main screen's tower is tiny for weeks; the core "watch it grow" payoff is lost.
 - **Options:** (a) draw the ghost only up to the next setback band or N floors ahead and fit to that;
   (b) fit to the built floors plus a fixed margin and let the ghost run off the top; (c) shorten the ladder.
+- **Decision (user, 2026-11-21):** option (a), capped at 10 floors ahead so every design frame is unchanged.
 - **Acceptance criteria:** at 19 of 100 floors the built tower fills at least half of the hero height on a
   360×800 and a 411×914 screen; topped-out towers unchanged.
-- **Resolution:** — · **Verification:** —
+- **Resolution:** the dashed outline reaches at most `TowerConst.GHOST_FLOORS_AHEAD` (10) floors above the built
+  ones (`ghostEnd` in `IsoScene.kt`); setbacks still follow the full target; a capped outline has no top, so the
+  tower reads as continuing. Applies to Build, Customise preview, share cards and the skyline.
+- **Verification:** `GhostOutlineTest` (design frames 14/24, 4/12, 7/12, 4/10 keep the full outline; built floors
+  ≥ 50% of the drawing at 19 of 100/160/250). Pixel 6a: Build at 19 of 100 fills the hero like design 2a; the
+  Customise preview and in-progress share card show a readable tower. Topped-out towers have no outline (unchanged).
 
 <a id="bug-011"></a>
 ## BUG-011 — Build tab does nothing after closing a ceremony

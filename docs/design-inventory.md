@@ -86,7 +86,7 @@ when it couldn't be.
 - [x] Lit-window ratio dusk .38 / night .62, deterministic hash, lit colour `#FFD98A`; flicker animation `lights`.
 - [x] 5 facade kits deco / glass / brick / brut / eco with exact colours and setbacks; window patterns per kit; lobby pattern.
 - [x] 5 crowns (ziggurat + spire, plant room + mast, water tank, cantilever block, roof garden) with exact geometry.
-- [x] Under-construction state: translucent (28%) next floor shell, solid partial floor at `progress`, amber dashed outline; dashed ghost outline up to target per setback band; top cap.
+- [x] Under-construction state (outline capped 10 floors ahead, D24): translucent (28%) next floor shell, solid partial floor at `progress`, amber dashed outline; dashed ghost outline up to target per setback band; top cap.
 - [x] Crane (mast, lattice, jib, counter-jib, cab, cable, hook, hook load) only while under construction.
 - [x] Ground plates plaza / park + trees; added canal and market ground (see deviations).
 - [x] `SSSkyline`: hex model base, 3 edge faces, street strip, towers placed diagonally (S=W+16), trees, amber selection pin.
@@ -125,7 +125,7 @@ when it couldn't be.
 - [x] 1e Daily target *(device ✓; card line heights fixed)*: back, title, 7-day average copy, Easy-going / Steady (Suggested) / Ambitious / Set my own (steps of 500), pause hint, CTA "Set N floors a week"
 - [x] 1f Add widget *(device ✓ after BUG-009; mock widget type fixed)*: home-screen mock with medium widget, title, body, "Add widget" (requestPinAppWidget), "Maybe later"; both → Build with first floor drop replayed
 ### Build (`feature/build`)
-- [x] 2a In progress (day) *(device ✓; number line box fixed; tower size see BUG-010)*: sky header, tower with crane + progress, Next floor card (hero number, 10 segments, steps/floors today), week card (ring %, "N of M floors this week", "X to go · D days left", chevron)
+- [x] 2a In progress (day) *(device ✓; number line box fixed; outline capped 10 floors ahead, BUG-010 / D24)*: sky header, tower with crane + progress, Next floor card (hero number, 10 segments, steps/floors today), week card (ring %, "N of M floors this week", "X to go · D days left", chevron)
 - [x] 2b Morning (dawn) *(device ✓)*: greeting overline before 11:00 ("GOOD MORNING · ART DECO"), nearest-milestone copy ("4 floors to topping out")
 - [x] 2c Target met (dusk) *(device ✓)*: light header ink, "Target met" chip pop, "8,420 of 7,000 today", "Anything more today is a bonus", lights flicker
 - [x] 2d Zero steps *(device ✓; 48h link fixed, BUG-012)*: calm copy "A fresh day. Your tower is right where you left it.", outlined first segment, "Resting? You can pause goals"; after 48h zero → link to 10a

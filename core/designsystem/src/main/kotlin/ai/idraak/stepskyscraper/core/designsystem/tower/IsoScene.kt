@@ -499,11 +499,14 @@ internal class IsoBuilder(
                 anchor = pt(ox + W / 2, oy + W / 2, topZ + FH / 2)
             }
             val ghost = StrokeSpec(gc, 0.6f, floatArrayOf(2f, 2.4f), 0.55f)
+            // Setbacks still follow the full target; only the outline's reach is capped. A capped outline is left
+            // open at the top (the tower continues).
+            val ghostEnd = ghostEnd(floors, target)
             var a = start
-            while (a < target) {
+            while (a < ghostEnd) {
                 val s = sc(a)
                 var b2 = a
-                while (b2 < target && sc(b2) == s) b2++
+                while (b2 < ghostEnd && sc(b2) == s) b2++
                 val gw = W * s
                 val go = (W - gw) / 2
                 val gx = ox + go
@@ -619,3 +622,6 @@ internal class IsoBuilder(
 
 /** JavaScript Math.round semantics (half up). */
 internal fun Float.roundJs(): Int = kotlin.math.floor(this + 0.5f).toInt()
+
+/** Top floor (exclusive) of the dashed outline: the target, or [TowerConst.GHOST_FLOORS_AHEAD] above the built floors. */
+internal fun ghostEnd(floors: Int, target: Int): Int = min(target, floors + TowerConst.GHOST_FLOORS_AHEAD)
