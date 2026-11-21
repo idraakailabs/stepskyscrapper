@@ -135,6 +135,7 @@ fun SsSnackbar(
                 Box(
                     Modifier
                         .heightIn(min = SsSpacing.touchTarget)
+                        .clip(SsRadius.shapeSm)
                         .selectable(false, role = Role.Button, onClick = onAction)
                         .padding(horizontal = 10.dp),
                     contentAlignment = Alignment.Center,

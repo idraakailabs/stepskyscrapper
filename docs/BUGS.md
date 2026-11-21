@@ -46,6 +46,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-019](#bug-019) | Paywall promises a trial reminder the app never sends | P1 | Confirmed (code) | Done |
 | [BUG-020](#bug-020) | "Open Health Connect" buttons crash the app on Android 14+ | P0 | Confirmed (reproduced) | Done |
 | [BUG-021](#bug-021) | Paywall plans wait for two network calls before appearing | P2 | Confirmed (measured) | Fixed – unverified |
+| [BUG-022](#bug-022) | Pressed states draw square ripples on round and rounded controls | P2 | Confirmed (reproduced) | Done |
 
 ---
 
@@ -441,9 +442,10 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   (`HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS`) on every version, falling back to the install flow; the
   on-screen help already guides the user to App permissions › Step Skyscraper. `start()` now also catches
   `SecurityException` (logged, returns false) so no launched screen can crash the app.
-- **Verification:** Pixel 6a debug: Help & privacy › "Manage step access in Health Connect" opens Health Connect
-  (`com.google.android.healthconnect.controller/.MainActivity`), crash buffer empty (AC 1). The Step source button uses
-  the same function. AC 2 by code review of `start()`.
+- **Verification:** Pixel 6a debug, both paths from inside the app: Me › Step source › "Open Health Connect" and
+  Me › Help & privacy › "Manage step access in Health Connect" each open Health Connect
+  (`com.google.android.healthconnect.controller/.MainActivity`); Back returns to the app; crash buffer empty (AC 1).
+  Also from Health Connect's own privacy link. AC 2 by code review of `start()`.
 
 <a id="bug-021"></a>
 ## BUG-021 — Paywall plans wait for two network calls before appearing
@@ -465,3 +467,22 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   `purchase()` still loads the packages first when they aren't in memory.
 - **Verification:** `OffersCacheTest` (round trip; empty and malformed data decode to nothing). Builds and installs.
   **Outstanding:** the cold-start device check (AC 1); two attempts missed the Pass card with scripted taps.
+
+<a id="bug-022"></a>
+## BUG-022 — Pressed states draw square ripples on round and rounded controls
+
+- **Priority:** P2 · **Classification:** Confirmed (reproduced) · **Status:** Done
+- **Evidence (smoke test 2026-11-21):** user report of "square-shaped shadows" on press. Audit of every `clickable`,
+  `selectable` and `toggleable`: the ripple was not clipped on `SsIconButton` (48dp square around round icons: close,
+  back, settings, share, palette), `SsInlineAction`, `SsSwitchRow`, the snackbar action, the facade-kit picker, the
+  Customise tiles and list rows, the Me Pass card and pause-sheet options, the Skyline tower card and chips, the paywall
+  legal links, and the settings cards on Me and This week (first and last rows' ripples crossed the card's rounded
+  corners). Buttons, chips, the nav capsule, radio cards and the segmented toggle were already clipped (BUG-017). No
+  `shadow`/elevation misuse was found.
+- **Fix:** `clip(shape)` before the clickable on each control, using its own shape token (`shapeFull` for icon buttons,
+  `shapeCard`/`shapeMd`/`shapeSm` otherwise); rounded backgrounds moved after the clip; settings cards clip their rows.
+- **Acceptance criteria:**
+  1. Holding any of these controls shows a pressed state that follows its rounded shape (device).
+- **Verification:** Pixel 6a debug, press-and-hold captures: the Me settings icon shows a round pressed state; the last
+  row of the Me settings card (Help & privacy) stays inside the card's rounded corners. `ktlintFormat`, unit tests and
+  lint green.

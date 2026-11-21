@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
@@ -211,6 +212,8 @@ fun SsIconButton(
     Box(
         modifier
             .size(SsSpacing.touchTarget)
+            // Round ripple for round icon buttons (it used to be a 48dp square).
+            .clip(SsRadius.shapeFull)
             .clickable(role = Role.Button, onClick = onClick)
             .semantics { this.contentDescription = contentDescription },
         contentAlignment = Alignment.Center,
@@ -225,6 +228,7 @@ fun SsInlineAction(text: String, onClick: () -> Unit, modifier: Modifier = Modif
     Box(
         modifier
             .heightIn(min = 44.dp)
+            .clip(SsRadius.shapeSm)
             .clickable(role = Role.Button, onClick = onClick)
             .padding(PaddingValues(horizontal = SsSpacing.m)),
         contentAlignment = Alignment.CenterStart,

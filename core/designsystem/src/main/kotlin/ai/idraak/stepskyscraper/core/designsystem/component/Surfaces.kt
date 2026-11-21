@@ -236,6 +236,7 @@ fun SsSwitchRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> U
         modifier
             .fillMaxWidth()
             .heightIn(min = SsSpacing.touchTarget)
+            .clip(SsRadius.shapeMd)
             .toggleable(checked, role = Role.Switch, onValueChange = onCheckedChange),
         verticalAlignment = Alignment.CenterVertically,
     ) {

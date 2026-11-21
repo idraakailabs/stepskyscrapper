@@ -71,6 +71,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
@@ -319,7 +320,8 @@ private fun NextLotRow(content: SkylineContent, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
-            .background(c.surface, SsRadius.shapeCard)
+            .clip(SsRadius.shapeCard)
+            .background(c.surface)
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 18.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -341,8 +343,9 @@ private fun TowerChip(tower: Tower, isNew: Boolean, selected: Boolean, onClick: 
     val c = SsTheme.colors
     Row(
         Modifier
-            .background(c.surface, SsRadius.shapeMd)
             .then(if (selected) Modifier.border(2.dp, c.ink, SsRadius.shapeMd) else Modifier)
+            .clip(SsRadius.shapeMd)
+            .background(c.surface)
             .clickable(role = Role.Button, onClick = onClick)
             .padding(start = 10.dp, end = 14.dp, top = 10.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,

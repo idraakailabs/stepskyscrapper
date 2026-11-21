@@ -59,6 +59,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -401,7 +402,8 @@ private fun PassCard(content: MeContent, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
-            .background(brand.passSurface, SsRadius.shapeCard)
+            .clip(SsRadius.shapeCard)
+            .background(brand.passSurface)
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = SsSpacing.screenMargin, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -430,7 +432,8 @@ private fun PassCard(content: MeContent, onClick: () -> Unit) {
 private fun SettingsList(content: MeContent, nav: MeNavigation, onIntent: (MeIntent) -> Unit) {
     val c = SsTheme.colors
     val g = content.goals
-    Column(Modifier.background(c.surface, SsRadius.shapeCard).padding(vertical = SsSpacing.xs)) {
+    // Clipped so the first and last rows' ripples follow the card's rounded corners.
+    Column(Modifier.clip(SsRadius.shapeCard).background(c.surface).padding(vertical = SsSpacing.xs)) {
         SsSettingsRow(
             Symbol.Flag,
             stringResource(R.string.me_goals),
@@ -500,7 +503,8 @@ internal fun PauseSheet(onPick: (PauseOption) -> Unit, onDismiss: () -> Unit) {
                     Modifier
                         .fillMaxWidth()
                         .heightIn(min = 56.dp)
-                        .background(c.background, SsRadius.shapeMd)
+                        .clip(SsRadius.shapeMd)
+                        .background(c.background)
                         .clickable(role = Role.Button) { onPick(option) }
                         .padding(horizontal = SsSpacing.l),
                     verticalAlignment = Alignment.CenterVertically,

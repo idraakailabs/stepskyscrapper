@@ -309,6 +309,7 @@ private fun LegalLink(text: String, onClick: () -> Unit) {
         color = SsTheme.colors.primaryText,
         modifier = Modifier
             .minimumInteractiveComponentSize()
+            .clip(SsRadius.shapeSm)
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = SsSpacing.s),
     )

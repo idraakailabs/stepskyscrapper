@@ -42,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -134,6 +135,7 @@ fun StyleAndNamePicker(
                 Column(
                     Modifier
                         .width(72.dp)
+                        .clip(SsRadius.shapeMd)
                         .selectable(isSelected, role = Role.RadioButton) { onSelect(kit) },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(6.dp),

@@ -72,6 +72,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
@@ -275,6 +276,7 @@ private fun TowerGrid(tiles: List<CosmeticTile>, draft: TowerLook?, onIntent: (C
                 Column(
                     Modifier
                         .weight(1f)
+                        .clip(SsRadius.shapeMd)
                         .selectable(selected, role = Role.RadioButton) { onIntent(CustomiseIntent.TapItem(tile)) }
                         .semantics { stateDescription = label ?: "" },
                     verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -370,7 +372,7 @@ private fun PaletteGrid(tiles: List<CosmeticTile>, draft: TowerLook?, onIntent: 
                     CosmeticVisuals.palettes[tile.item.id]
                 }
                 Column(
-                    Modifier.weight(1f).selectable(selected, role = Role.RadioButton) { onIntent(CustomiseIntent.TapItem(tile)) },
+                    Modifier.weight(1f).clip(SsRadius.shapeMd).selectable(selected, role = Role.RadioButton) { onIntent(CustomiseIntent.TapItem(tile)) },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
@@ -429,6 +431,7 @@ private fun LightsList(tiles: List<CosmeticTile>, draft: TowerLook?, onIntent: (
             Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp)
+                .clip(SsRadius.shapeMd)
                 .selectable(selected, role = Role.RadioButton) { onIntent(CustomiseIntent.TapItem(tile)) }
                 .padding(vertical = SsSpacing.xs),
             verticalAlignment = Alignment.CenterVertically,

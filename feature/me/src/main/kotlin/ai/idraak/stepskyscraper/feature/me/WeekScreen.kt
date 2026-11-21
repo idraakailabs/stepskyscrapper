@@ -40,6 +40,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -149,7 +150,7 @@ private fun WeekBody(content: WeekContent, onOpenGoals: () -> Unit, onIntent: (W
         Box(Modifier.height(14.dp))
         Bars(week.days, month = false)
     }
-    Column(Modifier.background(c.surface, SsRadius.shapeCard).padding(vertical = SsSpacing.xs)) {
+    Column(Modifier.clip(SsRadius.shapeCard).background(c.surface).padding(vertical = SsSpacing.xs)) {
         SsSettingsRow(
             Symbol.PauseCircle,
             stringResource(R.string.me_pause),

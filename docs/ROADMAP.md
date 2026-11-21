@@ -404,12 +404,16 @@ Bug cards are in [BUGS.md](BUGS.md).
   3. No pressed state draws a shape that doesn't match the control's rounded corners.
   4. Every major screen and navigation path opens on the device with no crash in the crash buffer.
 - **Progress (2026-11-21, branch `fix/smoke-test`):**
-  - Done: BUG-020 fixed and verified on the device; BUG-021 fixed (parallel fetch, cached plans, `OffersCacheTest`),
-    device cold-start check outstanding. Paywall measurements: warm open fully drawn < 0.5 s, slowest frame 24 ms.
-  - Smoke-tested so far (Pixel 6a, debug): Build, week card → This week, Me, Step source, Help & privacy (from the app and
-    from Health Connect), paywall (plans, legal links), Skyline reward card, Share save; no other crash seen.
-  - Not started: the pressed-state / ripple / shadow audit (AC 3) and the rest of the smoke test (onboarding, Customise,
-    Achievements, Settings, ceremony, widgets) and the final re-test (AC 4).
+  - [BUG-020](BUGS.md#bug-020) fixed and re-verified on both in-app paths (AC 1).
+  - [BUG-021](BUGS.md#bug-021) fixed (parallel fetch, cached plans, `OffersCacheTest`); paywall measurements: warm open
+    fully drawn < 0.5 s, slowest frame 24 ms; offerings 0.9–1.3 s after a cold start. AC 2's cold-start device check is
+    outstanding (scripted taps missed the Pass card; checking it offline would need the phone's network switched off).
+  - [BUG-022](BUGS.md#bug-022): pressed-state audit done, square ripples clipped on 15 controls (AC 3).
+  - Smoke test (Pixel 6a, debug, scripted with logcat crash buffer): Build, week card → This week, Customise, Share,
+    Skyline, Me, Settings, Goals, Step source › Open Health Connect, Help & privacy › Manage step access, paywall; 0
+    crashes; Back returns correctly from each. Earlier the same day: Skyline reward card, test ad, Share save, legal links.
+    Not covered: onboarding and the ceremony (need a fresh install / topping-out), widgets, Achievements list (not
+    reached by the script; unchanged code).
 
 <a id="tech-014"></a>
 ### TECH-014 — Architect Pass purchases through RevenueCat
