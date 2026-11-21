@@ -101,11 +101,12 @@ data class SsTypography(
     val chip: TextStyle = style(14, 19.6f, FontWeight.Medium),
     val bodyXS: TextStyle = style(13, 18.85f, FontWeight.Normal),
 
-    // Option / plan cards: the design leaves these at CSS `line-height: normal` (DM Sans ascent + descent = 1.302em).
-    val optionTitle: TextStyle = style(16, 20.8f, FontWeight.Bold),
-    val optionSubtitle: TextStyle = style(13, 16.9f, FontWeight.Normal),
-    val planTitle: TextStyle = style(15, 19.5f, FontWeight.Bold),
-    val planSubtitle: TextStyle = style(12, 15.6f, FontWeight.Normal),
+    // Card text the design leaves at CSS `line-height: normal` (DM Sans ascent + descent = 1.302em): option and
+    // plan cards, achievement and help-step cards, the 1f mock widget.
+    val cardTitle: TextStyle = style(16, 20.8f, FontWeight.Bold),
+    val cardBody: TextStyle = style(13, 16.9f, FontWeight.Normal),
+    val cardTitleS: TextStyle = style(15, 19.5f, FontWeight.Bold),
+    val cardCaption: TextStyle = style(12, 15.6f, FontWeight.Normal),
     val labelS: TextStyle = style(13, 18f, FontWeight.SemiBold),
     val labelSBold: TextStyle = style(13, 18f, FontWeight.Bold),
     val caption: TextStyle = style(12, 16f, FontWeight.Medium),

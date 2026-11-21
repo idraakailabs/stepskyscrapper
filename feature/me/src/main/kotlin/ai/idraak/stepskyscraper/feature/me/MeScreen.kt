@@ -40,7 +40,6 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -106,7 +105,7 @@ fun MeScreen(state: MeUiState, nav: MeNavigation, onIntent: (MeIntent) -> Unit) 
 @Composable
 private fun MeContentView(content: MeContent, state: MeUiState, nav: MeNavigation, onIntent: (MeIntent) -> Unit) {
     val c = SsTheme.colors
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).windowInsetsPadding(WindowInsets.statusBars)) {
+    Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars).verticalScroll(rememberScrollState())) {
         Row(
             Modifier.fillMaxWidth().padding(start = SsSpacing.screenMargin, end = SsSpacing.s, top = SsSpacing.s),
             verticalAlignment = Alignment.CenterVertically,
@@ -244,14 +243,15 @@ private fun Bars(bars: List<WeekDayBar>, month: Boolean) {
     val max = (bars.maxOfOrNull { it.floors } ?: 0).coerceAtLeast(1)
     val chartHeight = 88.dp
     Row(
-        Modifier.fillMaxWidth().height(120.dp),
+        // At least the design's 120dp; the tallest day needs 124dp (value + 88dp bar + label), so don't clip it.
+        Modifier.fillMaxWidth().heightIn(min = 120.dp),
         horizontalArrangement = Arrangement.spacedBy(if (month) 2.dp else SsSpacing.s),
         verticalAlignment = Alignment.Bottom,
     ) {
         bars.forEach { bar ->
             val today = stringResource(R.string.me_today)
             Column(
-                Modifier.weight(1f).fillMaxHeight().clearAndSetSemantics {
+                Modifier.weight(1f).clearAndSetSemantics {
                     contentDescription =
                         "${Formats.weekdayDayMonth(bar.date)}: ${bar.floors}"
                 },

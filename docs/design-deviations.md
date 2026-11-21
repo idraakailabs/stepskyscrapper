@@ -24,7 +24,12 @@ behaviour was chosen while keeping the look. Every such decision is listed here.
 | D15 | Bottom sheets "300ms emphasized-decelerate; drag down to dismiss" | Material 3 `ModalBottomSheet` (its own spring) for modal sheets; Customise opens as a full-height route sliding up 300ms emphasized-decelerate | Closest native behaviour |
 | D16 | Customise sheet collapses the preview into a sticky 64dp thumbnail when dragged to full height | Customise is a fixed 73% sheet with the live preview always visible above it; content scrolls inside | Simpler, always shows the live preview |
 | D17 | Sheet scrim `#24211D` at 32% | Light theme exactly; dark theme uses black at 48% for contrast on dark surfaces | Dark-mode legibility |
-| D18 | Share composer preview at 25%/28% | Preview at the same on-screen size (198×352 / 280×280dp); export renders the same composable at exactly 1080×1920 / 1080×1080 px | — |
+| D18 | Share composer preview at 25%/28%, with shorter preview copy ("24,310" / "steps · 11 Build Days") | Preview at the same on-screen size (198×352 / 280×280dp) and shows the exact export (8b/8c copy "24,310 steps" / "in 11 Build Days", date in the overline); export renders the same composable at exactly 1080×1920 / 1080×1080 px | The preview is what gets shared |
+| D19 | Customise has no close control (drag the sheet down) | A ✕ next to the Blueprints balance | Customise is a full-height route (D15), so it needs an explicit, accessible dismiss |
+| D20 | 5b shows Colour palette, Window lighting and Ground details in one scroll under the Palette tab | Each section is its own tab (Palette / Lights / Ground) with the designed swatches, radio list and chips | Tabs already exist for each section; one long list would duplicate them |
+| D21 | Body text without an explicit CSS line height uses `line-height: normal` (≈1.30em) | Tokens keep their ≈1.4em line heights (label 14/19.6, bodyS 14/21…); blocks drift ≤3dp. Card text where it added up (option/plan, achievement and help-step cards, 1f mock widget) uses the `card*` tokens at 1.30em | Changing every token would ripple through all screens for a few dp |
+| D22 | Line heights below the font's height (numbers 60/63, tower names, headlines) | Android keeps the font's full ascent/descent on the outer lines; `cssLineBox` trims the box to the CSS line height on every such text | Matches the browser layout (was up to +15dp per number) |
+| D23 | Frames are 360×800 | Layouts stretch to the phone (Pixel 6a: 411×914dp): hero towers scale with the hero box and bottom-anchored blocks move down | Responsive layout; checked on device |
 
 ## Product and data decisions
 

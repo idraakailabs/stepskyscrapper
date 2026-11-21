@@ -33,7 +33,13 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-006](#bug-006) | Onboarding payoff shows a 20% partial floor at 0 steps and rounds to segments | P3 | Confirmed (code) | Fixed – unverified |
 | [BUG-007](#bug-007) | Ad consent form may appear just by opening Skyline | P3 | Suspected | Open |
 | [BUG-008](#bug-008) | The Build feature module was missing from the Git repository | P0 | Confirmed (reproduced) | Done |
-| [BUG-009](#bug-009) | Onboarding skips "Add widget" (1f) and jumps to Build | P2 | Confirmed (reproduced) | Fixed – unverified |
+| [BUG-009](#bug-009) | Onboarding skips "Add widget" (1f) and jumps to Build | P2 | Confirmed (reproduced) | Done |
+| [BUG-010](#bug-010) | Under-construction towers on the real ladder render as a sliver | P1 | Confirmed (reproduced) | Open |
+| [BUG-011](#bug-011) | Build tab does nothing after closing a ceremony | P1 | Confirmed (reproduced) | Done |
+| [BUG-012](#bug-012) | "Steps not arriving?" link never appears while syncs run | P2 | Confirmed (reproduced) | Done |
+| [BUG-013](#bug-013) | Tower stats sheet opens half-height with its buttons under the gesture bar | P2 | Confirmed (reproduced) | Done |
+| [BUG-014](#bug-014) | Me: "Today" label clipped when today is the tallest bar | P3 | Confirmed (reproduced) | Done |
+| [BUG-015](#bug-015) | Me scrolls under the transparent status bar | P3 | Confirmed (reproduced) | Done |
 
 ---
 
@@ -88,6 +94,9 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   1. Tapping Save shows "Saved to Pictures." on success and the failure copy otherwise (UI test with fake).
   2. API 28 emulator: granting the permission saves the image without a second tap.
 - **Resolution:** — · **Verification:** —
+
+> **Device check (2026-11-21, Pixel 6a, Android 16):** "Save image" wrote the PNG to `Pictures/Step Skyscraper/`
+> with no on-screen confirmation — the missing feedback is reproduced; the Android 8–9 failure is not checked.
 
 <a id="bug-004"></a>
 ## BUG-004 — Week card opens Goals instead of a weekly detail with "Pause goals"
@@ -175,7 +184,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 <a id="bug-009"></a>
 ## BUG-009 — Onboarding skips "Add widget" (1f) and jumps to Build
 
-- **Priority:** P2 · **Classification:** Confirmed (reproduced) · **Status:** Fixed – unverified
+- **Priority:** P2 · **Classification:** Confirmed (reproduced) · **Status:** Done
 - **Evidence:** on the Pixel 6a (debug build, 2026-11-21) tapping "Set 49 floors a week" on 1e opened Build
   directly; 1f never appeared. `StartBuildingUseCase` marks onboarding complete before the widget step, the
   settings flow re-emits, and `AppNavHost` computed `startDestination = if (onboardingComplete) BuildRoute else
@@ -186,5 +195,74 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Acceptance criteria:**
   1. Fresh install on a device: 1e CTA → 1f "Add widget"; both "Add widget" and "Maybe later" → Build.
   2. Relaunching after onboarding opens Build directly.
-- **Resolution:** `AppNavHost` remembers the start destination (this branch). · **Verification:** pending the
-  device re-check (Pixel disconnected before the fixed build could be exercised).
+- **Resolution:** `AppNavHost` remembers the start destination (commit `fb98ad6`). · **Verification:** Pixel 6a,
+  fresh install: 1e CTA → 1f shown; "Maybe later" → Build; relaunch opens Build directly.
+
+<a id="bug-010"></a>
+## BUG-010 — Under-construction towers on the real ladder render as a sliver
+
+- **Priority:** P1 · **Classification:** Confirmed (reproduced) · **Status:** Open (needs a product decision)
+- **Evidence:** Pixel 6a, tower 4 at 19 of 100 floors: the dashed ghost outline runs to floor 100 and the view
+  fits that height, so the built floors fill ~10% of the Build hero (also the Customise preview and the
+  in-progress share card). `tower.js` behaves the same; the design simply uses 12–24-floor targets, while the
+  ladder is 10/25/50/100/160/250 ([P1](design-deviations.md)).
+- **Impact:** from tower 4 on, the main screen's tower is tiny for weeks; the core "watch it grow" payoff is lost.
+- **Options:** (a) draw the ghost only up to the next setback band or N floors ahead and fit to that;
+  (b) fit to the built floors plus a fixed margin and let the ghost run off the top; (c) shorten the ladder.
+- **Acceptance criteria:** at 19 of 100 floors the built tower fills at least half of the hero height on a
+  360×800 and a 411×914 screen; topped-out towers unchanged.
+- **Resolution:** — · **Verification:** —
+
+<a id="bug-011"></a>
+## BUG-011 — Build tab does nothing after closing a ceremony
+
+- **Priority:** P1 · **Classification:** Confirmed (reproduced) · **Status:** Done
+- **Evidence:** Pixel 6a: ceremony → Close → Skyline; tapping Build (or Me → Build) kept showing Skyline.
+  Ceremony close used `goToTab` (pop with `saveState = false`), the tab bar popped to the start destination
+  with `saveState = true` and navigated with `restoreState = true`, so selecting Build restored the stack just
+  saved (Skyline).
+- **Files:** `app/.../navigation/AppNavigation.kt`.
+- **Resolution:** one `goToTab` for all tab changes: pop up to `BuildRoute` (the real root after onboarding)
+  saving state; never restore state when selecting Build; ceremony close opens a fresh Skyline (commit `9b94410`).
+- **Verification:** Pixel 6a: ceremony → Close → Skyline → Build opens Build; Me → Build opens Build; Build →
+  Skyline → Build still works.
+
+<a id="bug-012"></a>
+## BUG-012 — "Steps not arriving?" link never appears while syncs run
+
+- **Priority:** P2 · **Classification:** Confirmed (reproduced) · **Status:** Done
+- **Evidence:** Pixel 6a with the debug clock 3 days ahead and no steps: Build showed "Resting? You can pause
+  goals", never the 48h step-help link. Every new day's sync inserts a 0-step row and `markSucceeded` treated
+  any written row as new data, resetting `sync_last_change`.
+- **Files:** `core/domain/.../SyncStepsUseCase.kt`, `core/domain/.../model/Steps.kt`.
+- **Resolution:** new data = a day's total went up (`SyncResult.stepsArrived`) (commit `9b94410`).
+- **Verification:** unit test `SyncStepsUseCaseTest.newEmptyDaysAreNotNewData`; Pixel 6a: last data change on
+  the 21st, clock on the 24th → "Steps not arriving? Let's check" → opens 10a.
+
+<a id="bug-013"></a>
+## BUG-013 — Tower stats sheet opens half-height with its buttons under the gesture bar
+
+- **Priority:** P2 · **Classification:** Confirmed (reproduced) · **Status:** Done
+- **Evidence:** Pixel 6a (914dp tall): 4b opened partially expanded (~457dp) and "Share tower" / "Rename" sat
+  under the navigation bar; the design shows the whole sheet.
+- **Files:** `feature/skyline/.../SkylineScreen.kt` (`skipPartiallyExpanded = false`).
+- **Resolution:** the sheet opens at its content height like every other sheet (this branch).
+- **Verification:** Pixel 6a: 4b opens fully with both buttons above the gesture bar; swipe between towers works.
+
+<a id="bug-014"></a>
+## BUG-014 — Me: "Today" label clipped when today is the tallest bar
+
+- **Priority:** P3 · **Classification:** Confirmed (reproduced) · **Status:** Done
+- **Evidence:** Pixel 6a: the bar column was a fixed 120dp but value + 88dp bar + label needs 124dp, so the bold
+  "Today" was cut off when today had the most floors.
+- **Resolution:** the row is at least 120dp and grows to fit (this branch). · **Verification:** Pixel 6a, today
+  = 6 floors (week max): "Today" fully visible.
+
+<a id="bug-015"></a>
+## BUG-015 — Me scrolls under the transparent status bar
+
+- **Priority:** P3 · **Classification:** Confirmed (reproduced) · **Status:** Done
+- **Evidence:** Pixel 6a: the status-bar padding was inside the scroll container, so cards and titles scrolled
+  under the clock and icons.
+- **Resolution:** padding applied outside the scroll (this branch). · **Verification:** Pixel 6a: scrolled Me
+  content stops below the status bar.

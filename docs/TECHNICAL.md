@@ -180,5 +180,9 @@ Index only; details live in the linked card.
 - **Strings** in each module's `res/values/strings.xml`; bold spans use escaped `&lt;b>` and `boldText()`.
 - **Design tokens only** (`SsTheme.colors/type`, `SsSpacing`, `SsRadius`, `SsMotion`); no raw colours or dp
   in features.
+- **Text with a line height below the font's height** (big numbers, tower names, headlines: anything under
+  ≈1.3em for DM Sans) gets `Modifier.cssLineBox(style)`; Android otherwise keeps the font's full ascent/descent
+  and the text sits up to 15dp taller than the design. Rows that pair a number with a unit use
+  `alignByBaseline()`; `RollingNumber` reports its own baseline.
 - **Release-only risks:** kotlinx-serialization routes and Glance receivers need the keep rules in
   `app/proguard-rules.pro`.

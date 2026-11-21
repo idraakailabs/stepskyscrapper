@@ -271,7 +271,7 @@ fun HelpStepCard(number: Int, title: String, body: @Composable () -> Unit, actio
             Text(number.toString(), style = SsTheme.type.labelSBold, color = c.onInk)
         }
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(SsSpacing.xs)) {
-            Text(title, style = SsTheme.type.planTitle, color = c.onSurface)
+            Text(title, style = SsTheme.type.cardTitleS, color = c.onSurface)
             body()
             // Design: a 44dp inline action with `margin: -6px 0 -6px -12px`, so it takes 32dp of layout and its
             // text lines up with the body copy. The 48dp touch target is kept; it overlaps the padding instead.

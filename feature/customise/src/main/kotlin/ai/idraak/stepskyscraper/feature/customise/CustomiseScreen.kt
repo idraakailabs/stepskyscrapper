@@ -257,10 +257,8 @@ internal fun lockLabel(lock: LockState, short: Boolean = false): String? = when 
     }
     is LockState.Price -> stringResource(R.string.cus_lock_price, lock.cost)
     LockState.Premium -> stringResource(R.string.cus_lock_pass)
-    is LockState.Achievement -> stringResource(
-        R.string.cus_lock_achievement,
-        AchievementCatalog.definition(lock.achievementId)?.title.orEmpty(),
-    )
+    // Design: the condition itself ("Build 200 floors"), not the achievement's name.
+    is LockState.Achievement -> AchievementCatalog.definition(lock.achievementId)?.description.orEmpty()
 }
 
 @Composable

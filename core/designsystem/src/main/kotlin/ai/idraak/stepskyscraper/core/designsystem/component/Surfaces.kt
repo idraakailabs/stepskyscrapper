@@ -107,8 +107,8 @@ fun SsRadioCard(
     radius: Dp = SsRadius.card,
     padding: PaddingValues = PaddingValues(horizontal = 18.dp, vertical = SsSpacing.l),
     subtitleColor: Color = SsTheme.colors.onSurfaceVariant,
-    titleStyle: androidx.compose.ui.text.TextStyle = SsTheme.type.optionTitle,
-    subtitleStyle: androidx.compose.ui.text.TextStyle = SsTheme.type.optionSubtitle,
+    titleStyle: androidx.compose.ui.text.TextStyle = SsTheme.type.cardTitle,
+    subtitleStyle: androidx.compose.ui.text.TextStyle = SsTheme.type.cardBody,
     textGap: Dp = SsSpacing.xxs,
 ) {
     val c = SsTheme.colors

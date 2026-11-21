@@ -20,7 +20,6 @@
     <string name="cus_lock_days_long">Build on %1$d days</string>
     <string name="cus_lock_level">Reach Architect level %1$d</string>
     <string name="cus_lock_price">%1$d Blueprints</string>
-    <string name="cus_lock_achievement">Earn \"%1$s\"</string>
     <string name="cus_lock_pass">Architect Pass</string>
     <string name="cus_explain_progress">You\'re at %1$d of %2$d. It unlocks on its own; nothing to buy.</string>
     <string name="cus_explain_price">Spend %1$d of your %2$d Blueprints. Blueprints are earned by finishing towers.</string>

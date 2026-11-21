@@ -320,8 +320,8 @@ private fun Plans(state: PaywallUiState, onIntent: (PaywallIntent) -> Unit) {
     val monthly = state.offer(PassPlan.Monthly)
     val lifetime = state.offer(PassPlan.Lifetime)
     val pad = PaddingValues(horizontal = SsSpacing.l, vertical = SsSpacing.m)
-    val title = SsTheme.type.planTitle
-    val sub = SsTheme.type.planSubtitle
+    val title = SsTheme.type.cardTitleS
+    val sub = SsTheme.type.cardCaption
     annual?.let { a ->
         val save = PaywallReducer.savingPercent(monthly, a)
         SsRadioCard(

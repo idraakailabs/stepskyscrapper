@@ -547,7 +547,7 @@ private fun WidgetMock(state: OnboardingUiState) {
                 Text(Formats.steps(400), style = SsTheme.type.numberWidgetMock, color = c.onSurface, modifier = Modifier.cssLineBox(SsTheme.type.numberWidgetMock))
                 Text(
                     stringResource(ai.idraak.stepskyscraper.core.ui.R.string.to_next_floor),
-                    style = SsTheme.type.planSubtitle,
+                    style = SsTheme.type.cardCaption,
                     color = c.bodySecondary,
                 )
             }

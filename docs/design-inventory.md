@@ -6,6 +6,10 @@ Source: Claude Design project `28cbb1ce-1aa3-42a7-a36b-460f7043966d`, file `Step
 
 Status legend: `[x]` implemented and checked against the design. Code locations are listed per item.
 
+**Device check (2026-11-21, Pixel 6a, debug build, [TECH-012](ROADMAP.md#tech-012)):** every frame was compared
+with the rendered design at the same dp scale. *(device ✓)* = checked on the phone; *(device —)* gives the reason
+when it couldn't be.
+
 ## 1. Design tokens
 
 ### 1.1 Colour, light (`core/designsystem/.../theme/Color.kt`)
@@ -113,58 +117,58 @@ Status legend: `[x]` implemented and checked against the design. Code locations 
 
 ## 4. Screens and states
 ### Onboarding (`feature/onboarding`)
-- [~] 1a Promise: dawn gradient, tower deco 7/12 progress .5 with crane and `drop`, headline, body, dots 1/4, "Start building" — *gap: the 6° crane swing is not animated*
-- [x] 1b Permission rationale: walk icon tile, title, lead, 3-row list, dots 2/4, "Allow step access" → Health Connect sheet (READ_STEPS [+ background]), "Not now" → demo tower
-- [x] 1b' Health Connect missing / needs update → Play listing deep link (reviewer note)
-- [x] 1c Payoff: "You've already walked", 0 → steps roll 1.2s, floors drop with haptic tick, dashed next floor, segment bar, "Floor N in X steps…", dots 3/4, "Choose its style"; zero-step copy variant
-- [~] 1d Style & name: preview card, 5 style tiles (selected = ring + check badge), name field (display face, 2dp ring) + dice, "You can rename it any time.", dots 4/4, "Lay the foundation"; re-skin drop 60ms stagger — *gap: the 80ms lift-off of the old floors is not played*
-- [x] 1e Daily target: back, title, 7-day average copy, Easy-going / Steady (Suggested) / Ambitious / Set my own (steps of 500), pause hint, CTA "Set N floors a week"
-- [x] 1f Add widget: home-screen mock with medium widget, title, body, "Add widget" (requestPinAppWidget), "Maybe later"; both → Build with first floor drop replayed
+- [~] 1a Promise *(device ✓)*: dawn gradient, tower deco 7/12 progress .5 with crane and `drop`, headline, body, dots 1/4, "Start building" — *gap: the 6° crane swing is not animated*
+- [x] 1b Permission rationale *(device ✓, real Health Connect sheet incl. background access)*: walk icon tile, title, lead, 3-row list, dots 2/4, "Allow step access" → Health Connect sheet (READ_STEPS [+ background]), "Not now" → demo tower
+- [x] 1b' *(device — Health Connect is installed on the test phone)* Health Connect missing / needs update → Play listing deep link (reviewer note)
+- [x] 1c Payoff *(device ✓; number/unit baseline fixed)*: "You've already walked", 0 → steps roll 1.2s, floors drop with haptic tick, dashed next floor, segment bar, "Floor N in X steps…", dots 3/4, "Choose its style"; zero-step copy variant
+- [~] 1d Style & name *(device ✓)*: preview card, 5 style tiles (selected = ring + check badge), name field (display face, 2dp ring) + dice, "You can rename it any time.", dots 4/4, "Lay the foundation"; re-skin drop 60ms stagger — *gap: the 80ms lift-off of the old floors is not played*
+- [x] 1e Daily target *(device ✓; card line heights fixed)*: back, title, 7-day average copy, Easy-going / Steady (Suggested) / Ambitious / Set my own (steps of 500), pause hint, CTA "Set N floors a week"
+- [x] 1f Add widget *(device ✓ after BUG-009; mock widget type fixed)*: home-screen mock with medium widget, title, body, "Add widget" (requestPinAppWidget), "Maybe later"; both → Build with first floor drop replayed
 ### Build (`feature/build`)
-- [x] 2a In progress (day): sky header, tower with crane + progress, Next floor card (hero number, 10 segments, steps/floors today), week card (ring %, "N of M floors this week", "X to go · D days left", chevron)
-- [x] 2b Morning (dawn): greeting overline before 11:00 ("GOOD MORNING · ART DECO"), nearest-milestone copy ("4 floors to topping out")
-- [x] 2c Target met (dusk): light header ink, "Target met" chip pop, "8,420 of 7,000 today", "Anything more today is a bonus", lights flicker
-- [x] 2d Zero steps: calm copy "A fresh day. Your tower is right where you left it.", outlined first segment, "Resting? You can pause goals"; after 48h zero → link to 10a
-- [x] 2e Syncing / stale: dimmed number, "Syncing…" chip with rotating icon, "Updated 12 min ago", pull-to-refresh, snackbar "Synced. N floors added." + View, floors drop in sequence, number never goes backwards
-- [x] 2f Dark (night): night sky, sheet blends into dark background, dark nav
-- [x] Goals paused: week card "Goals paused. Floors still count." in neutral grey
-- [x] Steps not connected (permission denied): demo tower + "Connect steps to start building." card
-- [x] Tap tower → zoom 1.4× to active floor with its step count; long-press → rotate 90° (other façade)
-- [x] Font scale > 150%: hero shrinks to 200dp, card area scrolls
+- [x] 2a In progress (day) *(device ✓; number line box fixed; tower size see BUG-010)*: sky header, tower with crane + progress, Next floor card (hero number, 10 segments, steps/floors today), week card (ring %, "N of M floors this week", "X to go · D days left", chevron)
+- [x] 2b Morning (dawn) *(device ✓)*: greeting overline before 11:00 ("GOOD MORNING · ART DECO"), nearest-milestone copy ("4 floors to topping out")
+- [x] 2c Target met (dusk) *(device ✓)*: light header ink, "Target met" chip pop, "8,420 of 7,000 today", "Anything more today is a bonus", lights flicker
+- [x] 2d Zero steps *(device ✓; 48h link fixed, BUG-012)*: calm copy "A fresh day. Your tower is right where you left it.", outlined first segment, "Resting? You can pause goals"; after 48h zero → link to 10a
+- [x] 2e Syncing / stale *(device ✓ chip and dimming; snackbar — needs new floors from Health Connect)*: dimmed number, "Syncing…" chip with rotating icon, "Updated 12 min ago", pull-to-refresh, snackbar "Synced. N floors added." + View, floors drop in sequence, number never goes backwards
+- [x] 2f Dark (night) *(device ✓)*: night sky, sheet blends into dark background, dark nav
+- [x] Goals paused *(device ✓)*: week card "Goals paused. Floors still count." in neutral grey
+- [x] Steps not connected (permission denied) *(device — permission not revoked on the user's phone; screenshot test)*: demo tower + "Connect steps to start building." card
+- [x] *(device ✓)* Tap tower → zoom 1.4× to active floor with its step count; long-press → rotate 90° (other façade)
+- [x] Font scale > 150% *(device — needs the system font size changed by the user)*: hero shrinks to 200dp, card area scrolls
 - [x] Loading and error states
 ### Topping out (`feature/build` ceremony route)
-- [x] 3a light (dusk) / 3b dark (night): beams, close, tower with crown `lift` + lights, sheet "TOPPED OUT", name, stats, +Blueprints (roll 0→N), Share + Start next tower
+- [x] 3a light (dusk) / 3b dark (night) *(device ✓; reward sentence fixed)*: beams, close, tower with crown `lift` + lights, sheet "TOPPED OUT", name, stats, +Blueprints (roll 0→N), Share + Start next tower
 - [x] Sequence 0.0 crown lift + haptic, 0.9 windows + beams, 1.6 sheet rises 300ms; tap to skip; optional clack sound respecting silent mode
-- [x] Start next tower → style + name picker → Build; Close → Skyline with new tower highlighted; paywall once after first ceremony is dismissed
+- [x] *(device ✓; Close → Skyline → Build fixed, BUG-011)* Start next tower → style + name picker → Build; Close → Skyline with new tower highlighted; paywall once after first ceremony is dismissed
 ### Skyline (`feature/skyline`)
-- [x] 4a New tower joined: header DISTRICT N, district name, "N towers · F floors · since d MMM", next-floor pill, share; skyline with amber pin (24h); reward card + "Watch a short ad to double Blueprints" + disclaimer; tower chips row
-- [x] 4b Tower stats sheet: thumb, "TOWER N · STYLE", name, 4 stat tiles, rows (Steps, Best day, Crown · palette), Share tower / Rename; swipe between towers; selected tower lifts 4dp + pin
-- [x] 4c Dark default: next-district card (8 segments, "5 of 8 towers", copy), next lot row
+- [x] 4a New tower joined *(device ✓)*: header DISTRICT N, district name, "N towers · F floors · since d MMM", next-floor pill, share; skyline with amber pin (24h); reward card + "Watch a short ad to double Blueprints" + disclaimer; tower chips row
+- [x] 4b Tower stats sheet *(device ✓ after BUG-013)*: thumb, "TOWER N · STYLE", name, 4 stat tiles, rows (Steps, Best day, Crown · palette), Share tower / Rename; swipe between towers; selected tower lifts 4dp + pin
+- [x] 4c Dark default *(device ✓)*: next-district card (8 segments, "5 of 8 towers", copy), next lot row
 - [x] Pinch zoom 1–3×, drag pan; empty skyline state (first tower under construction)
 - [x] Rewarded ad hidden for Architect Pass members (2× by default)
 ### Customise (`feature/customise`)
-- [x] 5a Facade tab: live preview above sheet, Blueprints balance chip, tabs Facade / Palette / Crown / Lights / Ground, 3-column tiles with three lock types (progress, Blueprint price, Premium)
-- [~] 5b Palette swatches, Window lighting radio list, Ground details chips, sticky "Done" — *gap: no 64dp sticky thumbnail on full expansion (deviation D16)*
+- [x] 5a Facade tab *(device ✓; achievement locks show the condition)*: live preview above sheet, Blueprints balance chip, tabs Facade / Palette / Crown / Lights / Ground, 3-column tiles with three lock types (progress, Blueprint price, Premium)
+- [~] 5b *(device ✓, D19/D20)* Palette swatches, Window lighting radio list, Ground details chips, sticky "Done" — *gap: no 64dp sticky thumbnail on full expansion (deviation D16)*
 - [x] Crown tab
-- [x] Locked tile tap → 3s "Preview" on the tower, then unlock-explainer sheet; Premium → paywall; buy with Blueprints
+- [x] *(device ✓)* Locked tile tap → 3s "Preview" on the tower, then unlock-explainer sheet; Premium → paywall; buy with Blueprints
 - [x] Re-skin bottom-to-top 400ms
 ### Me (`feature/me`)
-- [x] 6a Me: title + settings, next-floor pill, Architect level card, stats (Build Days / Floors / Towers), Floors built (Week/Month toggle, bars, today amber, future outlined), Last 4 weeks (paused week icon), Achievements grid + "See all 24", Architect Pass card, settings list (Goals, Pause goals switch, Step source, Notifications, Appearance, Help & privacy)
-- [x] Pause goals sheet: 3 days / 1 week / until I turn it back on
+- [x] 6a Me *(device ✓; BUG-014, BUG-015 fixed)*: title + settings, next-floor pill, Architect level card, stats (Build Days / Floors / Towers), Floors built (Week/Month toggle, bars, today amber, future outlined), Last 4 weeks (paused week icon), Achievements grid + "See all 24", Architect Pass card, settings list (Goals, Pause goals switch, Step source, Notifications, Appearance, Help & privacy)
+- [x] Pause goals sheet *(device ✓, no design frame)*: 3 days / 1 week / until I turn it back on
 - [x] Goals screen (daily target options, weekly goal, adaptive suggestion)
 - [x] Notifications, Appearance (Follow system / Light / Dark), Help & privacy, Settings screens
-- [~] 7a Achievements list: In progress (progress + reward chip), Earned (date + reward); badge flip — *gap: the "Equip" chip is shown for 7 days but is a label, not a shortcut into Customise*
+- [~] 7a Achievements list *(device ✓; card line heights fixed)*: In progress (progress + reward chip), Earned (date + reward); badge flip — *gap: the "Equip" chip is shown for 7 days but is a label, not a shortcut into Customise*
 ### Share (`feature/share`)
-- [x] 8a Composer: preview, Tower/Skyline toggle, Story 9:16 / Square 1:1, "Show step stats" switch, Download, "Share image" (share sheet + caption); 150ms crossfade
-- [x] 8b Story cards tower / skyline (1080×1920, safe zones top 14% / bottom 10%)
-- [x] 8c Square cards tower / skyline no stats (1080×1080); brand mark
+- [x] 8a Composer *(device ✓, D18)*: preview, Tower/Skyline toggle, Story 9:16 / Square 1:1, "Show step stats" switch, Download, "Share image" (share sheet + caption); 150ms crossfade
+- [x] *(device ✓, exported PNGs)* 8b Story cards tower / skyline (1080×1920, safe zones top 14% / bottom 10%)
+- [x] *(device ✓, exported PNGs)* 8c Square cards tower / skyline no stats (1080×1080); brand mark
 ### Paywall (`feature/paywall`)
-- [x] 9a: close + Restore, dusk hero with 3 towers, title, body, 3 benefits, Yearly (trial, Save 58%) / Monthly / Lifetime, CTA follows plan, legal copy with trial end date; loading/error/purchased states
+- [x] 9a *(device: error state ✓; plan cards need Play products, TECH-004 — screenshot test only)*: close + Restore, dusk hero with 3 towers, title, body, 3 benefits, Yearly (trial, Save 58%) / Monthly / Lifetime, CTA follows plan, legal copy with trial end date; loading/error/purchased states
 ### Help (`feature/me` step-source route)
-- [x] 10a: "Steps not arriving?", last-data card + status, 3 numbered steps (reordered for Samsung), deep links, "Check again" inline result, "Still stuck? Send a diagnostic"
+- [x] 10a *(device ✓; step-card heights fixed)*: "Steps not arriving?", last-data card + status, 3 numbered steps (reordered for Samsung), deep links, "Check again" inline result, "Still stuck? Send a diagnostic"
 - [x] HC not installed / needs update / permission revoked / sensor fallback states
 ### Widgets (`widget`)
-- [x] 11a Small 2×2 (silhouette mono tower, FLOOR N, number, bar), light + dark
+- [x] *(device — not placed on the user's home screen)* 11a Small 2×2 (silhouette mono tower, FLOOR N, number, bar), light + dark
 - [x] Medium 4×2 (sky panel tower with crane, name, number, floors today, week x/y, bar), light + dark
 - [x] Tap → Build; update after each sync
 

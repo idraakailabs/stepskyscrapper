@@ -379,7 +379,7 @@ private fun TowerChip(tower: Tower, isNew: Boolean, selected: Boolean, onClick: 
 private fun StatsSheet(tower: Tower, onIntent: (SkylineIntent) -> Unit) {
     val c = SsTheme.colors
     val kit = CosmeticCatalog.kitOf(tower.record.look.facadeId)
-    SsModalSheet(onDismiss = { onIntent(SkylineIntent.CloseSheet) }, skipPartiallyExpanded = false) {
+    SsModalSheet(onDismiss = { onIntent(SkylineIntent.CloseSheet) }) {
         var drag by remember { mutableFloatStateOf(0f) }
         Column(
             Modifier
