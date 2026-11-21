@@ -223,6 +223,11 @@ Bug cards are in [BUGS.md](BUGS.md).
   1. Yearly with trial, monthly and lifetime purchases each unlock premium items immediately (device).
   2. Purchases are acknowledged (no auto-refund after 3 days on the test track).
   3. Reinstall + Restore restores premium; a cancelled test subscription removes it after expiry.
+- **Progress (2026-11-21):** Play Console checked: the app "SkyScrapper" (`ai.idraak.stepskyscraper`) exists as a
+  Draft in the IdraakAI developer account; Monetize › Subscriptions shows only "Upload a new APK", so no product can be
+  created until a signed AAB with the billing permission is on a testing track. That upload needs
+  [TECH-005](#tech-005) (upload key) and, because of the `bundleRelease` guards, live AdMob ids
+  ([TECH-003](#tech-003)) and an https `PRIVACY_POLICY_URL` ([TECH-011](#tech-011)).
 
 <a id="tech-005"></a>
 ### TECH-005 — Release signing
