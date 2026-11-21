@@ -232,7 +232,7 @@ Bug cards are in [BUGS.md](BUGS.md).
 
 <a id="tech-005"></a>
 ### TECH-005 — Release signing
-- **Type:** Technical task · **Priority:** P0 · **Status:** In Progress (waiting for the upload key) · **Effort:** XS
+- **Type:** Technical task · **Priority:** P0 · **Status:** In Progress (key set up; first upload pending) · **Effort:** XS
 - **Problem (verified):** `signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")`
   (`app/build.gradle.kts:55`): without `keystore.properties` the release build is signed with the debug key.
 - **Solution:** create an upload key, enrol in Play App Signing, add `keystore.properties` locally and as CI
@@ -250,6 +250,11 @@ Bug cards are in [BUGS.md](BUGS.md).
   environment variables, `bundleRelease` produced an AAB that `jarsigner -verify` accepted. Outstanding: create
   the real upload key (you choose the passwords; see [play-console-checklist.md](play-console-checklist.md)),
   enrol in Play App Signing and upload to internal testing (criterion 2).
+- **Progress (2026-11-21):** upload key created as alias `stepskyscrapper` in the shared Idraak PKCS12 keystore
+  (`D:\Work\Idraak\Keystore\IdraakKeyStore`, RSA 2048, 25 years; backup taken first; key password = store password,
+  as PKCS12 requires). The build now also reads the `STEPSKY_*` keys from `local.properties` (git-ignored), where they
+  are set on the dev machine. `verifyReleaseSigning` passes and the release APK's certificate matches the alias
+  (SHA-256 `7B:07:5B:00:…:9B:1E`). Outstanding: Play App Signing enrolment and the first upload (criterion 2).
 
 <a id="tech-006"></a>
 ### TECH-006 — Generate the baseline profile and measure startup

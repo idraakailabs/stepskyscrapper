@@ -17,16 +17,22 @@ if (file("google-services.json").exists()) {
     apply(plugin = libs.plugins.firebase.crashlytics.get().pluginId)
 }
 
-// Release signing (upload key). Read from keystore.properties (local, git-ignored) or, in CI, from the
-// STEPSKY_* environment variables. There is deliberately no fallback to the debug key: without a complete
-// config the release build is left unsigned, and bundleRelease fails (see verifyReleaseSigning below).
+// Release signing (upload key). Read from keystore.properties (local, git-ignored), then from the STEPSKY_*
+// keys in local.properties (also git-ignored), then, in CI, from the STEPSKY_* environment variables. There is
+// deliberately no fallback to the debug key: without a complete config the release build is left unsigned, and
+// bundleRelease fails (see verifyReleaseSigning below).
 val keystoreProperties = Properties().apply {
     val file = rootProject.file("keystore.properties")
+    if (file.exists()) file.inputStream().use(::load)
+}
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
     if (file.exists()) file.inputStream().use(::load)
 }
 
 fun signingValue(property: String, env: String): String? =
     keystoreProperties.getProperty(property)?.takeIf { it.isNotBlank() }
+        ?: localProperties.getProperty(env)?.takeIf { it.isNotBlank() }
         ?: providers.environmentVariable(env).orNull?.takeIf { it.isNotBlank() }
 
 val releaseStoreFile = signingValue("storeFile", "STEPSKY_KEYSTORE_FILE")

@@ -132,7 +132,9 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
 - [x] **Done** — no debug-key fallback; `verifyReleaseSigning`, `verifyReleaseAdMob` and
   `verifyReleasePrivacyPolicy` run before `bundleRelease` (`--dry-run` confirms). A throwaway-key AAB passed
   `jarsigner -verify` earlier ([TECH-005](ROADMAP.md#tech-005)).
-- [ ] **Pending – user** — create the upload key and `keystore.properties`; enrol in Play App Signing; build with
+- [x] **Done** (2026-11-21) — upload key: alias `stepskyscrapper`, `STEPSKY_*` in `local.properties`; release APK
+  signed with it. Live AdMob ids are in `~/.gradle/gradle.properties`.
+- [ ] **Pending – user** — enrol in Play App Signing; build with
   `./gradlew clean :app:bundleRelease` ([play-console-checklist.md §2](play-console-checklist.md#2-build-the-signed-aab)).
 
 ## 9. Target API and compatibility

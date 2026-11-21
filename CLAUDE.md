@@ -93,7 +93,7 @@ This is a permanent project rule for every session.
 - RevenueCat: `release` uses only `REVENUECAT_API_KEY` (`goog_…`); debug uses the Test Store key
   `REVENUECAT_TEST_API_KEY` (`test_…`, simulated purchases, no Play) when set. Both in `~/.gradle/gradle.properties`.
   Never let a `test_` key reach `release` (the SDK crashes). See [docs/TECHNICAL.md §5.2](docs/TECHNICAL.md#52-purchases-revenuecat).
-- `bundleRelease` fails by design unless the upload key (`keystore.properties` or `STEPSKY_*` env vars), valid live
+- `bundleRelease` fails by design unless the upload key (`keystore.properties`, `STEPSKY_*` in `local.properties` or env vars), valid live
   AdMob ids and an https `PRIVACY_POLICY_URL` are configured (`verifyReleaseSigning`, `verifyReleaseAdMob`,
   `verifyReleasePrivacyPolicy`); `assembleRelease` still builds an unsigned, ads-off APK for smoke tests.
 - Git: `develop` is the integration branch and `main` is release-only (the user decides merges); remote `origin` = `https://github.com/idraakailabs/stepskyscrapper.git`. Line endings are LF

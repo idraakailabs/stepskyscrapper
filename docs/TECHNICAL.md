@@ -227,7 +227,8 @@ need the release package on a testing track with license testers; the debug buil
 - Backup: `allowBackup=true`; `backup_rules.xml` (Android 11 and lower) and `data_extraction_rules.xml` (12+: cloud
   backup and device transfer) include only `step_skyscraper.db` and `datastore/user_prefs.preferences_pb`.
 - Signing: upload key from `keystore.properties` (git-ignored, `storeFile` relative to the root, e.g. under the
-  ignored `keystore/` folder) or the `STEPSKY_*` environment variables in CI. Never the debug key: without a key
+  ignored `keystore/` folder), else the `STEPSKY_*` keys in `local.properties` (git-ignored; how the dev machine is set
+  up: alias `stepskyscrapper` in the shared Idraak keystore), else the `STEPSKY_*` environment variables in CI. Never the debug key: without a key
   the release APK is unsigned and `bundleRelease` stops at `verifyReleaseSigning`.
 - Baseline profile: hand-seeded `app/src/main/baseline-prof.txt`; generator in `:baselineprofile` needs a
   device ([TECH-006](ROADMAP.md#tech-006)).

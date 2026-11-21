@@ -24,7 +24,9 @@
   URL, and set `PRIVACY_POLICY_URL=https://…` in `gradle.properties` (this value is public, so committing it is fine).
   Done 2026-11-21: `PRIVACY_POLICY_URL` and `TERMS_URL` point at idraakai.org in the repo's `gradle.properties`.
   Optionally set `SUPPORT_EMAIL` for the diagnostic email.
-- [ ] **Upload key**: create it yourself (you choose the passwords; back up the file and passwords outside Git):
+- [x] **Upload key** (done 2026-11-21): alias `stepskyscrapper` in the shared Idraak keystore; the `STEPSKY_*` values are
+  in `local.properties` on the dev machine. Keep the keystore, its backup and the password outside Git. For a new key
+  elsewhere: create it yourself (you choose the passwords; back up the file and passwords outside Git):
   `keytool -genkeypair -v -keystore keystore/upload-keystore.jks -alias upload -keyalg RSA -keysize 4096 -validity 10000`.
   Copy `keystore.properties.example` to `keystore.properties` and fill it in. CI alternative: `STEPSKY_KEYSTORE_FILE`,
   `STEPSKY_KEYSTORE_PASSWORD`, `STEPSKY_KEY_ALIAS`, `STEPSKY_KEY_PASSWORD`.
