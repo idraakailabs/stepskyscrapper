@@ -90,6 +90,9 @@ This is a permanent project rule for every session.
   ids from `ADMOB_APP_ID_PROD` / `ADMOB_REWARDED_UNIT_ID_PROD` (`~/.gradle/gradle.properties` or CI env, never in Git);
   the old `ADMOB_APP_ID` / `ADMOB_REWARDED_UNIT_ID` properties are gone. Remote Config `ads_enabled` (default false)
   switches live ads on. See [docs/TECHNICAL.md §5.1](docs/TECHNICAL.md#51-admob-and-the-ads_enabled-switch).
+- RevenueCat: `release` uses only `REVENUECAT_API_KEY` (`goog_…`); debug uses the Test Store key
+  `REVENUECAT_TEST_API_KEY` (`test_…`, simulated purchases, no Play) when set. Both in `~/.gradle/gradle.properties`.
+  Never let a `test_` key reach `release` (the SDK crashes). See [docs/TECHNICAL.md §5.2](docs/TECHNICAL.md#52-purchases-revenuecat).
 - `bundleRelease` fails by design unless the upload key (`keystore.properties` or `STEPSKY_*` env vars), valid live
   AdMob ids and an https `PRIVACY_POLICY_URL` are configured (`verifyReleaseSigning`, `verifyReleaseAdMob`,
   `verifyReleasePrivacyPolicy`); `assembleRelease` still builds an unsigned, ads-off APK for smoke tests.

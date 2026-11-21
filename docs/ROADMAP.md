@@ -408,6 +408,11 @@ Bug cards are in [BUGS.md](BUGS.md).
   blocks the entitlement refresh. Verified: `ktlintCheck`, paywall/data/billing tests, lint, debug and R8 release
   builds; Pixel 6a debug: RevenueCat configured and fetched `default`, Play answered `PRODUCT_NOT_FOUND` (expected until
   the products exist), entitlement refresh still ran. AC 1–3 met; AC 4 pending.
+- **Progress (2026-11-21, Test Store):** debug variants use the RevenueCat Test Store key (`REVENUECAT_TEST_API_KEY`,
+  `test_…`); release keeps the Play key. The Test Store products `monthly`, `yearly`, `lifetime` were already in the
+  `default` offering; `PassProducts.planFor` now maps them. Verified on the Pixel 6a debug build: RevenueCat logged
+  "Using a Test Store API key"; Me showed "From $9.99/month" and the paywall listed Yearly $79.99 ($6.67 a month,
+  Save 33%), Monthly $9.99 and Lifetime $99.99. A simulated purchase was not run. `PassProductsTest` added.
 - **Outstanding (user):** create the Play service account, grant it in Play Console and upload its JSON in RevenueCat
   (App › Service account credentials); connect Google developer notifications; then TECH-004.
 

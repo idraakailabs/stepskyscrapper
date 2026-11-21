@@ -63,6 +63,10 @@ val admobLiveConfigured = admobLiveIdsProblem == null
 
 val revenueCatApiKey = adProperty("REVENUECAT_API_KEY")
 
+// RevenueCat Test Store key (test_…): debug and other non-release variants use it when set, so the paywall shows
+// the Test Store prices and simulated purchases without Google Play. The `release` variant never uses it.
+val revenueCatTestApiKey = adProperty("REVENUECAT_TEST_API_KEY")
+
 android {
     namespace = "ai.idraak.stepskyscraper"
 
@@ -75,8 +79,9 @@ android {
         manifestPlaceholders["admobAppId"] = admobTestAppId
         buildConfigField("String", "PRIVACY_POLICY_URL", "\"${providers.gradleProperty("PRIVACY_POLICY_URL").getOrElse("")}\"")
         buildConfigField("String", "SUPPORT_EMAIL", "\"${providers.gradleProperty("SUPPORT_EMAIL").getOrElse("")}\"")
-        // RevenueCat public Android SDK key (goog_…). Not secret, but kept out of Git like the other ids; without it
-        // purchases are switched off (no offers, Restore reports the store as unavailable). See verifyReleaseRevenueCat.
+        // RevenueCat public SDK key, set per variant in androidComponents.onVariants below. Not secret, but kept out
+        // of Git like the other ids; without it purchases are switched off (no offers, Restore reports the store as
+        // unavailable). See verifyReleaseRevenueCat.
         buildConfigField("String", "REVENUECAT_API_KEY", "\"${revenueCatApiKey.orEmpty()}\"")
     }
 
@@ -117,6 +122,9 @@ androidComponents {
         fields.put("ADS_PROD_RELEASE", BuildConfigField("boolean", prodRelease.toString(), "Live-ad variant"))
         fields.put("ADMOB_LIVE_APP_ID", str(if (live) admobLiveAppId!! else ""))
         fields.put("ADMOB_LIVE_REWARDED_UNIT_ID", str(if (live) admobLiveRewardedUnitId!! else ""))
+        // Release: the Google Play key (goog_…) only. Other variants: the Test Store key when set, else the Play key.
+        val revenueCatKey = if (prodRelease) revenueCatApiKey else revenueCatTestApiKey ?: revenueCatApiKey
+        fields.put("REVENUECAT_API_KEY", str(revenueCatKey.orEmpty()))
         // Debug-only helpers for consent testing (ignored by the release variant at runtime).
         fields.put("ADMOB_TEST_DEVICE_ID", str(if (prodRelease) "" else adProperty("ADMOB_TEST_DEVICE_ID").orEmpty()))
         fields.put(

@@ -48,6 +48,21 @@ object PassProducts {
 
     /** RevenueCat entitlement unlocked by every plan. */
     const val ENTITLEMENT = "architect_pass"
+
+    /** RevenueCat Test Store product ids (debug builds with `REVENUECAT_TEST_API_KEY`). */
+    const val TEST_MONTHLY = "monthly"
+    const val TEST_LIFETIME = "lifetime"
+
+    /**
+     * The plan behind an active entitlement's product: Play ids (`architect_pass_lifetime`, `architect_pass` with base
+     * plan `monthly` / `annual`) or Test Store ids (`lifetime`, `monthly`, `yearly`). Anything else counts as annual.
+     */
+    fun planFor(productIdentifier: String, basePlanIdentifier: String?): PassPlan = when {
+        productIdentifier == LIFETIME || productIdentifier == TEST_LIFETIME -> PassPlan.Lifetime
+        basePlanIdentifier == BASE_MONTHLY || productIdentifier.endsWith(":$BASE_MONTHLY") ||
+            productIdentifier == TEST_MONTHLY -> PassPlan.Monthly
+        else -> PassPlan.Annual
+    }
 }
 
 /** Facts from the app's build config (`REVENUECAT_API_KEY`); a blank key switches purchases off. */
@@ -154,14 +169,7 @@ class RevenueCatRepository @Inject constructor(
 
     private fun toEntitlement(info: CustomerInfo): Entitlement {
         val active = info.entitlements[PassProducts.ENTITLEMENT]?.takeIf { it.isActive }
-        val plan = active?.let {
-            when {
-                it.productIdentifier == PassProducts.LIFETIME -> PassPlan.Lifetime
-                it.productPlanIdentifier == PassProducts.BASE_MONTHLY || it.productIdentifier.endsWith(":${PassProducts.BASE_MONTHLY}") ->
-                    PassPlan.Monthly
-                else -> PassPlan.Annual
-            }
-        }
+        val plan = active?.let { PassProducts.planFor(it.productIdentifier, it.productPlanIdentifier) }
         return Entitlement(isPremium = plan != null, plan = plan, verifiedAt = clock.now())
     }
 

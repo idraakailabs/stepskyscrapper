@@ -168,13 +168,21 @@ and on the paywall.
 | Entitlement | `architect_pass` (`PassProducts.ENTITLEMENT`) |
 | Products | `architect_pass:monthly`, `architect_pass:annual` (Play subscription `architect_pass`, base plans), `architect_pass_lifetime` (one-time) |
 | Offering | `default`: `$rc_monthly`, `$rc_annual`, `$rc_lifetime` → `PassPlan.Monthly/Annual/Lifetime` |
+| Test Store | Products `monthly`, `yearly`, `lifetime` (same entitlement, same `default` packages); key `test_…` |
+
+**Keys per variant (`app/build.gradle.kts` `onVariants`):** `release` gets only `REVENUECAT_API_KEY` (Google Play,
+`goog_…`; `verifyReleaseRevenueCat` enforces the prefix). Debug and every other non-release variant get
+`REVENUECAT_TEST_API_KEY` (RevenueCat Test Store, `test_…`) when it is set, else the Play key. Both live in
+`~/.gradle/gradle.properties` or CI env, never in Git. With the Test Store key the paywall shows the Test Store prices
+and purchases are simulated by RevenueCat (sandbox, no Google Play, no revenue); RevenueCat logs "Using a Test Store
+API key". The SDK crashes if a Test Store key reaches a production build, which is why `release` never reads it.
+`PassProducts.planFor` maps both Play ids and Test Store ids to `PassPlan` (`PassProductsTest`).
 
 The plan comes from the active entitlement's product (`architect_pass_lifetime` → Lifetime, base plan `monthly` →
 Monthly, else Annual); the trial length comes from the package's default subscription option. A failed offerings fetch
 (e.g. products not yet in Play Console) is logged as `StepSkyBilling: Offerings unavailable` and does not block the
-entitlement refresh. Only RevenueCat's anonymous app user id and purchase data leave the device. The debug build
-(`.debug` package) configures RevenueCat too, but Play can't sell it products; test purchases need the release package
-on a testing track with license testers.
+entitlement refresh. Only RevenueCat's anonymous app user id and purchase data leave the device. Real Google Play purchases
+need the release package on a testing track with license testers; the debug build uses the Test Store instead.
 
 ## 6. Build, signing and release
 

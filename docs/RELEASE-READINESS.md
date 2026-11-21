@@ -25,6 +25,8 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
 - [x] Remote Config version 1 published: `ads_enabled` = false, `tower_ladder`.
 - [x] RevenueCat: SDK 11.2.0 replaces Play Billing ([TECH-014](ROADMAP.md#tech-014)); entitlement `architect_pass`,
   default offering (monthly, annual, lifetime); `REVENUECAT_API_KEY` in `~/.gradle/gradle.properties`.
+- [x] RevenueCat Test Store in debug builds (`REVENUECAT_TEST_API_KEY`): the paywall shows Test Store prices without
+  Google Play (Pixel 6a, 2026-11-21). Release never uses the test key.
 
 **Ads (code side complete)**
 - [x] One opt-in rewarded ad, on Skyline only; none on Build, onboarding, ceremony, paywall or widgets.
