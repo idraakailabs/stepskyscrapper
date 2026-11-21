@@ -13,8 +13,8 @@
 |---|---|
 | **Live baseline** | Phase 1, version 1.0.0 (versionCode 1), commit `a8d9d51` on `main` (not published). Release-prep work is merged into `develop` (`aa95425`), not yet into `main` |
 | **Active phase** | Phase 2, Release blockers: every code-side item is done; what remains are your console and key actions (see [RELEASE-READINESS.md](RELEASE-READINESS.md)) |
-| **In progress** | [TECH-005](#tech-005) (upload key), [TECH-003](#tech-003) (live AdMob ids, UMP messages), [TECH-011](#tech-011) (host the policy, declarations), [TECH-012](#tech-012) (on-device checks that need your phone settings) |
-| **Recommended next task** | You: create the upload key, Firebase project and AdMob app, host [privacy-policy.md](privacy-policy.md), then build the AAB and upload it to internal testing ([play-console-checklist.md](play-console-checklist.md)). Then [TECH-004](#tech-004) billing products and [TECH-007](#tech-007) release smoke test. |
+| **In progress** | [TECH-002](#tech-002) (Firebase configured; device checks), [TECH-014](#tech-014) (RevenueCat; Play service account), [TECH-005](#tech-005) (upload key), [TECH-003](#tech-003) (live AdMob ids, UMP messages), [TECH-011](#tech-011) (host the policy, declarations), [TECH-012](#tech-012) (on-device checks that need your phone settings) |
+| **Recommended next task** | You: create the upload key and AdMob app, connect the Play service account to RevenueCat, host [privacy-policy.md](privacy-policy.md), then build the AAB and upload it to internal testing ([play-console-checklist.md](play-console-checklist.md)). Then [TECH-004](#tech-004) billing products and [TECH-007](#tech-007) release smoke test. |
 
 Update this table whenever a task starts, finishes or the active phase changes.
 
@@ -58,12 +58,13 @@ testing track with crash reports, analytics, real ads and working purchases.
 |---|---|---|---|---|---|
 | [TECH-001](#tech-001) | Put the project under version control | Technical task | P1 | Done | — |
 | [BUG-008](BUGS.md#bug-008) | Build feature module missing from Git | Confirmed bug | P0 | Done | — |
-| [TECH-002](#tech-002) | Configure Firebase (Analytics, Crashlytics, Remote Config) | Technical task | P0 | Planned | Firebase console |
+| [TECH-002](#tech-002) | Configure Firebase (Analytics, Crashlytics, Remote Config) | Technical task | P0 | In Progress (configured; device checks pending) | — |
 | [TECH-003](#tech-003) | Real AdMob ids and UMP consent message | Technical task | P0 | In Progress (code done; ids and console pending you) | AdMob console |
 | [TECH-004](#tech-004) | Create Play billing products and test purchases | Technical task | P0 | Planned | Play Console |
 | [TECH-005](#tech-005) | Release signing | Technical task | P0 | In Progress | Upload key |
 | [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | In Progress (drafts done; hosting and console pending you) | Hosted policy, Play Console |
 | [TECH-013](#tech-013) | Play release readiness review | Technical task | P0 | Done | — |
+| [TECH-014](#tech-014) | Architect Pass purchases through RevenueCat | Technical task | P0 | In Progress | Play service account, TECH-004 |
 | [BUG-018](BUGS.md#bug-018) | Health Connect privacy link opens Build | Confirmed bug | P1 | Done | — |
 
 ## Phase 3 — Reliability and release quality
@@ -161,7 +162,7 @@ Bug cards are in [BUGS.md](BUGS.md).
 
 <a id="tech-002"></a>
 ### TECH-002 — Configure Firebase (Analytics, Crashlytics, Remote Config)
-- **Type:** Technical task · **Priority:** P0 · **Status:** Planned · **Effort:** S
+- **Type:** Technical task · **Priority:** P0 · **Status:** In Progress · **Effort:** S
 - **Problem (verified):** the Google Services and Crashlytics plugins apply only when `app/google-services.json`
   exists (`app/build.gradle.kts`); without it analytics events are dropped, crashes aren't reported and the
   ladder is always the bundled default.
@@ -173,6 +174,11 @@ Bug cards are in [BUGS.md](BUGS.md).
   1. A forced test crash in a release build appears in Crashlytics with a de-obfuscated stack trace.
   2. `onboarding_completed` appears in DebugView; no event parameter contains a number of steps or floors.
   3. Changing `tower_ladder` in the console changes the next tower's target on the next launch (device).
+- **Progress (2026-11-21):** Firebase project `skyscrapper-a675f` has Android apps `ai.idraak.stepskyscraper` and
+  `ai.idraak.stepskyscraper.debug`; `app/google-services.json` (both clients, git-ignored) is in place on the dev
+  machine; Remote Config version 1 published with `tower_ladder` = `10,25,50,100,160,250` (String) and `ads_enabled` =
+  `false` (Boolean). Pixel 6a debug: `FirebaseApp initialization successful`, Crashlytics initialised. Criteria 1–3
+  not yet checked (test crash, DebugView, ladder change). CI still needs the file as a secret.
 
 <a id="tech-003"></a>
 ### TECH-003 — Real AdMob ids and UMP consent message
@@ -204,9 +210,11 @@ Bug cards are in [BUGS.md](BUGS.md).
 ### TECH-004 — Create Play billing products and test purchases
 - **Type:** Technical task · **Priority:** P0 · **Status:** Planned · **Effort:** S
 - **Problem (verified):** product ids `architect_pass` (base plans `monthly`, `annual` + trial offer) and
-  `architect_pass_lifetime` are hard-coded in `core/billing/.../PlayBillingRepository.kt`; none exist in a Play
+  `architect_pass_lifetime` are hard-coded in `core/billing/.../RevenueCatRepository.kt` (`PassProducts`; purchases go
+  through RevenueCat since [TECH-014](#tech-014)); none exist in a Play
   Console, so purchase, trial, acknowledgement and restore are untested (unverified area).
-- **Solution:** create the products in Play Console, add license testers, run each flow on a device.
+- **Solution:** create the products in Play Console, add license testers, run each flow on a device. The RevenueCat
+  side (products, entitlement, offering) is already set up ([TECH-014](#tech-014)).
 - **Benefit:** revenue path works on day one.
 - **Dependencies / risks:** an app uploaded to a testing track ([TECH-005](#tech-005)).
 - **Acceptance criteria:**
@@ -367,6 +375,34 @@ Bug cards are in [BUGS.md](BUGS.md).
   in [TECHNICAL.md §6](TECHNICAL.md#6-build-signing-and-release)); new unit tests `AdMobPrivacyChoicesTest` (2) and
   `MeTest.adPrivacyChoicesFollowTheUmpRequirement`; `ktlintFormat build test lint` green. Device checks of the two
   UI changes are listed in RELEASE-READINESS.md.
+
+<a id="tech-014"></a>
+### TECH-014 — Architect Pass purchases through RevenueCat
+- **Type:** Technical task · **Priority:** P0 · **Status:** In Progress (code and RevenueCat setup done; Play side pending) · **Effort:** S
+- **Problem:** the user chose RevenueCat for subscriptions (receipt validation, analytics, paywall experiments
+  later); the app called Google Play Billing directly (`PlayBillingRepository`).
+- **Solution:** `core:billing` `RevenueCatRepository` (RevenueCat Android SDK 11.2.0) behind the unchanged
+  `EntitlementRepository`; same Play product ids; RevenueCat entitlement `architect_pass` and the `default` offering
+  (`$rc_monthly`, `$rc_annual`, `$rc_lifetime`). Key from `REVENUECAT_API_KEY` (Gradle property or env var, outside
+  Git); `verifyReleaseRevenueCat` fails `bundleRelease` without a `goog_` key.
+- **Benefit:** server-side validation and acknowledgement, cross-device restore, revenue charts.
+- **Dependencies / risks:** RevenueCat needs a Play service-account key to validate purchases; products exist only after
+  the first internal-testing upload ([TECH-005](#tech-005), [TECH-004](#tech-004)). Adds RevenueCat as a data processor
+  (privacy policy, Data safety).
+- **Acceptance criteria:**
+  1. Paywall, Me and premium unlocks behave as before (no UI change); `EntitlementRepository` unchanged.
+  2. Without the key the build works and purchases are off; `bundleRelease` fails with instructions.
+  3. With the key, a debug build configures RevenueCat and fetches the `default` offering (logcat).
+  4. On the internal-testing track, monthly, annual (trial) and lifetime purchases and Restore set the entitlement
+     ([TECH-004](#tech-004)).
+- **Progress (2026-11-21):** RevenueCat project "SkyScrapper": Play app `ai.idraak.stepskyscraper`, entitlement
+  `architect_pass` with `architect_pass:monthly`, `architect_pass:annual` (not backwards compatible) and
+  `architect_pass_lifetime`, all three on the `default` offering. Code as above; a failed offerings fetch no longer
+  blocks the entitlement refresh. Verified: `ktlintCheck`, paywall/data/billing tests, lint, debug and R8 release
+  builds; Pixel 6a debug: RevenueCat configured and fetched `default`, Play answered `PRODUCT_NOT_FOUND` (expected until
+  the products exist), entitlement refresh still ran. AC 1–3 met; AC 4 pending.
+- **Outstanding (user):** create the Play service account, grant it in Play Console and upload its JSON in RevenueCat
+  (App › Service account credentials); connect Google developer notifications; then TECH-004.
 
 <a id="prod-001"></a>
 ### PROD-001 — Browse every district in Skyline

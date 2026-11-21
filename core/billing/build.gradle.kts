@@ -6,7 +6,7 @@ plugins {
 dependencies {
     implementation(projects.core.domain)
     implementation(projects.core.datastore)
-    implementation(libs.billing.ktx)
+    implementation(libs.revenuecat.purchases)
     implementation(libs.kotlinx.coroutines.android)
     testImplementation(projects.core.testing)
 }

@@ -6,10 +6,15 @@
 > guarantees Play acceptance.
 
 ## 1. Before the first build (needs you)
-- [ ] **Firebase**: create the project with an Android app `ai.idraak.stepskyscraper`, download
-  `google-services.json` to `app/` (git-ignored). The Google Services and Crashlytics plugins apply automatically
-  when the file exists. In Remote Config add `tower_ladder` (String, `10,25,50,100,160,250`) and `ads_enabled`
-  (Boolean, default **false**), then publish. Set the Analytics data-retention period you name in the privacy policy.
+- [x] **Firebase** (done 2026-11-21): project `skyscrapper-a675f` with Android apps `ai.idraak.stepskyscraper` and
+  `ai.idraak.stepskyscraper.debug`; `google-services.json` in `app/` (git-ignored; copy it to any other build machine
+  or CI secret). Remote Config `tower_ladder` (String, `10,25,50,100,160,250`) and `ads_enabled` (Boolean, **false**)
+  published. Still to do: set the Analytics data-retention period you name in the privacy policy.
+- [ ] **RevenueCat**: the project, Play app, entitlement `architect_pass`, products and `default` offering are set up
+  (2026-11-21, [TECH-014](ROADMAP.md#tech-014)); `REVENUECAT_API_KEY=goog_…` is in `~/.gradle/gradle.properties` on the
+  dev machine (add it to CI as a secret). Still to do: in Google Cloud create a service account, grant it in Play
+  Console (Users and permissions: view financial data, manage orders and subscriptions), upload its JSON key in
+  RevenueCat › App › Service account credentials, and connect Google developer notifications.
 - [ ] **AdMob**: create the app and one *Rewarded* unit. Put the live ids in `~/.gradle/gradle.properties` (outside the
   repo) or CI secrets: `ADMOB_APP_ID_PROD=ca-app-pub-…~…` and `ADMOB_REWARDED_UNIT_ID_PROD=ca-app-pub-…/…`.
   In AdMob › Privacy & messaging, create and **publish** a GDPR message and a US-state regulations message. Register
@@ -29,7 +34,7 @@
 1. Check the configuration (each fails with the reason if something is missing):
 
    ```powershell
-   ./gradlew :app:verifyReleaseSigning :app:verifyReleaseAdMob :app:verifyReleasePrivacyPolicy
+   ./gradlew :app:verifyReleaseSigning :app:verifyReleaseAdMob :app:verifyReleasePrivacyPolicy :app:verifyReleaseRevenueCat
    ```
 
 2. Build:
@@ -63,6 +68,7 @@
   7-day free-trial phase for new customers.
 - One-time product `architect_pass_lifetime`.
 - Products can only be created after an APK/AAB with the billing permission is uploaded (step 3).
+- RevenueCat already lists these ids; once they exist in Play, its product pages should show the store status as OK.
 
 ## 5. App content declarations
 | Declaration | Draft answer |
@@ -103,13 +109,13 @@ isn't declared as collected.
 | Location › Approximate location | Collected and shared | AdMob (IP-derived), only when an ad is requested | Advertising or marketing, Analytics, Fraud prevention | Optional (opt-in ad) |
 | App activity › App interactions | Collected (Analytics); collected and shared (AdMob ad interactions) | Firebase Analytics events (no step values); AdMob | Analytics; Advertising or marketing | Analytics: required. AdMob: optional |
 | App info and performance › Crash logs, Diagnostics | Collected (Crashlytics); collected and shared (AdMob diagnostics) | Firebase Crashlytics; AdMob | App functionality, Analytics; Advertising, Fraud prevention | Crashlytics: required |
-| Device or other IDs | Collected (Firebase installation / app-instance id); collected and shared (advertising ID via AdMob, after consent where required) | Firebase; AdMob | Analytics, App functionality; Advertising or marketing, Fraud prevention | Firebase: required. AdMob: optional |
-| Financial info / Purchase history | Not declared: payments are processed by Google Play; the app keeps only the entitlement on the device. Recheck Play's current guidance for Play Billing | Play Billing | — | — |
+| Device or other IDs | Collected (Firebase installation / app-instance id; RevenueCat anonymous app user id); collected and shared (advertising ID via AdMob, after consent where required) | Firebase; RevenueCat; AdMob | Analytics, App functionality; Advertising or marketing, Fraud prevention | Firebase: required. AdMob: optional |
+| Financial info / Purchase history | Collected (RevenueCat validates Play purchases as our service provider; payment details stay with Google Play). Recheck Play's current guidance for purchase-management SDKs | RevenueCat | App functionality | Optional (only if the user buys) |
 | Personal info, messages, photos, contacts, calendar, files | Not collected (share images and the diagnostic email are sent only by the user through Android's share sheet) | — | — | — |
 
 | Question | Draft answer |
 |---|---|
-| Is data encrypted in transit? | Yes (Firebase, AdMob and Play over TLS) |
+| Is data encrypted in transit? | Yes (Firebase, RevenueCat, AdMob and Play over TLS) |
 | Can users request deletion? | Choose based on your support process. On-device data is deleted by clearing data or uninstalling; there's no account. Firebase data isn't linked to identity; if you answer Yes, offer deletion requests through the contact email in the policy |
 | Account creation | None |
 | Independent security review | No |

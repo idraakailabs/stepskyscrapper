@@ -81,8 +81,8 @@ Facts (verified in code):
 2. Premium is cosmetic only (by design); conversion depends on how much users care about looks.
 3. Earlier districts aren't viewable once a new district starts ([PROD-001](ROADMAP.md#prod-001)).
 4. Notifications were effectively off on Android 13+ until the user visited Settings ([BUG-001](BUGS.md#bug-001), fixed; the post-ceremony prompt is still to be checked on a device).
-5. Firebase, AdMob and billing products aren't configured, so analytics, crash reports and payments don't work
-   yet ([ROADMAP Phase 2](ROADMAP.md#phase-2--release-blockers)).
+5. AdMob and the Play billing products aren't configured yet, so ads and real purchases don't work (Firebase and
+   RevenueCat are configured since 2026-11-21) ([ROADMAP Phase 2](ROADMAP.md#phase-2--release-blockers)).
 
 Assumptions (not verifiable from the repo): whether the ladder heights (10, 25, 50…) feel right; how often
 users return without notifications; real Health Connect behaviour across OEMs.
@@ -110,7 +110,7 @@ Task cards are in [ROADMAP.md](ROADMAP.md).
 
 ## 9. Monetisation strategy
 
-Current model (enforced on the device via Play Billing; entitlement cached offline): Architect Pass unlocks
+Current model (Google Play purchases validated through RevenueCat; entitlement cached offline): Architect Pass unlocks
 12 premium facades/crowns/palettes, lighting and ground sets, and 2× Blueprints on towers topped out while a member
 (not retroactive); one opt-in rewarded ad doubles a finished tower's Blueprints. A tower never earns more than 2×
 its base: the Pass and ad bonuses exclude each other. Blueprints buy cosmetics only and never floors.
@@ -133,8 +133,8 @@ its base: the Pass and ad bonuses exclude each other. Blueprints buy cosmetics o
 | Monetisation | `paywall_shown` → `purchase_started` → `purchase_completed`; rewarded-ad completion rate |
 | Growth | `share_card` events per active user |
 
-Events are defined in `core/domain/.../model/Analytics.kt` but **instrumentation is inert** until Firebase is
-configured ([TECH-002](ROADMAP.md#tech-002)); dashboards are [GROW-001](ROADMAP.md#grow-001).
+Events are defined in `core/domain/.../model/Analytics.kt` but **instrumentation is live** since Firebase was
+configured on 2026-11-21 ([TECH-002](ROADMAP.md#tech-002); DebugView check pending); dashboards are [GROW-001](ROADMAP.md#grow-001).
 
 ## 11. Out of scope ("Don't build")
 

@@ -63,8 +63,8 @@ Firebase, AdMob ids and messages, the hosted privacy policy, and the Play Consol
 ## 5. Remote Config ad control and safe defaults
 - [x] **Done** — `ads_enabled` Boolean, default `false`; missing, unfetched, failed fetch or no Firebase → no ads;
   debug ignores it; turning it off discards a loaded ad. Tests: `AdsGatingTest`, `RemoteConfigAdsSwitchTest`.
-- [ ] **Pending – user** — Firebase Remote Config: add `ads_enabled` = false and `tower_ladder`, publish. Switch ads
-  on only after the AdMob app is approved and the UMP messages are published.
+- [x] **Done** (2026-11-21) — Firebase Remote Config version 1 published: `ads_enabled` = false, `tower_ladder`. Switch
+  ads on only after the AdMob app is approved and the UMP messages are published.
 - [ ] **Manual verification** — release with live ids and `ads_enabled` true/false on a registered AdMob test device
   (TECHNICAL.md §5.1). Never tap a live ad on an unregistered device.
 
@@ -73,8 +73,12 @@ Firebase, AdMob ids and messages, the hosted privacy policy, and the Play Consol
   `SourceFile,LineNumberTable` kept. `./gradlew build` (includes `assembleRelease`) green on 2026-11-21.
 - [x] **Done** — Crashlytics mapping upload: automatic for minified builds once `google-services.json` exists
   (Crashlytics plugin 3.0.8).
-- [ ] **Pending – user** — `app/google-services.json` (Firebase project). Without it the AAB has no analytics, crash
-  reports or Remote Config, so ads stay off.
+- [x] **Done** (2026-11-21) — `app/google-services.json` for Firebase project `skyscrapper-a675f` (release and debug
+  apps) is on the dev machine, git-ignored; Firebase initialises on the Pixel 6a. Copy it to any other build machine.
+- [x] **Done** (2026-11-21) — purchases go through RevenueCat ([TECH-014](ROADMAP.md#tech-014)); `REVENUECAT_API_KEY`
+  is in `~/.gradle/gradle.properties`; `verifyReleaseRevenueCat` guards `bundleRelease`.
+- [ ] **Pending – user** — RevenueCat › App › Service account credentials (Play service-account JSON) and Google
+  developer notifications, so RevenueCat can validate purchases.
 - [ ] **Manual verification** — forced test crash appears de-obfuscated in Crashlytics ([TECH-002](ROADMAP.md#tech-002)).
 
 ## 7. Version name and code
@@ -113,7 +117,8 @@ Firebase, AdMob ids and messages, the hosted privacy policy, and the Play Consol
 
 ## 12. Crash reporting and stability
 - [x] **Done** — no crash in the R8 smoke test; `build test lint` green.
-- [ ] **Blocked** (on Firebase) — Crashlytics live; non-fatal reporting is a later task ([TECH-010](ROADMAP.md#tech-010)).
+- [x] **Done** — Crashlytics initialises (Firebase configured 2026-11-21); non-fatal reporting is a later task
+  ([TECH-010](ROADMAP.md#tech-010)).
 - [ ] **Manual verification** — pre-launch report on the internal-testing upload has no crashes.
 
 ## 13. Store listing, screenshots and declarations
@@ -125,7 +130,8 @@ Firebase, AdMob ids and messages, the hosted privacy policy, and the Play Consol
 - [ ] **Pending – user** — content rating (IARC questionnaire), target audience 13+ (no under-13 groups, so the
   Families policy doesn't apply), news / COVID / government / financial: No.
 - [ ] **Pending – user** — billing products `architect_pass` (`monthly`, `annual` + 7-day trial) and
-  `architect_pass_lifetime`, license testers ([TECH-004](ROADMAP.md#tech-004)).
+  `architect_pass_lifetime` in Play Console (already set up in RevenueCat), license testers
+  ([TECH-004](ROADMAP.md#tech-004)).
 - [x] **Done** — Auto Backup: only the Room database and the settings DataStore, for cloud backup and device transfer.
 
 ## 14. App access
@@ -142,7 +148,8 @@ Firebase, AdMob ids and messages, the hosted privacy policy, and the Play Consol
 
 ## Action required from you
 1. Upload key + `keystore.properties`; enrol in Play App Signing.
-2. Firebase project, `app/google-services.json`, Remote Config `ads_enabled` (false) and `tower_ladder`.
+2. ~~Firebase project, `app/google-services.json`, Remote Config~~ (done 2026-11-21). RevenueCat: Play service-account
+   JSON and developer notifications.
 3. AdMob app and rewarded unit, `ADMOB_APP_ID_PROD` / `ADMOB_REWARDED_UNIT_ID_PROD`, GDPR + US-state messages, test
    devices, `app-ads.txt`.
 4. Host the privacy policy and set `PRIVACY_POLICY_URL`.

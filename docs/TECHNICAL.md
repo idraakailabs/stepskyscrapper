@@ -20,7 +20,7 @@
 | Navigation | Navigation Compose 2.10.2, type-safe `@Serializable` routes, wired in `app/.../navigation/AppNavigation.kt` |
 | Persistence | Room 2.8.5 (`core:database`), DataStore Preferences 1.3.0 (`core:datastore`) |
 | Step data | Health Connect 1.1.0 aggregate API; `TYPE_STEP_COUNTER` fallback (`core:steps`) |
-| External services | Play Billing 9.1.0, Google Mobile Ads 25.5.0 + UMP 4.0.0, Firebase BOM 35.2.0 (Analytics, Crashlytics, Remote Config) |
+| External services | RevenueCat Purchases 11.2.0 (on Play Billing 9.1.0), Google Mobile Ads 25.5.0 + UMP 4.0.0, Firebase BOM 35.2.0 (Analytics, Crashlytics, Remote Config) |
 | Background work | WorkManager 2.12.0 with Hilt workers |
 | Widgets | Glance 1.2.0 (`:widget`) |
 | Testing | JUnit 4, Truth, Turbine, Robolectric 4.18.1, Roborazzi 1.79.0, Compose UI test |
@@ -101,11 +101,12 @@ Backup rules: `app/src/main/res/xml/backup_rules.xml`, `data_extraction_rules.xm
 | Remote Config `ads_enabled` | `false` | Prod Release kill switch for the rewarded ad (§5.1); debug ignores it |
 | `PRIVACY_POLICY_URL` (`gradle.properties`, public) | empty (link hidden) → `bundleRelease` fails (`verifyReleasePrivacyPolicy`, needs `https://`) | `AndroidPlatformActions.openPrivacyPolicy`; draft text in [privacy-policy.md](privacy-policy.md) |
 | `SUPPORT_EMAIL` | empty (generic share sheet) | Diagnostic draft |
-| `app/google-services.json` | absent | Applies Google Services + Crashlytics plugins only if present |
+| `app/google-services.json` | absent | Applies Google Services + Crashlytics plugins only if present. Firebase project `skyscrapper-a675f`, apps `ai.idraak.stepskyscraper` and `.debug` (both clients in one file) |
+| `REVENUECAT_API_KEY` (Gradle property or env var, outside Git; public `goog_…` key) | empty → purchases off (no offers, Restore reports the store unavailable); `bundleRelease` fails (`verifyReleaseRevenueCat`) | `BuildConfig.REVENUECAT_API_KEY` → `BillingEnvironment` → `RevenueCatRepository` (§5.2) |
 | Remote Config `tower_ladder` | `10,25,50,100,160,250` (bundled) | `RemoteConfigLadderRepository`; malformed values fall back |
 | `keystore.properties` or `STEPSKY_KEYSTORE_FILE` / `STEPSKY_KEYSTORE_PASSWORD` / `STEPSKY_KEY_ALIAS` / `STEPSKY_KEY_PASSWORD` | absent → release **unsigned**, `bundleRelease` fails | `app/build.gradle.kts` (template `keystore.properties.example`) |
 
-Live values (Firebase, AdMob, Play Console) weren't available; they are unverified. The old `ADMOB_APP_ID` /
+Firebase and RevenueCat were configured on 2026-11-21 ([TECH-002](ROADMAP.md#tech-002), [TECH-014](ROADMAP.md#tech-014)); AdMob and Play Console values are still unverified. The old `ADMOB_APP_ID` /
 `ADMOB_REWARDED_UNIT_ID` properties were removed and are no longer read.
 
 ### 5.1 AdMob and the `ads_enabled` switch
@@ -154,6 +155,27 @@ ads are enabled and UMP reports `PrivacyOptionsRequirementStatus.REQUIRED`.
 - Checks: `./gradlew :app:verifyReleaseAdMob` fails without live ids and with Google's sample ids;
   `./gradlew --dry-run :app:bundleRelease` lists `verifyReleaseAdMob`, `verifyReleasePrivacyPolicy` and `verifyReleaseSigning`.
 
+### 5.2 Purchases (RevenueCat)
+
+Architect Pass goes through RevenueCat (`core:billing` `RevenueCatRepository`, SDK 11.2.0), which runs Google Play
+Billing, acknowledges and validates purchases server-side. The domain `EntitlementRepository` is unchanged; the
+entitlement is still cached offline in DataStore (`EntitlementCacheStore`) and refreshed at start-up (`MainActivity`)
+and on the paywall.
+
+| RevenueCat object | Value |
+|---|---|
+| Project / app | "SkyScrapper" / Play Store app `ai.idraak.stepskyscraper` |
+| Entitlement | `architect_pass` (`PassProducts.ENTITLEMENT`) |
+| Products | `architect_pass:monthly`, `architect_pass:annual` (Play subscription `architect_pass`, base plans), `architect_pass_lifetime` (one-time) |
+| Offering | `default`: `$rc_monthly`, `$rc_annual`, `$rc_lifetime` → `PassPlan.Monthly/Annual/Lifetime` |
+
+The plan comes from the active entitlement's product (`architect_pass_lifetime` → Lifetime, base plan `monthly` →
+Monthly, else Annual); the trial length comes from the package's default subscription option. A failed offerings fetch
+(e.g. products not yet in Play Console) is logged as `StepSkyBilling: Offerings unavailable` and does not block the
+entitlement refresh. Only RevenueCat's anonymous app user id and purchase data leave the device. The debug build
+(`.debug` package) configures RevenueCat too, but Play can't sell it products; test purchases need the release package
+on a testing track with license testers.
+
 ## 6. Build, signing and release
 
 - Application id / namespace: `ai.idraak.stepskyscraper` (renamed from `com.idraak.stepskyscraper` on
@@ -165,9 +187,10 @@ ads are enabled and UMP reports `PrivacyOptionsRequirementStatus.REQUIRED`.
   With `google-services.json` present the Crashlytics Gradle plugin (3.0.8) uploads the R8 mapping file for minified
   builds by default. Without it, Firebase is skipped (no analytics, crash reports or Remote Config).
 - Release guards wired into `bundleRelease`: `verifyReleaseSigning` (upload key), `verifyReleaseAdMob` (live ids,
-  §5.1), `verifyReleasePrivacyPolicy` (`PRIVACY_POLICY_URL` starts with `https://`). `assembleRelease` (part of
+  §5.1), `verifyReleasePrivacyPolicy` (`PRIVACY_POLICY_URL` starts with `https://`), `verifyReleaseRevenueCat`
+  (`REVENUECAT_API_KEY` starts with `goog_`). `assembleRelease` (part of
   `build`) still produces `app-release-unsigned.apk` for smoke tests.
-- Building the upload: put `keystore.properties`, `ADMOB_*_PROD`, `PRIVACY_POLICY_URL` and `app/google-services.json` in
+- Building the upload: put `keystore.properties`, `ADMOB_*_PROD`, `REVENUECAT_API_KEY`, `PRIVACY_POLICY_URL` and `app/google-services.json` in
   place, then `./gradlew clean :app:bundleRelease` → `app/build/outputs/bundle/release/app-release.aab`. Step-by-step:
   [play-console-checklist.md §2](play-console-checklist.md#2-build-the-signed-aab).
 - Permissions in the merged release manifest (checked with `aapt2 dump permissions`, 2026-11-21):

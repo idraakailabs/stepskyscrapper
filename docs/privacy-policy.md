@@ -82,13 +82,17 @@ problems and improve the app, not to identify you. We don't link it to your name
 - AdMob never receives step counts, floors or health data. See
   [how Google uses information from apps that use its services](https://policies.google.com/technologies/partner-sites).
 
-## 4. Purchases (Google Play Billing)
+## 4. Purchases (Google Play Billing and RevenueCat)
 
 The optional Architect Pass subscription and lifetime purchase are processed by Google Play. Google handles
-your payment details; we never receive them. The app receives only whether a purchase is active, which it
-stores on your device to unlock premium styles. See the
-[Google Play terms](https://play.google.com/about/play-terms/) and
-[Google Privacy Policy](https://policies.google.com/privacy).
+your payment details; we never receive them. To check that a purchase is valid and restore it on a new phone, the
+app uses RevenueCat, our purchase-management provider: it receives your purchase records from Google Play
+(product, purchase time, status and a purchase token) together with a random app user id that RevenueCat creates.
+It never receives your name, email, payment details or any step data. The app stores only whether a purchase is
+active on your device to unlock premium styles. See the
+[Google Play terms](https://play.google.com/about/play-terms/), the
+[Google Privacy Policy](https://policies.google.com/privacy) and the
+[RevenueCat Privacy Policy](https://www.revenuecat.com/privacy).
 
 ## 5. Things you choose to share
 
@@ -113,7 +117,7 @@ them. You can turn them off in the app's Settings or in Android settings.
 | Notifications | Topping-out and weekly-summary notifications (optional) |
 | Internet / network state | Firebase, Remote Config, ads and Google Play purchases |
 | Advertising ID and Android ad services | Used by Google AdMob for the optional rewarded ad |
-| Google Play billing | Optional purchases |
+| Google Play billing | Optional purchases (validated through RevenueCat) |
 | Storage (Android 9 and lower only) | Save a share image to your Pictures folder when you ask |
 
 ## 8. Children

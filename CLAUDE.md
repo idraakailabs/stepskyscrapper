@@ -3,7 +3,7 @@
 Android app (Kotlin, Jetpack Compose, Material 3) that turns walking into building: every 1,000 steps adds a
 floor to an isometric skyscraper. Offline-first, no accounts, steps read from Health Connect (sensor fallback)
 and never leave the device. Version 1.0.0, built but not yet published. Multi-module clean architecture with
-MVI, Hilt, Room, DataStore, WorkManager, Glance, Play Billing, AdMob and Firebase.
+MVI, Hilt, Room, DataStore, WorkManager, Glance, RevenueCat (on Play Billing), AdMob and Firebase.
 
 ## Project documentation — read before changing anything
 
@@ -82,7 +82,9 @@ This is a permanent project rule for every session.
 
 - AGP is pinned to **9.2.1**, the newest version Android Studio accepts; don't upgrade it past what Studio
   supports. Build needs JDK 17+ (21 used) and Android SDK platform **37.2** (Compose 1.13 requires compileSdk ≥ 37.1).
-- Without `app/google-services.json`, Firebase is skipped: analytics are dropped and the bundled ladder is used.
+- Without `app/google-services.json`, Firebase is skipped: analytics are dropped and the bundled ladder is used
+  (Firebase project `skyscrapper-a675f`; the file is git-ignored). Purchases need `REVENUECAT_API_KEY` (public
+  `goog_…` key, kept in `~/.gradle/gradle.properties`); without it purchases are off and `bundleRelease` fails.
 - AdMob: debug (and every non-`release` variant) always uses Google's test ids, hard-coded. Only `release` uses live
   ids from `ADMOB_APP_ID_PROD` / `ADMOB_REWARDED_UNIT_ID_PROD` (`~/.gradle/gradle.properties` or CI env, never in Git);
   the old `ADMOB_APP_ID` / `ADMOB_REWARDED_UNIT_ID` properties are gone. Remote Config `ads_enabled` (default false)

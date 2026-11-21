@@ -61,6 +61,8 @@ val admobLiveIdsProblem: String? = when {
 }
 val admobLiveConfigured = admobLiveIdsProblem == null
 
+val revenueCatApiKey = adProperty("REVENUECAT_API_KEY")
+
 android {
     namespace = "ai.idraak.stepskyscraper"
 
@@ -73,6 +75,9 @@ android {
         manifestPlaceholders["admobAppId"] = admobTestAppId
         buildConfigField("String", "PRIVACY_POLICY_URL", "\"${providers.gradleProperty("PRIVACY_POLICY_URL").getOrElse("")}\"")
         buildConfigField("String", "SUPPORT_EMAIL", "\"${providers.gradleProperty("SUPPORT_EMAIL").getOrElse("")}\"")
+        // RevenueCat public Android SDK key (goog_…). Not secret, but kept out of Git like the other ids; without it
+        // purchases are switched off (no offers, Restore reports the store as unavailable). See verifyReleaseRevenueCat.
+        buildConfigField("String", "REVENUECAT_API_KEY", "\"${revenueCatApiKey.orEmpty()}\"")
     }
 
     signingConfigs {
@@ -161,6 +166,22 @@ val verifyReleasePrivacyPolicy = tasks.register("verifyReleasePrivacyPolicy") {
     }
 }
 tasks.matching { it.name == "bundleRelease" }.configureEach { dependsOn(verifyReleasePrivacyPolicy) }
+
+// Architect Pass purchases go through RevenueCat: a Play bundle without its key would hide every plan.
+val verifyReleaseRevenueCat = tasks.register("verifyReleaseRevenueCat") {
+    group = "verification"
+    description = "Fails unless REVENUECAT_API_KEY is a RevenueCat Google Play public key (goog_…)."
+    val key = revenueCatApiKey.orEmpty()
+    doLast {
+        if (!key.startsWith("goog_")) {
+            throw GradleException(
+                "REVENUECAT_API_KEY is not set to a RevenueCat Google Play public key (goog_…). Set it in " +
+                    "~/.gradle/gradle.properties or as an environment variable. See docs/play-console-checklist.md.",
+            )
+        }
+    }
+}
+tasks.matching { it.name == "bundleRelease" }.configureEach { dependsOn(verifyReleaseRevenueCat) }
 
 // A Play upload must be signed with the upload key: fail early with instructions instead of producing an
 // unsigned bundle. assembleRelease (part of `build`) still works and yields app-release-unsigned.apk.
