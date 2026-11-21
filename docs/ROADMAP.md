@@ -11,7 +11,7 @@
 
 | | |
 |---|---|
-| **Live baseline** | Phase 1, version 1.0.0 (versionCode 1), commit `e5c003b` on `main` (not published). Release-prep work is on the release branches, not yet merged into `develop` |
+| **Live baseline** | Phase 1, version 1.0.0 (versionCode 1), commit `a8d9d51` on `main` (not published). Release-prep work is merged into `develop` (`aa95425`), not yet into `main` |
 | **Active phase** | Phase 2, Release blockers: every code-side item is done; what remains are your console and key actions (see [RELEASE-READINESS.md](RELEASE-READINESS.md)) |
 | **In progress** | [TECH-005](#tech-005) (upload key), [TECH-003](#tech-003) (live AdMob ids, UMP messages), [TECH-011](#tech-011) (host the policy, declarations), [TECH-012](#tech-012) (on-device checks that need your phone settings) |
 | **Recommended next task** | You: create the upload key, Firebase project and AdMob app, host [privacy-policy.md](privacy-policy.md), then build the AAB and upload it to internal testing ([play-console-checklist.md](play-console-checklist.md)). Then [TECH-004](#tech-004) billing products and [TECH-007](#tech-007) release smoke test. |
