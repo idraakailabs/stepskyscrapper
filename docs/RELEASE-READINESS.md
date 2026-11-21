@@ -4,8 +4,8 @@
 > How-to steps: [play-console-checklist.md](play-console-checklist.md) · Bugs: [BUGS.md](BUGS.md) · Tasks:
 > [ROADMAP.md](ROADMAP.md) · Config and build: [TECHNICAL.md](TECHNICAL.md).
 >
-> **Reviewed:** 2026-11-21 on branch `claude/release-readiness-048453` (release integration + review fixes; not yet
-> merged into `develop`). This sheet records what was checked. It does **not** guarantee that Google Play will accept
+> **Reviewed:** 2026-11-21. All release-prep work, including Firebase and RevenueCat (`55ddc5b`), is on `develop`;
+> `main` is not updated yet. This sheet records what was checked. It does **not** guarantee that Google Play will accept
 > the app; Play review decides that.
 
 **Status key:** **Done** (checked, evidence given) · **Pending – user** (needs your keys, accounts or console) ·
@@ -15,6 +15,44 @@
 and RevenueCat (SDK, API key, offering) are set up. The upload is blocked only on items that need your accounts:
 upload key, live AdMob ids and messages, the hosted privacy policy, RevenueCat's Play service account, and the Play
 Console forms.
+
+## What's done
+Everything below is finished and on `develop`. Evidence is in the numbered sections and the linked cards.
+
+**Services configured**
+- [x] Firebase project `skyscrapper-a675f`: release and debug apps, `app/google-services.json` on the dev machine
+  (git-ignored); Analytics, Crashlytics and Remote Config initialise on the Pixel 6a.
+- [x] Remote Config version 1 published: `ads_enabled` = false, `tower_ladder`.
+- [x] RevenueCat: SDK 11.2.0 replaces Play Billing ([TECH-014](ROADMAP.md#tech-014)); entitlement `architect_pass`,
+  default offering (monthly, annual, lifetime); `REVENUECAT_API_KEY` in `~/.gradle/gradle.properties`.
+
+**Ads (code side complete)**
+- [x] One opt-in rewarded ad, on Skyline only; none on Build, onboarding, ceremony, paywall or widgets.
+- [x] Debug always uses Google test ids; only `release` uses live ids. `ads_enabled` off by default, so no live ads
+  until you switch it on.
+- [x] Consent (UMP) before any ad request, form only on tap (BUG-007); "Ad privacy choices" row in Help & privacy.
+
+**Release build and guards**
+- [x] targetSdk 37 (meets Play's API 36 rule), versionName 1.0.0, versionCode 1.
+- [x] R8 and resource shrinking with keep rules; Crashlytics mapping upload automatic.
+- [x] `bundleRelease` refuses to build without the upload key, live AdMob ids, an https privacy-policy URL or the
+  RevenueCat key (`verifyReleaseSigning`, `verifyReleaseAdMob`, `verifyReleasePrivacyPolicy`,
+  `verifyReleaseRevenueCat`). No debug-key fallback.
+- [x] Permissions reviewed; unused `FOREGROUND_SERVICE` removed.
+
+**Bugs fixed**
+- [x] Verified: BUG-002, 004, 008–018 (BUG-018: Health Connect's privacy link opens Help & privacy).
+- [x] Fixed, still to see once on a device: BUG-001 (notification prompt), 003 (Android 8–9 save), 005 (ceremony
+  highlight), 006 (0-step payoff), 007 (EEA consent form).
+
+**Docs and policy drafts**
+- [x] [privacy-policy.md](privacy-policy.md) drafted from the final code (incl. RevenueCat), with placeholders for
+  your name, contact and retention period.
+- [x] Data safety, ads, advertising-ID, Health apps, target-audience and app-access answers in
+  [play-console-checklist.md](play-console-checklist.md).
+- [x] Design parity pass on the Pixel 6a ([TECH-012](ROADMAP.md#tech-012)); only widgets, 200% font and TalkBack
+  remain.
+- [x] `./gradlew build test lint` green; R8 release APK opens every screen with no crash.
 
 ## 1. Bug fixes and verification
 - [x] **Done** — BUG-016 sync icon wobble, BUG-017 capsule ripple: fixed and checked on the Pixel 6a (frame
