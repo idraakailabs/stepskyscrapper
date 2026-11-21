@@ -413,6 +413,10 @@ Bug cards are in [BUGS.md](BUGS.md).
   `default` offering; `PassProducts.planFor` now maps them. Verified on the Pixel 6a debug build: RevenueCat logged
   "Using a Test Store API key"; Me showed "From $9.99/month" and the paywall listed Yearly $79.99 ($6.67 a month,
   Save 33%), Monthly $9.99 and Lifetime $99.99. A simulated purchase was not run. `PassProductsTest` added.
+- **Progress (2026-11-21, Test Store prices):** the old Test Store products had fixed prices ($9.99 / $79.99 / $99.99) and
+  sat on a stray entitlement, so a test purchase would not have unlocked the Pass. New Test Store products
+  `pass_monthly` $2.99, `pass_yearly` $14.99 (1-week free trial) and `pass_lifetime` $29.99 were created, attached to
+  `architect_pass` and swapped into the `default` packages; `PassProducts` maps the new ids.
 - **Outstanding (user):** create the Play service account, grant it in Play Console and upload its JSON in RevenueCat
   (App › Service account credentials); connect Google developer notifications; then TECH-004.
 

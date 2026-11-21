@@ -50,12 +50,12 @@ object PassProducts {
     const val ENTITLEMENT = "architect_pass"
 
     /** RevenueCat Test Store product ids (debug builds with `REVENUECAT_TEST_API_KEY`). */
-    const val TEST_MONTHLY = "monthly"
-    const val TEST_LIFETIME = "lifetime"
+    const val TEST_MONTHLY = "pass_monthly"
+    const val TEST_LIFETIME = "pass_lifetime"
 
     /**
      * The plan behind an active entitlement's product: Play ids (`architect_pass_lifetime`, `architect_pass` with base
-     * plan `monthly` / `annual`) or Test Store ids (`lifetime`, `monthly`, `yearly`). Anything else counts as annual.
+     * plan `monthly` / `annual`) or Test Store ids (`pass_lifetime`, `pass_monthly`, `pass_yearly`). Anything else counts as annual.
      */
     fun planFor(productIdentifier: String, basePlanIdentifier: String?): PassPlan = when {
         productIdentifier == LIFETIME || productIdentifier == TEST_LIFETIME -> PassPlan.Lifetime

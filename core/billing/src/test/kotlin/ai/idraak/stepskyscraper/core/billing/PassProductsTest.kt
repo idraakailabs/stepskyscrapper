@@ -15,8 +15,8 @@ class PassProductsTest {
 
     @Test
     fun testStoreProductsMapToTheirPlans() {
-        assertThat(PassProducts.planFor("lifetime", null)).isEqualTo(PassPlan.Lifetime)
-        assertThat(PassProducts.planFor("monthly", null)).isEqualTo(PassPlan.Monthly)
-        assertThat(PassProducts.planFor("yearly", null)).isEqualTo(PassPlan.Annual)
+        assertThat(PassProducts.planFor("pass_lifetime", null)).isEqualTo(PassPlan.Lifetime)
+        assertThat(PassProducts.planFor("pass_monthly", null)).isEqualTo(PassPlan.Monthly)
+        assertThat(PassProducts.planFor("pass_yearly", null)).isEqualTo(PassPlan.Annual)
     }
 }

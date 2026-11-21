@@ -168,7 +168,7 @@ and on the paywall.
 | Entitlement | `architect_pass` (`PassProducts.ENTITLEMENT`) |
 | Products | `architect_pass:monthly`, `architect_pass:annual` (Play subscription `architect_pass`, base plans), `architect_pass_lifetime` (one-time) |
 | Offering | `default`: `$rc_monthly`, `$rc_annual`, `$rc_lifetime` → `PassPlan.Monthly/Annual/Lifetime` |
-| Test Store | Products `monthly`, `yearly`, `lifetime` (same entitlement, same `default` packages); key `test_…` |
+| Test Store | Products `pass_monthly` ($2.99), `pass_yearly` ($14.99, 1-week free trial for new customers), `pass_lifetime` ($29.99, non-consumable), all on entitlement `architect_pass` and in the `default` packages; key `test_…`. Older `monthly` / `yearly` / `lifetime` test products ($9.99 / $79.99 / $99.99, on a stray `create_a_project_called_skyscrapper_pro` entitlement) are no longer offered. Test Store prices can't be edited after creation: to change one, create a new product and swap it into the package |
 
 **Keys per variant (`app/build.gradle.kts` `onVariants`):** `release` gets only `REVENUECAT_API_KEY` (Google Play,
 `goog_…`; `verifyReleaseRevenueCat` enforces the prefix). Debug and every other non-release variant get
