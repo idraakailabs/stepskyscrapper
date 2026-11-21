@@ -13,6 +13,10 @@
 >    unkept trial-reminder promise was removed ([BUG-019](BUGS.md#bug-019)); don't add one here unless a reminder is
 >    built.
 >
+>
+> **Hosted (2026-11-21):** https://idraakai.org/step-skyscraper/privacy/ and /step-skyscraper/terms/, in the
+> Idraak-Web repo under `src/content/step-skyscraper-legal/` with the placeholders filled (IdraakAI,
+> idraakai.labs@gmail.com). Change both copies together.
 > Everything below the line is the text to host.
 
 ---

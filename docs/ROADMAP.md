@@ -359,8 +359,9 @@ Bug cards are in [BUGS.md](BUGS.md).
   Data safety, ads, advertising-ID, target-audience and Health apps answers updated in
   [play-console-checklist.md](play-console-checklist.md); `verifyReleasePrivacyPolicy` makes `bundleRelease` fail
   until `PRIVACY_POLICY_URL` is an https URL; the Health Connect rationale intents now open Help & privacy
-  ([BUG-018](BUGS.md#bug-018)). Outstanding: fill the placeholders, host the policy, set the URL, complete the forms,
-  then criteria 1–3 on a device and in Play Console.
+  ([BUG-018](BUGS.md#bug-018)). Hosted 2026-11-21 at https://idraakai.org/step-skyscraper/privacy/ (terms at `/terms/`) and set as
+  `PRIVACY_POLICY_URL` in `~/.gradle/gradle.properties` (`verifyReleasePrivacyPolicy` passes). Outstanding: legal
+  review, the Play Console forms, then criteria 1–3 on a device and in Play Console.
 
 <a id="tech-013"></a>
 ### TECH-013 — Play release readiness review

@@ -11,6 +11,10 @@
 > 4. Keep it in step with the Data safety answers in [play-console-checklist.md](play-console-checklist.md). If
 >    the app's data use changes, update both.
 >
+>
+> **Hosted (2026-11-21):** https://idraakai.org/step-skyscraper/privacy/ and /step-skyscraper/terms/, in the
+> Idraak-Web repo under `src/content/step-skyscraper-legal/` with the placeholders filled (IdraakAI,
+> idraakai.labs@gmail.com). Change both copies together.
 > Everything below the line is the text to host.
 
 ---

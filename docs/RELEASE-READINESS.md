@@ -151,12 +151,17 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
   against the code 2026-11-21 (analytics events, RevenueCat, backup, permissions): still accurate.
 - [x] **Done** — Terms of Service drafted from the final code: [terms-of-service.md](terms-of-service.md) (Pass plans,
   renewal and cancellation, Blueprints, optional ad, health disclaimer).
-- [ ] **Pending – user** — fill the terms' placeholders (name, contact, governing law), have both texts reviewed, host
-  the terms next to the policy and link them in the store listing.
+- [x] **Done** (2026-11-21) — both texts are live on the IdraakAI site, publisher IdraakAI, contact
+  idraakai.labs@gmail.com: [privacy](https://idraakai.org/step-skyscraper/privacy/) and
+  [terms](https://idraakai.org/step-skyscraper/terms/) (Idraak-Web `40885b8`). Keep them in step with
+  privacy-policy.md and terms-of-service.md.
+- [ ] **Pending – user** — legal review of both texts; enter the privacy URL in Play Console › App content and link the
+  terms in the store listing.
 - [x] **Done** — [BUG-019](BUGS.md#bug-019): the paywall no longer promises a trial reminder the app never sent
   (sentence removed 2026-11-21).
-- [ ] **Pending – user** — fill the placeholders, get it reviewed, host at an https URL, set `PRIVACY_POLICY_URL`
-  (`bundleRelease` fails until you do). Verify: Help & privacy shows "Read the full privacy policy" and it opens.
+- [x] **Done** (2026-11-21) — `PRIVACY_POLICY_URL=https://idraakai.org/step-skyscraper/privacy/` in
+  `~/.gradle/gradle.properties`; `:app:verifyReleasePrivacyPolicy` passes.
+- [ ] **Manual verification** — Help & privacy shows "Read the full privacy policy" and it opens (next build).
 - [ ] **Pending – user** — Data safety form and Health apps declaration in Play Console.
 
 ## 11. Ads declaration and consent
@@ -202,7 +207,7 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
    JSON and developer notifications.
 3. AdMob app and rewarded unit, `ADMOB_APP_ID_PROD` / `ADMOB_REWARDED_UNIT_ID_PROD`, GDPR + US-state messages, test
    devices, `app-ads.txt`.
-4. Host the privacy policy and the terms of service, and set `PRIVACY_POLICY_URL`.
+4. ~~Host the privacy policy and terms, set `PRIVACY_POLICY_URL`~~ (done 2026-11-21); legal review still advised.
 5. Play Console: app content declarations (ads, advertising ID, Data safety, Health apps, target audience, content
    rating, app access), billing products, store listing assets.
 6. Device checks after the next topping-out: BUG-001 prompt, BUG-005 highlight; BUG-007 EEA consent form (needs the
