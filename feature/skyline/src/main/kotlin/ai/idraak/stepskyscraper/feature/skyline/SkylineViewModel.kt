@@ -175,7 +175,10 @@ class SkylineViewModel @Inject constructor(
         val (district, towers) = SkylineReducer.districtTowers(s)
         val newest = SkylineReducer.highlighted(towers, s.today, highlight)
         val reward = towers.firstOrNull { it.index == newest }?.let { t ->
-            val claimed = t.record.rewardedAdClaimed || wallet.hasEntry(CompleteTowerUseCase.adKey(t.index))
+            // Already doubled by the ad or by the Pass bonus (BUG-002: never more than 2×).
+            val claimed = t.record.rewardedAdClaimed ||
+                wallet.hasEntry(CompleteTowerUseCase.adKey(t.index)) ||
+                wallet.hasEntry(CompleteTowerUseCase.premiumKey(t.index))
             RewardCard(
                 t.index,
                 t.name,

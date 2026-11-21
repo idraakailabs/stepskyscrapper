@@ -58,7 +58,11 @@ class ClaimRewardedBonusUseCase @Inject constructor(
         if (snapshot.entitlement.isPremium) return Outcome.Failure(DomainError.AdUnavailable(AdFailure.Premium))
         val tower = snapshot.city.towers.firstOrNull { it.index == towerIndex && it.isComplete }
             ?: return Outcome.Failure(DomainError.ItemLocked("tower:$towerIndex"))
-        if (tower.record.rewardedAdClaimed || wallet.hasEntry(CompleteTowerUseCase.adKey(towerIndex))) {
+        // BUG-002: a tower doubled by the Pass bonus (e.g. the Pass has since lapsed) can't be doubled again.
+        if (tower.record.rewardedAdClaimed ||
+            wallet.hasEntry(CompleteTowerUseCase.adKey(towerIndex)) ||
+            wallet.hasEntry(CompleteTowerUseCase.premiumKey(towerIndex))
+        ) {
             return Outcome.Failure(DomainError.AlreadyClaimed)
         }
         val shown = ads.show(host)

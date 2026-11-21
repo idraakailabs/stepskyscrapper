@@ -24,12 +24,14 @@ Firebase, AdMob ids and messages, the hosted privacy policy, and the Play Consol
   open it a day later, close the ceremony → Skyline pins that tower.
 - [ ] **Manual verification** — BUG-003 Android 8–9 save (Android 16 verified). Steps: Android 9 emulator, Share ›
   Save → grant storage → "Saved to Pictures." without a second tap.
-- [ ] **Manual verification** — BUG-007 consent only on tap (unit-tested; partial device check). Steps: TECHNICAL.md
-  §5.1 "Testing ads safely" with `ADMOB_UMP_DEBUG_EEA=true`; open Skyline with a reward card → no form; tap → form.
+- [ ] **Manual verification** — BUG-007 consent only on tap (unit-tested; non-EEA path and tap → test ad verified on
+  the Pixel 6a 2026-11-21). Remaining: the EEA form, once the AdMob app's GDPR message is published. Steps:
+  TECHNICAL.md §5.1 "Testing ads safely" with `ADMOB_UMP_DEBUG_EEA=true`; open Skyline with a reward card → no form;
+  tap → form.
 - [ ] **Manual verification** — BUG-006 payoff at exactly 0 steps (unit-tested).
-- [ ] **Manual verification** — BUG-018 Health Connect privacy link (adb intent verified on the Pixel 6a). Steps: set
-  `PRIVACY_POLICY_URL`, Health Connect › App permissions › Step Skyscraper › privacy link → Help & privacy alone.
-- [ ] Open, not release blockers: BUG-002 (Blueprint stacking, needs PROD-006), BUG-004 (week card).
+- [x] BUG-018 Health Connect privacy link → Help & privacy alone, Back → Health Connect (Pixel 6a, 2026-11-21). The
+  hosted-policy link inside it appears once `PRIVACY_POLICY_URL` is set (TECH-011).
+- [x] BUG-002 (Blueprint stacking) and BUG-004 (week card → weekly detail) fixed and verified 2026-11-21.
 
 ## 2. Critical functional and UI checks
 - [x] **Done** — R8 release APK on the Pixel 6a: onboarding, Build, Skyline, Customise, Me, Share opened with no
@@ -146,5 +148,5 @@ Firebase, AdMob ids and messages, the hosted privacy policy, and the Play Consol
 4. Host the privacy policy and set `PRIVACY_POLICY_URL`.
 5. Play Console: app content declarations (ads, advertising ID, Data safety, Health apps, target audience, content
    rating, app access), billing products, store listing assets.
-6. Device checks after the next topping-out: BUG-001 prompt, BUG-005 highlight, BUG-007 / debug test ad, ad privacy
-   choices; Android 8–9 save; BUG-018 from Health Connect.
+6. Device checks after the next topping-out: BUG-001 prompt, BUG-005 highlight; BUG-007 EEA consent form (needs the
+   published GDPR message), ad privacy choices; Android 8–9 save; BUG-006 on a fresh install with 0 steps.

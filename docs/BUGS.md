@@ -26,9 +26,9 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | ID | Title | Priority | Classification | Status |
 |---|---|---|---|---|
 | [BUG-001](#bug-001) | Notifications are "on" but never delivered on Android 13+ | P2 | Confirmed (code) | Fixed – unverified |
-| [BUG-002](#bug-002) | Blueprint bonuses can stack to 3× and Pass bonus applies retroactively | P2 | Confirmed (code) | Open |
+| [BUG-002](#bug-002) | Blueprint bonuses can stack to 3× and Pass bonus applies retroactively | P2 | Confirmed (code) | Done |
 | [BUG-003](#bug-003) | "Save image" gives no feedback and silently fails on Android 8–9 | P2 | Confirmed (code) | Fixed – unverified |
-| [BUG-004](#bug-004) | Week card opens Goals instead of a weekly detail with "Pause goals" | P2 | Confirmed (code) | Open |
+| [BUG-004](#bug-004) | Week card opens Goals instead of a weekly detail with "Pause goals" | P2 | Confirmed (code) | Done |
 | [BUG-005](#bug-005) | Skyline ignores the tower to highlight after the ceremony | P3 | Confirmed (code) | Fixed – unverified |
 | [BUG-006](#bug-006) | Onboarding payoff shows a 20% partial floor at 0 steps and rounds to segments | P3 | Confirmed (code) | Fixed – unverified |
 | [BUG-007](#bug-007) | Ad consent form may appear just by opening Skyline | P3 | Suspected | Fixed – unverified |
@@ -42,7 +42,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-015](#bug-015) | Me scrolls under the transparent status bar | P3 | Confirmed (reproduced) | Done |
 | [BUG-016](#bug-016) | "Syncing…" icon wobbles while it rotates | P3 | Confirmed (reproduced) | Done |
 | [BUG-017](#bug-017) | Pressed tab / segment / chip shows a rectangular ripple, not the capsule | P3 | Confirmed (reproduced) | Done |
-| [BUG-018](#bug-018) | Health Connect privacy link opens Build instead of the privacy rationale | P1 | Confirmed (code) | Fixed – unverified |
+| [BUG-018](#bug-018) | Health Connect privacy link opens Build instead of the privacy rationale | P1 | Confirmed (code) | Done |
 
 ---
 
@@ -75,11 +75,13 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   (`CeremonyViewModelTest`: first dismissal asks once and sets the flag; no prompt when both preferences are off) but
   **not checked on a device** (needs a fresh topping-out). AC 3 not checked. Known follow-ups (not fixed): granting
   from one switch also shows the other as on (both default on); no route to system settings after a permanent denial.
+- **Device check (2026-11-21):** not repeated: AC 1 and AC 3 need a real topping-out (no way to add steps on the phone
+  without writing fake Health Connect data). Stays Fixed – unverified.
 
 <a id="bug-002"></a>
 ## BUG-002 — Blueprint bonuses can stack to 3× and Pass bonus applies retroactively
 
-- **Priority:** P2 · **Classification:** Confirmed (code) · **Status:** Open
+- **Priority:** P2 · **Classification:** Confirmed (code) · **Status:** Done
 - **Evidence:** `EnsureTowerRecordsUseCase` calls `CompleteTowerUseCase` for **every** finished tower on every
   sync (`core/domain/.../TowerLifecycleUseCases.kt:32`). `CompleteTowerUseCase` adds a `tower_premium:N` entry
   whenever the user is premium *now* (`:52`), so buying the Pass doubles Blueprints for all past towers. A
@@ -92,7 +94,16 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Acceptance criteria:**
   1. Unit test: buying the Pass after 3 towers doesn't change the balance for those towers.
   2. Unit test: a tower never earns more than 2× its base Blueprints.
-- **Resolution:** — · **Verification:** —
+- **Resolution (2026-11-21):** the recommended fix, with the bonus rules it implies recorded in
+  [PROD-006](ROADMAP.md#prod-006): the Pass bonus is not retroactive, and the Pass and ad bonuses exclude each other.
+  `CompleteTowerUseCase` now adds `tower_premium:N` only in the call that first records the tower's base
+  `tower:N` entry, only if the user is premium then, and never when `tower_ad:N` already exists. Later syncs only
+  re-read the ledger. `ClaimRewardedBonusUseCase` refuses a tower that already has `tower_premium:N` (a lapsed Pass),
+  and Skyline treats such a tower's reward card as claimed. No key names or stored data changed. Entries already
+  written before this fix stay in the ledger (balances are never rewritten).
+- **Verification:** `core:domain` `BlueprintBonusTest` (4 tests, pass): buying the Pass after 3 towers leaves their
+  Blueprints unchanged (AC 1); a tower topped out while premium earns 2× once; ad then Pass and ad before the first
+  completion both stay at 2× (AC 2). Pixel 6a: the Skyline reward card for a non-Pass tower is unchanged.
 
 <a id="bug-003"></a>
 ## BUG-003 — "Save image" gives no feedback and silently fails on Android 8–9
@@ -114,6 +125,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Verification:** AC 1: `ShareSaveFeedbackTest` (success, failure, nothing when idle); Pixel 6a: Save → "Saved to
   Pictures." and a new PNG in `Pictures/Step Skyscraper/`. AC 2 (Android 8–9 grant-then-save) **not verified**: no
   Android 8–9 device used.
+- **Device check (2026-11-21):** not repeated: AC 2 needs an Android 8–9 device. Stays Fixed – unverified.
 
 > **Device check (2026-11-21, Pixel 6a, Android 16):** "Save image" wrote the PNG to `Pictures/Step Skyscraper/`
 > with no on-screen confirmation — the missing feedback is reproduced; the Android 8–9 failure is not checked.
@@ -121,7 +133,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 <a id="bug-004"></a>
 ## BUG-004 — Week card opens Goals instead of a weekly detail with "Pause goals"
 
-- **Priority:** P2 · **Classification:** Confirmed (code) · **Status:** Open
+- **Priority:** P2 · **Classification:** Confirmed (code) · **Status:** Done
 - **Evidence:** `onOpenWeek = { nav.navigate(GoalsRoute) }` (`app/.../navigation/AppNavigation.kt:121`). The
   design (2a note) says "Week card → weekly detail with 'Pause goals'"; the Goals screen has no pause control,
   and the zero-step week card text "Resting? You can pause goals" leads somewhere without that option.
@@ -131,7 +143,18 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Acceptance criteria:**
   1. Tapping the week card opens a screen with this week's bars and a "Pause goals" control (UI test).
   2. Pausing there updates the Build week card to "Goals paused. Floors still count." (ViewModel test).
-- **Resolution:** — · **Verification:** —
+- **Resolution (2026-11-21):** new `WeekRoute` in `feature:me` (`WeekScreen.kt`: `WeekViewModel` + stateless
+  `WeekScreen`). It shows "This week": floors of the weekly goal, a progress bar, a status line ("N floors to go this
+  week" / goal reached / "Goals paused. Floors still count."), the Me week bars (`Bars`, now `internal`), a
+  "Pause goals" switch that opens the existing pause sheet (`PauseSheet`, now `internal` and callback-based) or resumes,
+  and a Goals row. The Build week card navigates to `WeekRoute`. The screen sets dark status-bar icons, because Build
+  leaves them light (found on the device). The design has no mock for this screen ([D25](design-deviations.md)).
+- **Verification:** `WeekTest` (3 tests, pass): seven bars and "Pause goals" shown, the switch sends `TogglePause`
+  (AC 1); pausing from `WeekViewModel` sets the pause and the shared `WeekProgress` becomes paused, which the Build
+  card renders as "Goals paused. Floors still count." (AC 2); paused copy. Screenshot `week_detail.png`. Pixel 6a
+  (debug): Build week card → "This week" with this week's bars; switching resume changed the Build card to
+  "26 to go · 2 days left"; pausing for 3 days changed it back to "Goals paused. Floors still count." (the device's
+  original pause, until 23 Nov, was restored); status bar readable on the screen and light again on Build.
 
 <a id="bug-005"></a>
 ## BUG-005 — Skyline ignores the tower to highlight after the ceremony
@@ -152,6 +175,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Verification:** AC 1: `SkylineTest.lateCeremonyHighlightsTheRequestedTower` (tower topped out 9 days ago: pinned
   only with the argument) and `highlightIgnoresTowersOutsideTheDistrict`, passing on the merged code. Device check of
   a late ceremony still outstanding.
+- **Device check (2026-11-21):** not possible: needs a ceremony after a real topping-out. Stays Fixed – unverified.
 
 <a id="bug-006"></a>
 ## BUG-006 — Onboarding payoff shows a 20% partial floor at 0 steps and rounds to segments
@@ -168,6 +192,8 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   instead of the rounded, 20%-minimum segment value. · **Verification:** unit test
   `OnboardingTest.payoffPartialFloorFollowsStepsIntoTheFloor` (0 → 0, 4,200 → 0.2, 4,250 → 0.25). Device check of
   1c at 0 steps still outstanding (Pixel disconnected during the 2026-11-21 parity pass).
+- **Device check (2026-11-21):** not done: onboarding shows only on a fresh install, and reinstalling would wipe the
+  phone's progress. Stays Fixed – unverified.
 
 <a id="bug-007"></a>
 ## BUG-007 — Ad consent form may appear just by opening Skyline
@@ -192,6 +218,13 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   lines, but no reward card was visible, so `prepare()` and the tap path weren't exercised. **Outstanding:** the
   acceptance case needs a tower topped out within 24 h, a published GDPR message and `ADMOB_UMP_DEBUG_EEA=true`
   ([TECHNICAL.md §5.1](TECHNICAL.md#51-admob-and-the-ads_enabled-switch)).
+- **Device check (2026-11-21, Pixel 6a, debug, non-EEA):** with the debug clock set to the day tower 3 topped out,
+  Skyline showed the reward card. Opening it showed no consent form; because consent wasn't required, `prepare()`
+  initialised and preloaded the test ad (`MobileAds.initialize (after consent)`, `load request`, `loaded`) as
+  designed. Tapping "Watch a short ad…" showed a Google "Test Ad" (`show`). The app was stopped before the reward;
+  no Blueprints were granted and the card was still offered. **Still outstanding (AC 1):** the EEA case. The debug
+  build uses Google's sample AdMob app, which has no GDPR message, and resetting consent needs `pm clear` (wipes app
+  data), so it waits for the real AdMob app's published GDPR message ([TECH-003](ROADMAP.md#tech-003)).
 
 <a id="bug-008"></a>
 ## BUG-008 — The Build feature module was missing from the Git repository
@@ -340,7 +373,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 <a id="bug-018"></a>
 ## BUG-018 — Health Connect privacy link opens Build instead of the privacy rationale
 
-- **Priority:** P1 · **Classification:** Confirmed (code) · **Status:** Fixed – unverified
+- **Priority:** P1 · **Classification:** Confirmed (code) · **Status:** Done
 - **Evidence (release-readiness review, 2026-11-21):** the manifest routes
   `androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE` (Android 13 and lower) and the Android 14 `VIEW_PERMISSION_USAGE`
   alias to `MainActivity`, but nothing read `intent.action`: Health Connect's privacy link opened onboarding or Build.
@@ -358,3 +391,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   opens Build / Skyline / Me. The Android 14+ alias can't be started from adb (protected by
   `START_VIEW_PERMISSION_USAGE`, as intended) and runs the same `intent.action` check. **Outstanding:** tap the privacy
   link from Health Connect itself, with `PRIVACY_POLICY_URL` set so the policy link shows.
+- **Device check (2026-11-21, Pixel 6a, Android 16):** Health Connect › Step Skyscraper › "Read privacy policy" opened
+  the app's Help & privacy alone (`ViewPermissionUsageActivity`, no tabs); Back returned to Health Connect. The
+  acceptance criteria are met. The hosted-policy link inside Help & privacy appears once `PRIVACY_POLICY_URL` is set,
+  which is tracked by [TECH-011](ROADMAP.md#tech-011) and is not part of this bug.

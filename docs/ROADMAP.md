@@ -64,7 +64,7 @@ testing track with crash reports, analytics, real ads and working purchases.
 | [TECH-005](#tech-005) | Release signing | Technical task | P0 | In Progress | Upload key |
 | [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | In Progress (drafts done; hosting and console pending you) | Hosted policy, Play Console |
 | [TECH-013](#tech-013) | Play release readiness review | Technical task | P0 | Done | — |
-| [BUG-018](BUGS.md#bug-018) | Health Connect privacy link opens Build | Confirmed bug | P1 | Fixed – unverified | — |
+| [BUG-018](BUGS.md#bug-018) | Health Connect privacy link opens Build | Confirmed bug | P1 | Done | — |
 
 ## Phase 3 — Reliability and release quality
 
@@ -99,9 +99,9 @@ districts are viewable, Blueprint rules are consistent.
 
 | ID | Title | Type | Priority | Status | Depends on |
 |---|---|---|---|---|---|
-| [PROD-006](#prod-006) | Decide first-tower height and premium-bonus rules | Product decision | P2 | Planned | — |
-| [BUG-002](BUGS.md#bug-002) | Blueprint bonuses can stack / apply retroactively | Confirmed bug | P2 | Open | PROD-006 |
-| [BUG-004](BUGS.md#bug-004) | Week card opens Goals, not weekly detail | Confirmed bug | P2 | Open | — |
+| [PROD-006](#prod-006) | Decide first-tower height and premium-bonus rules | Product decision | P2 | In Progress (bonus rules decided; ladder open) | — |
+| [BUG-002](BUGS.md#bug-002) | Blueprint bonuses can stack / apply retroactively | Confirmed bug | P2 | Done | PROD-006 |
+| [BUG-004](BUGS.md#bug-004) | Week card opens Goals, not weekly detail | Confirmed bug | P2 | Done | — |
 | [PROD-001](#prod-001) | Browse every district in Skyline | Product improvement | P2 | Planned | — |
 | [PROD-002](#prod-002) | Re-skin finished towers from the stats sheet | Product improvement | P3 | Planned | — |
 
@@ -429,7 +429,7 @@ Bug cards are in [BUGS.md](BUGS.md).
 
 <a id="prod-006"></a>
 ### PROD-006 — Decide first-tower height and premium-bonus rules
-- **Type:** Product decision · **Priority:** P2 · **Status:** Planned · **Effort:** XS
+- **Type:** Product decision · **Priority:** P2 · **Status:** In Progress · **Effort:** XS
 - **Problem:** the design review left open whether the first tower should be short for a quick first
   topping-out (the ladder starts at 10); Blueprint bonus rules for the Pass and the rewarded ad are ambiguous
   ([BUG-002](BUGS.md#bug-002)).
@@ -439,6 +439,9 @@ Bug cards are in [BUGS.md](BUGS.md).
 - **Dependencies / risks:** analytics ([TECH-002](#tech-002)) for a ladder test.
 - **Acceptance criteria:**
   1. The decision is written in this card and [PRODUCT.md §9](PRODUCT.md#9-monetisation-strategy).
+- **Decided (2026-11-21, BUG-002's recommended fix):** the Pass bonus applies only to towers topped out while a
+  member (not retroactive), and the Pass and rewarded-ad bonuses exclude each other (max 2× per tower). Implemented
+  in [BUG-002](BUGS.md#bug-002) and recorded in PRODUCT.md §9. **Still open:** first-tower height (ladder).
 
 <a id="grow-001"></a>
 ### GROW-001 — Activation and retention dashboards

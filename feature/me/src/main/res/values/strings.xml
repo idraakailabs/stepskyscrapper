@@ -28,6 +28,9 @@
     <string name="me_goals">Goals</string>
     <string name="me_goals_sub">%1$s a day · %2$d floors a week</string>
     <string name="me_pause">Pause goals</string>
+    <string name="week_to_go">%1$d floors to go this week</string>
+    <string name="week_reached">Weekly goal reached. Every floor counts.</string>
+    <string name="week_paused">Goals paused. Floors still count.</string>
     <string name="me_pause_sub">For rest, travel or illness. Floors still count.</string>
     <string name="me_pause_until">Paused until %1$s. Floors still count.</string>
     <string name="me_pause_indefinite">Paused until you turn it back on.</string>

@@ -18,6 +18,7 @@ import ai.idraak.stepskyscraper.feature.me.MeRoute
 import ai.idraak.stepskyscraper.feature.me.PrivacyRoute
 import ai.idraak.stepskyscraper.feature.me.SettingsRoute
 import ai.idraak.stepskyscraper.feature.me.StepHelpRoute
+import ai.idraak.stepskyscraper.feature.me.WeekRoute
 import ai.idraak.stepskyscraper.feature.onboarding.OnboardingRoute
 import ai.idraak.stepskyscraper.feature.paywall.PaywallRoute
 import ai.idraak.stepskyscraper.feature.share.ShareRoute
@@ -122,7 +123,7 @@ private fun AppNavHost(nav: NavHostController, onboardingComplete: Boolean) {
             BuildRoute(
                 onOpenCustomise = { nav.navigate(CustomiseRoute(it)) },
                 onOpenShare = { nav.navigate(ShareRoute(it)) },
-                onOpenWeek = { nav.navigate(GoalsRoute) },
+                onOpenWeek = { nav.navigate(WeekRoute) },
                 onOpenStepHelp = { nav.navigate(StepHelpRoute) },
                 onOpenCeremony = { nav.navigate(CeremonyRoute(it)) },
             )
@@ -172,6 +173,7 @@ private fun AppNavHost(nav: NavHostController, onboardingComplete: Boolean) {
         composable<ShareRoute> { ShareRoute(onClose = { nav.popBackStack() }) }
         composable<PaywallRoute> { PaywallRoute(onClose = { nav.popBackStack() }) }
         composable<GoalsRoute> { GoalsRoute(onBack = { nav.popBackStack() }) }
+        composable<WeekRoute> { WeekRoute(onBack = { nav.popBackStack() }, onOpenGoals = { nav.navigate(GoalsRoute) }) }
         composable<AchievementsRoute> { AchievementsRoute(onBack = { nav.popBackStack() }) }
         composable<StepHelpRoute> { StepHelpRoute(onBack = { nav.popBackStack() }) }
         composable<SettingsRoute> {

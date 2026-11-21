@@ -267,6 +267,8 @@ Index only; details live in the linked card.
   A tower's target is frozen in `towers.target_floors` when founded.
 - **Wallet entries are keyed** (`tower:N`, `tower_premium:N`, `tower_ad:N`, `ach:id`, `spend:item`); new
   rewards need a new key prefix to stay idempotent.
+  `tower_premium:N` is written only when `tower:N` is first recorded (Pass at topping-out time), never alongside
+  `tower_ad:N`; a tower earns at most 2× its base (BUG-002).
 - **Room changes** need a version bump and a migration; schemas are exported to `core/database/schemas/`.
 - **No step values** in `AnalyticsEvent` params, ad requests or logs.
 - **No ads** on Build, onboarding or the ceremony; `RewardedAdGateway` is only injected by `SkylineViewModel`.

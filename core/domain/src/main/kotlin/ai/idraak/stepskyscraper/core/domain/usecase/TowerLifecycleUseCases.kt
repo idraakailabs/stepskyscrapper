@@ -35,8 +35,9 @@ class EnsureTowerRecordsUseCase @Inject constructor(
 }
 
 /**
- * Awards the topping-out Blueprints for a finished tower (5 per floor, doubled for Architect Pass members).
- * Keyed ledger entries make this idempotent; returns the total the tower has earned.
+ * Awards the topping-out Blueprints for a finished tower (5 per floor, doubled for towers topped out while an
+ * Architect Pass member). Keyed ledger entries make this idempotent; returns the total the tower has earned.
+ * A tower earns at most 2× its base: the Pass bonus and the rewarded-ad bonus exclude each other.
  */
 class CompleteTowerUseCase @Inject constructor(
     private val wallet: WalletRepository,
@@ -48,13 +49,14 @@ class CompleteTowerUseCase @Inject constructor(
         val base = BlueprintLadder.blueprintsFor(tower.target)
         val add = wallet.addEntry(WalletEntry(baseKey(tower.index), base, WalletReason.ToppingOut, clock.now()))
         if (add is Outcome.Failure) return add
-        var total = base
-        if (entitlements.entitlement.first().isPremium) {
+        val firstAward = (add as Outcome.Success).value
+        // BUG-002: the Pass bonus is decided once, when the topping-out is first recorded, so buying the Pass
+        // later never doubles earlier towers; and a tower that already has the ad bonus never gets a second one.
+        if (firstAward && !wallet.hasEntry(adKey(tower.index)) && entitlements.entitlement.first().isPremium) {
             wallet.addEntry(WalletEntry(premiumKey(tower.index), base, WalletReason.PremiumBonus, clock.now()))
-            total += base
-        } else if (wallet.hasEntry(premiumKey(tower.index))) {
-            total += base
         }
+        var total = base
+        if (wallet.hasEntry(premiumKey(tower.index))) total += base
         if (wallet.hasEntry(adKey(tower.index))) total += base
         return Outcome.Success(total)
     }

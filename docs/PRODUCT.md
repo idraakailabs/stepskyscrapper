@@ -49,7 +49,7 @@ included here. Screen-by-screen design coverage: [design-inventory.md](design-in
 | Area | Current behaviour |
 |---|---|
 | Onboarding (1a–1f) | Promise → step-access rationale → Health Connect permission sheet (Steps, plus background read when available) → payoff with today's real steps → style + name → daily target with a 7-day suggestion → widget pin prompt. "Not now" skips to style with a "Connect steps" card on Build. |
-| Build tab | Sky header (sky follows the clock), tower with crane and partial floor, "Next floor in N steps" with 10 segments, week ring card, pull-to-refresh, "Synced. N floors added." snackbar, tap to zoom, long-press to mirror. Week card opens **Goals**, not a weekly detail ([BUG-004](BUGS.md#bug-004)). |
+| Build tab | Sky header (sky follows the clock), tower with crane and partial floor, "Next floor in N steps" with 10 segments, week ring card, pull-to-refresh, "Synced. N floors added." snackbar, tap to zoom, long-press to mirror. Week card opens a "This week" detail: this week's bars, progress to the weekly goal, a "Pause goals" switch and a link to Goals. |
 | Topping-out ceremony | Full screen once per tower: crown lift, lit windows, beams, Blueprints count-up, Share / Start next tower / Close; paywall once after the first tower. |
 | Skyline tab | Finished towers of the current district on a model base, pinch/pan, stats sheet with rename and swipe, opt-in rewarded ad card for the newest (or ceremony-highlighted) tower, shown only while ads are enabled (debug: always, with Google test ads; Play build: only with live ids and Remote Config `ads_enabled` on, which defaults to off), and the consent form appears only after tapping it; next-district progress. Earlier districts can't be browsed ([PROD-001](ROADMAP.md#prod-001)). |
 | Customise | Facade, palette, crown, lights and ground tabs; three lock types (progress, Blueprints, Architect Pass); 3 s locked preview then unlock sheet; buying with Blueprints. Opened from Build only. |
@@ -111,8 +111,9 @@ Task cards are in [ROADMAP.md](ROADMAP.md).
 ## 9. Monetisation strategy
 
 Current model (enforced on the device via Play Billing; entitlement cached offline): Architect Pass unlocks
-12 premium facades/crowns/palettes, lighting and ground sets, and 2× Blueprints; one opt-in rewarded ad doubles
-a finished tower's Blueprints. Blueprints buy cosmetics only and never floors.
+12 premium facades/crowns/palettes, lighting and ground sets, and 2× Blueprints on towers topped out while a member
+(not retroactive); one opt-in rewarded ad doubles a finished tower's Blueprints. A tower never earns more than 2×
+its base: the Pass and ad bonuses exclude each other. Blueprints buy cosmetics only and never floors.
 
 | Feature | Tier | Rationale |
 |---|---|---|

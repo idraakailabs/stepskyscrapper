@@ -100,7 +100,7 @@ fun MeScreen(state: MeUiState, nav: MeNavigation, onIntent: (MeIntent) -> Unit) 
             is Lce.Content -> MeContentView(content.value, state, nav, onIntent)
         }
     }
-    if (state.pauseSheet) PauseSheet(onIntent)
+    if (state.pauseSheet) PauseSheet({ onIntent(MeIntent.Pause(it)) }, { onIntent(MeIntent.DismissPause) })
 }
 
 @Composable
@@ -239,7 +239,7 @@ private fun FloorsChart(content: MeContent, month: Boolean, onToggle: (Boolean) 
 }
 
 @Composable
-private fun Bars(bars: List<WeekDayBar>, month: Boolean) {
+internal fun Bars(bars: List<WeekDayBar>, month: Boolean) {
     val c = SsTheme.colors
     val max = (bars.maxOfOrNull { it.floors } ?: 0).coerceAtLeast(1)
     val chartHeight = 88.dp
@@ -482,9 +482,9 @@ internal fun appearanceLabel(a: Appearance) = when (a) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PauseSheet(onIntent: (MeIntent) -> Unit) {
+internal fun PauseSheet(onPick: (PauseOption) -> Unit, onDismiss: () -> Unit) {
     val c = SsTheme.colors
-    SsModalSheet(onDismiss = { onIntent(MeIntent.DismissPause) }) {
+    SsModalSheet(onDismiss = onDismiss) {
         Column(
             Modifier.padding(start = SsSpacing.screenMargin, end = SsSpacing.screenMargin, top = SsSpacing.s, bottom = 40.dp),
             verticalArrangement = Arrangement.spacedBy(SsSpacing.m),
@@ -501,7 +501,7 @@ private fun PauseSheet(onIntent: (MeIntent) -> Unit) {
                         .fillMaxWidth()
                         .heightIn(min = 56.dp)
                         .background(c.background, SsRadius.shapeMd)
-                        .clickable(role = Role.Button) { onIntent(MeIntent.Pause(option)) }
+                        .clickable(role = Role.Button) { onPick(option) }
                         .padding(horizontal = SsSpacing.l),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(SsSpacing.m),
