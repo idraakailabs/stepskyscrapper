@@ -144,6 +144,10 @@ by Android's app sandbox.
 If we change this policy, we'll update the effective date above and, for significant changes, mention it in
 the app's release notes.
 
-## 12. Contact
+## 12. Terms
+
+Use of the app is also governed by our Terms of Service: [terms URL].
+
+## 13. Contact
 
 [developer or company name] · [contact email] · [postal address, if required]

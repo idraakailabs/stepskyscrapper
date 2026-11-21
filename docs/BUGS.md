@@ -43,6 +43,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-016](#bug-016) | "Syncing…" icon wobbles while it rotates | P3 | Confirmed (reproduced) | Done |
 | [BUG-017](#bug-017) | Pressed tab / segment / chip shows a rectangular ripple, not the capsule | P3 | Confirmed (reproduced) | Done |
 | [BUG-018](#bug-018) | Health Connect privacy link opens Build instead of the privacy rationale | P1 | Confirmed (code) | Done |
+| [BUG-019](#bug-019) | Paywall promises a trial reminder the app never sends | P1 | Confirmed (code) | Open |
 
 ---
 
@@ -395,3 +396,20 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
   the app's Help & privacy alone (`ViewPermissionUsageActivity`, no tabs); Back returned to Health Connect. The
   acceptance criteria are met. The hosted-policy link inside Help & privacy appears once `PRIVACY_POLICY_URL` is set,
   which is tracked by [TECH-011](ROADMAP.md#tech-011) and is not part of this bug.
+
+<a id="bug-019"></a>
+## BUG-019 — Paywall promises a trial reminder the app never sends
+
+- **Priority:** P1 · **Classification:** Confirmed (code) · **Status:** Open
+- **Evidence (terms-of-service review, 2026-11-21):** the yearly-trial legal line `pw_legal_trial`
+  (`feature/paywall/src/main/res/values/strings.xml`) ends "We'll remind you 2 days before the trial ends." No code
+  schedules such a reminder: no worker, notification or RevenueCat hook refers to the trial end (searched `core`,
+  `feature`, `app`, `widget`).
+- **Impact:** a promise in the purchase terms that isn't kept. Google Play's subscriptions policy requires offer terms
+  to be clear and accurate, so this is a review and refund-complaint risk, and the Terms of Service can't repeat it.
+- **Fix (needs your choice):** either (a) remove the sentence from `pw_legal_trial` (smallest change, recommended for
+  1.0), or (b) schedule a local notification 2 days before the trial ends, from the purchase time RevenueCat reports,
+  cancelled when the subscription is cancelled.
+- **Acceptance criteria:** the paywall shows no promise the app doesn't keep; for (b), the reminder fires on a
+  license-tester trial (Play test trials renew in minutes) and the Settings switch can turn it off; screenshots
+  re-recorded.

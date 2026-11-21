@@ -18,6 +18,7 @@ MVI, Hilt, Room, DataStore, WorkManager, Glance, RevenueCat (on Play Billing), A
 | [docs/RELEASE-READINESS.md](docs/RELEASE-READINESS.md) | Release Readiness Sheet: every pre-upload check with its status and what the user still has to do |
 | [docs/play-console-checklist.md](docs/play-console-checklist.md) | Release steps, signed AAB, Health apps declaration, Data safety answers |
 | [docs/privacy-policy.md](docs/privacy-policy.md) | Privacy policy draft to host (keep in step with the Data safety answers) |
+| [docs/terms-of-service.md](docs/terms-of-service.md) | Terms of Service draft to host (keep in step with the paywall and Pass plans) |
 
 The "Current position" table in `docs/ROADMAP.md` is the source of truth for the active phase and next task.
 The design source files are in `design/source/` (`Step Skyscraper All.dc.html`, `tower.js`).

@@ -145,7 +145,14 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
 - [x] **Done** — Health Connect: `READ_STEPS` + background read only; rationale intent and Android 14 alias now open
   Help & privacy (BUG-018).
 - [x] **Done** — privacy policy drafted from the final code: [privacy-policy.md](privacy-policy.md); Data safety
-  draft updated ([play-console-checklist.md §7](play-console-checklist.md#7-data-safety-form-draft)).
+  draft updated ([play-console-checklist.md §7](play-console-checklist.md#7-data-safety-form-draft)). Rechecked
+  against the code 2026-11-21 (analytics events, RevenueCat, backup, permissions): still accurate.
+- [x] **Done** — Terms of Service drafted from the final code: [terms-of-service.md](terms-of-service.md) (Pass plans,
+  renewal and cancellation, Blueprints, optional ad, health disclaimer).
+- [ ] **Pending – user** — fill the terms' placeholders (name, contact, governing law), have both texts reviewed, host
+  the terms next to the policy and link them in the store listing.
+- [ ] **Open** — [BUG-019](BUGS.md#bug-019): the paywall promises a trial reminder the app never sends. Decide: remove
+  the sentence (recommended) or build the reminder.
 - [ ] **Pending – user** — fill the placeholders, get it reviewed, host at an https URL, set `PRIVACY_POLICY_URL`
   (`bundleRelease` fails until you do). Verify: Help & privacy shows "Read the full privacy policy" and it opens.
 - [ ] **Pending – user** — Data safety form and Health apps declaration in Play Console.
@@ -193,7 +200,8 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
    JSON and developer notifications.
 3. AdMob app and rewarded unit, `ADMOB_APP_ID_PROD` / `ADMOB_REWARDED_UNIT_ID_PROD`, GDPR + US-state messages, test
    devices, `app-ads.txt`.
-4. Host the privacy policy and set `PRIVACY_POLICY_URL`.
+4. Host the privacy policy and the terms of service, and set `PRIVACY_POLICY_URL`. Decide BUG-019 (trial-reminder
+   sentence on the paywall).
 5. Play Console: app content declarations (ads, advertising ID, Data safety, Health apps, target audience, content
    rating, app access), billing products, store listing assets.
 6. Device checks after the next topping-out: BUG-001 prompt, BUG-005 highlight; BUG-007 EEA consent form (needs the

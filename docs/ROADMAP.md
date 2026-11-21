@@ -65,6 +65,7 @@ testing track with crash reports, analytics, real ads and working purchases.
 | [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | In Progress (drafts done; hosting and console pending you) | Hosted policy, Play Console |
 | [TECH-013](#tech-013) | Play release readiness review | Technical task | P0 | Done | — |
 | [TECH-014](#tech-014) | Architect Pass purchases through RevenueCat | Technical task | P0 | In Progress | Play service account, TECH-004 |
+| [BUG-019](BUGS.md#bug-019) | Paywall promises a trial reminder the app never sends | Confirmed bug | P1 | Open | Your wording decision |
 | [BUG-018](BUGS.md#bug-018) | Health Connect privacy link opens Build | Confirmed bug | P1 | Done | — |
 
 ## Phase 3 — Reliability and release quality
@@ -115,6 +116,7 @@ Goal: learn from real users. **Exit criteria:** funnel dashboards live and the s
 | [GROW-001](#grow-001) | Activation and retention dashboards | Growth task | P2 | Planned | TECH-002 |
 | [GROW-002](#grow-002) | Store listing from share cards | Growth task | P2 | Planned | TECH-007 |
 | [GROW-003](#grow-003) | Paywall price and trial experiments | Product idea (optional) | P3 | Planned | TECH-004, GROW-001 |
+| [GROW-004](#grow-004) | Policy-safe interstitial ad (post-launch, optional) | Product idea (optional) | P3 | Planned | TECH-003, GROW-001 |
 
 ## Phase 6 — Polish and future
 
@@ -512,3 +514,35 @@ Bug cards are in [BUGS.md](BUGS.md).
 - **Dependencies / risks:** [TECH-004](#tech-004), [GROW-001](#grow-001); needs approval.
 - **Acceptance criteria:**
   1. An experiment runs to its planned sample size and the decision is recorded here.
+
+<a id="grow-004"></a>
+### GROW-004 — Policy-safe interstitial ad (post-launch, optional)
+- **Type:** Product idea (optional) · **Priority:** P3 · **Status:** Planned (do **not** build before launch) ·
+  **Effort:** M
+- **Opportunity:** a second ad format could add revenue once there is real traffic. Decided 2026-11-21: no
+  interstitial in 1.0. A new AdMob account is at its most fragile (limited ad serving, invalid-traffic review), the
+  app has almost no natural breaks outside the ad-free ceremony, and a full-screen ad in a short daily check-in hurts
+  retention and the Architect Pass.
+- **Solution (only if the gate below passes):** one interstitial at a single user-initiated natural break, for example
+  after the Share flow is finished and closed, or when leaving the weekly detail screen. Same consent path as the
+  rewarded ad (UMP, `AdsGate`), its own Remote Config switch.
+- **Gate before starting:** AdMob app approved, GDPR and US-state messages live, at least 4 weeks of clean rewarded-ad
+  data (no invalid-traffic or policy warnings in AdMob), and [GROW-001](#grow-001) retention data to compare against.
+- **Hard rules (from AdMob interstitial guidance, Play's disruptive-ads policy and this project's rules):** never at
+  app launch or exit, on a tab switch, when opening from a notification or widget, or on Build, onboarding, the
+  topping-out ceremony, the paywall or Help & privacy; never mid-interaction or right after an unexpected tap; no
+  loading screen before it; never for Architect Pass members; no step or floor data in requests or logs.
+- **Dependencies / risks:** [TECH-003](#tech-003), [GROW-001](#grow-001). Risk: account suspension if placement or
+  frequency is wrong; retention and conversion loss. Needs the user's approval to start.
+- **Acceptance criteria:**
+  1. Remote Config `interstitial_enabled` (Boolean, default `false`) gates every load and show; off, missing or
+     unfetched → no interstitial, and a loaded one is discarded.
+  2. Frequency caps: at most 1 per session, at least 5 minutes apart, none in the first session or the first 3 days
+     after install, none within 2 minutes of a rewarded ad. Unit-tested.
+  3. The ad is preloaded and shown only if already loaded; otherwise the transition continues with no delay.
+  4. Shown only at the chosen natural break; tests prove it never shows on the forbidden screens or moments above.
+  5. Debug and non-release variants use Google's interstitial test id only; `verifyReleaseAdMob` also checks the live
+     interstitial unit id.
+  6. Pass members never see it; Data safety, privacy policy and [RELEASE-READINESS.md](RELEASE-READINESS.md) updated.
+  7. After a staged rollout (Remote Config percentage), day-7 retention and Pass conversion are not worse than the
+     control group by more than an agreed threshold; the decision is recorded here.
