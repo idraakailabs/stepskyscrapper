@@ -65,7 +65,7 @@ testing track with crash reports, analytics, real ads and working purchases.
 | [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | In Progress (drafts done; hosting and console pending you) | Hosted policy, Play Console |
 | [TECH-013](#tech-013) | Play release readiness review | Technical task | P0 | Done | — |
 | [TECH-014](#tech-014) | Architect Pass purchases through RevenueCat | Technical task | P0 | In Progress | Play service account, TECH-004 |
-| [BUG-019](BUGS.md#bug-019) | Paywall promises a trial reminder the app never sends | Confirmed bug | P1 | Open | Your wording decision |
+| [BUG-019](BUGS.md#bug-019) | Paywall promises a trial reminder the app never sends | Confirmed bug | P1 | Done | — |
 | [BUG-018](BUGS.md#bug-018) | Health Connect privacy link opens Build | Confirmed bug | P1 | Done | — |
 
 ## Phase 3 — Reliability and release quality

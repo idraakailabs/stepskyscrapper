@@ -10,7 +10,8 @@
 > 3. Host it at a public https URL next to the privacy policy, and put that URL in
 >    [privacy-policy.md](privacy-policy.md) §12 and the store listing.
 > 4. Keep section 4 in step with the paywall text and the products in Play Console and RevenueCat. The paywall's
->    trial-reminder sentence is deliberately not repeated here until [BUG-019](BUGS.md#bug-019) is decided.
+>    unkept trial-reminder promise was removed ([BUG-019](BUGS.md#bug-019)); don't add one here unless a reminder is
+>    built.
 >
 > Everything below the line is the text to host.
 

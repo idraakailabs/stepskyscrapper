@@ -43,7 +43,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 | [BUG-016](#bug-016) | "Syncing…" icon wobbles while it rotates | P3 | Confirmed (reproduced) | Done |
 | [BUG-017](#bug-017) | Pressed tab / segment / chip shows a rectangular ripple, not the capsule | P3 | Confirmed (reproduced) | Done |
 | [BUG-018](#bug-018) | Health Connect privacy link opens Build instead of the privacy rationale | P1 | Confirmed (code) | Done |
-| [BUG-019](#bug-019) | Paywall promises a trial reminder the app never sends | P1 | Confirmed (code) | Open |
+| [BUG-019](#bug-019) | Paywall promises a trial reminder the app never sends | P1 | Confirmed (code) | Done |
 
 ---
 
@@ -400,7 +400,7 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 <a id="bug-019"></a>
 ## BUG-019 — Paywall promises a trial reminder the app never sends
 
-- **Priority:** P1 · **Classification:** Confirmed (code) · **Status:** Open
+- **Priority:** P1 · **Classification:** Confirmed (code) · **Status:** Done
 - **Evidence (terms-of-service review, 2026-11-21):** the yearly-trial legal line `pw_legal_trial`
   (`feature/paywall/src/main/res/values/strings.xml`) ends "We'll remind you 2 days before the trial ends." No code
   schedules such a reminder: no worker, notification or RevenueCat hook refers to the trial end (searched `core`,
@@ -413,3 +413,9 @@ reproduced on the emulator and fixed in `SuggestDailyTargetUseCase` and `SystemB
 - **Acceptance criteria:** the paywall shows no promise the app doesn't keep; for (b), the reminder fires on a
   license-tester trial (Play test trials renew in minutes) and the Settings switch can turn it off; screenshots
   re-recorded.
+- **Resolution (2026-11-21, your choice: option a):** removed "We'll remind you 2 days before the trial ends." from
+  `pw_legal_trial`. The trial line now reads "Free until {date}, then {price} a year, renewing each year until you
+  cancel. Cancel in Google Play › Subscriptions at least 24 hours before renewal." No other string or locale had the
+  sentence. No reminder is built; that stays out of scope unless planned as a new task.
+- **Verification:** `grep -r "remind you"` over the sources finds nothing; paywall screenshots re-recorded with
+  `:feature:paywall:recordRoborazziDebug`; `ktlintFormat build test lint` green.

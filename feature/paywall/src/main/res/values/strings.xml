@@ -19,7 +19,7 @@
     <string name="pw_cta_yearly">Subscribe for %1$s a year</string>
     <string name="pw_cta_monthly">Subscribe for %1$s a month</string>
     <string name="pw_cta_lifetime">Buy for %1$s</string>
-    <string name="pw_legal_trial">Free until %1$s, then %2$s a year, renewing each year until you cancel. Cancel in Google Play › Subscriptions at least 24 hours before renewal. We\'ll remind you 2 days before the trial ends.</string>
+    <string name="pw_legal_trial">Free until %1$s, then %2$s a year, renewing each year until you cancel. Cancel in Google Play › Subscriptions at least 24 hours before renewal.</string>
     <string name="pw_legal_yearly">%1$s a year, renewing each year until you cancel. Cancel in Google Play › Subscriptions at least 24 hours before renewal.</string>
     <string name="pw_legal_monthly">%1$s a month, renewing each month until you cancel. Cancel in Google Play › Subscriptions at least 24 hours before renewal.</string>
     <string name="pw_legal_lifetime">One payment of %1$s. No subscription, nothing renews.</string>
