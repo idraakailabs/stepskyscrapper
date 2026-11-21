@@ -22,6 +22,8 @@
     <string name="pw_legal_trial">Free until %1$s, then %2$s a year, renewing each year until you cancel. Cancel in Google Play › Subscriptions at least 24 hours before renewal.</string>
     <string name="pw_legal_yearly">%1$s a year, renewing each year until you cancel. Cancel in Google Play › Subscriptions at least 24 hours before renewal.</string>
     <string name="pw_legal_monthly">%1$s a month, renewing each month until you cancel. Cancel in Google Play › Subscriptions at least 24 hours before renewal.</string>
+    <string name="pw_terms">Terms of service</string>
+    <string name="pw_privacy">Privacy policy</string>
     <string name="pw_legal_lifetime">One payment of %1$s. No subscription, nothing renews.</string>
     <string name="pw_loading">Loading prices from Google Play…</string>
     <string name="pw_unavailable">Prices aren\'t available right now. Check your connection and try again.</string>

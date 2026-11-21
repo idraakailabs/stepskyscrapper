@@ -60,7 +60,7 @@ included here. Screen-by-screen design coverage: [design-inventory.md](design-in
 | Step-source help | Last data time, source status, three steps (reordered for Samsung), deep links, "Check again", diagnostic draft without step data. |
 | Widgets | Small 2×2 and medium 4×2 Glance widgets, light and dark, refreshed after each sync. |
 | Notifications | Local "topping out" and Sunday weekly summary, on by default. On Android 13+ the permission is asked once, after the first topping-out ceremony is dismissed; Me and both Settings switches show "Off" while the OS blocks notifications. |
-| Help & privacy | Privacy summary, step help, Health Connect access, "Ad privacy choices" (only while ads are on and Google's consent message requires it), hosted policy link once `PRIVACY_POLICY_URL` is set. Health Connect's privacy link opens this screen on its own. |
+| Help & privacy | Privacy summary, step help, Health Connect access, "Ad privacy choices" (only while ads are on and Google's consent message requires it), hosted policy link once `PRIVACY_POLICY_URL` is set. Health Connect's privacy link opens this screen on its own. Links: "Read the full privacy policy" and "Terms of service" (hosted on idraakai.org). |
 | Persistence | All progress on the device (Room + DataStore), included in Android backup. |
 | Debug only | Component gallery from Settings. |
 

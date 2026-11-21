@@ -22,6 +22,7 @@
   `app-ads.txt` on the developer website named in the listing.
 - [ ] **Privacy policy**: fill in the placeholders in [privacy-policy.md](privacy-policy.md), host it at a public https
   URL, and set `PRIVACY_POLICY_URL=https://…` in `gradle.properties` (this value is public, so committing it is fine).
+  Done 2026-11-21: `PRIVACY_POLICY_URL` and `TERMS_URL` point at idraakai.org in the repo's `gradle.properties`.
   Optionally set `SUPPORT_EMAIL` for the diagnostic email.
 - [ ] **Upload key**: create it yourself (you choose the passwords; back up the file and passwords outside Git):
   `keytool -genkeypair -v -keystore keystore/upload-keystore.jks -alias upload -keyalg RSA -keysize 4096 -validity 10000`.

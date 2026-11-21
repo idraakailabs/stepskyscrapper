@@ -79,6 +79,7 @@ android {
         manifestPlaceholders["admobAppId"] = admobTestAppId
         buildConfigField("String", "PRIVACY_POLICY_URL", "\"${providers.gradleProperty("PRIVACY_POLICY_URL").getOrElse("")}\"")
         buildConfigField("String", "SUPPORT_EMAIL", "\"${providers.gradleProperty("SUPPORT_EMAIL").getOrElse("")}\"")
+        buildConfigField("String", "TERMS_URL", "\"${providers.gradleProperty("TERMS_URL").getOrElse("")}\"")
         // RevenueCat public SDK key, set per variant in androidComponents.onVariants below. Not secret, but kept out
         // of Git like the other ids; without it purchases are switched off (no offers, Restore reports the store as
         // unavailable). See verifyReleaseRevenueCat.

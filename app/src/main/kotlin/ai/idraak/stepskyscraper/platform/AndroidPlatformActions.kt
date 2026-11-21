@@ -218,6 +218,13 @@ class AndroidPlatformActions(
         if (url.isNotBlank()) start(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
 
+    override val hasTermsOfService: Boolean get() = BuildConfig.TERMS_URL.isNotBlank()
+
+    override fun openTermsOfService() {
+        val url = BuildConfig.TERMS_URL
+        if (url.isNotBlank()) start(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    }
+
     override fun sendDiagnostic(report: String) {
         val email = BuildConfig.SUPPORT_EMAIL
         val intent = if (email.isNotBlank()) {

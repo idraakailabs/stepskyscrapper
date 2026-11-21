@@ -36,10 +36,12 @@ import ai.idraak.stepskyscraper.core.ui.format.Formats
 import ai.idraak.stepskyscraper.core.ui.mvi.MviViewModel
 import ai.idraak.stepskyscraper.core.ui.mvi.UiText
 import ai.idraak.stepskyscraper.core.ui.mvi.toUiText
+import ai.idraak.stepskyscraper.core.ui.platform.LocalPlatformActions
 import ai.idraak.stepskyscraper.core.ui.platform.LocalUiHost
 import ai.idraak.stepskyscraper.core.ui.preview.PreviewSurface
 import ai.idraak.stepskyscraper.core.ui.preview.ScreenPreviews
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +60,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -66,7 +69,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -280,8 +285,33 @@ fun PaywallScreen(state: PaywallUiState, onClose: () -> Unit, onIntent: (Paywall
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
+            LegalLinks()
         }
     }
+}
+
+/** Terms and privacy links under the purchase terms; each hides when its URL isn't configured for the build. */
+@Composable
+private fun LegalLinks() {
+    val platform = LocalPlatformActions.current
+    if (!platform.hasTermsOfService && !platform.hasPrivacyPolicy) return
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        if (platform.hasTermsOfService) LegalLink(stringResource(R.string.pw_terms), platform::openTermsOfService)
+        if (platform.hasPrivacyPolicy) LegalLink(stringResource(R.string.pw_privacy), platform::openPrivacyPolicy)
+    }
+}
+
+@Composable
+private fun LegalLink(text: String, onClick: () -> Unit) {
+    Text(
+        text,
+        style = SsTheme.type.legal.copy(textDecoration = TextDecoration.Underline),
+        color = SsTheme.colors.primaryText,
+        modifier = Modifier
+            .minimumInteractiveComponentSize()
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = SsSpacing.s),
+    )
 }
 
 @Composable

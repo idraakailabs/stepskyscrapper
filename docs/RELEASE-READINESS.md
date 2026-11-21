@@ -72,7 +72,8 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
   tap → form.
 - [ ] **Manual verification** — BUG-006 payoff at exactly 0 steps (unit-tested).
 - [x] BUG-018 Health Connect privacy link → Help & privacy alone, Back → Health Connect (Pixel 6a, 2026-11-21). The
-  hosted-policy link inside it appears once `PRIVACY_POLICY_URL` is set (TECH-011).
+  hosted-policy link inside it appears once `PRIVACY_POLICY_URL` is set (TECH-011); both the policy and terms links
+  open the live idraakai.org pages on the Pixel 6a (2026-11-21).
 - [x] BUG-002 (Blueprint stacking) and BUG-004 (week card → weekly detail) fixed and verified 2026-11-21.
 
 ## 2. Critical functional and UI checks

@@ -18,6 +18,7 @@ import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import com.github.takahirom.roborazzi.captureRoboImage
 import com.google.common.truth.Truth.assertThat
@@ -106,6 +107,24 @@ class MeTest {
             SsTheme(reduceMotion = true) { MeScreen(MeUiState(Lce.Content(previewMe())), MeNavigation({}, {}, {}, {}, {}, {})) {} }
         }
         compose.onNodeWithText("Topping out and weekly summary only").performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun helpAndPrivacyLinksTheHostedTerms() {
+        var opened = false
+        val platform = object : PlatformActions by PreviewPlatformActions {
+            override fun openTermsOfService() {
+                opened = true
+            }
+        }
+        compose.setContent {
+            CompositionLocalProvider(LocalPlatformActions provides platform) {
+                SsTheme(reduceMotion = true) { PrivacyScreen(PrivacyUiState(), {}, null) {} }
+            }
+        }
+        compose.onNodeWithText("Read the full privacy policy").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithText("Terms of service").performScrollTo().assertIsDisplayed().performClick()
+        assertThat(opened).isTrue()
     }
 
     @Test

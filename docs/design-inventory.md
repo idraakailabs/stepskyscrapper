@@ -157,14 +157,14 @@ when it couldn't be.
 - [x] Pause goals sheet *(device ✓, no design frame)*: 3 days / 1 week / until I turn it back on
 - [x] Weekly detail "This week" *(device ✓, no design frame, D25; BUG-004)*: opened from the Build week card; floors of goal + bar, status line, Me week bars, Pause goals switch (pause sheet / resume), Goals row
 - [x] Goals screen (daily target options, weekly goal, adaptive suggestion)
-- [x] Notifications, Appearance (Follow system / Light / Dark), Help & privacy, Settings screens *(2026-11-21: notification rows read "Off" while the OS blocks delivery (BUG-001); Help & privacy adds "Ad privacy choices" only when UMP requires it (no design frame, see P13) and opens on its own from Health Connect's privacy link)*
+- [x] Notifications, Appearance (Follow system / Light / Dark), Help & privacy, Settings screens *(2026-11-21: notification rows read "Off" while the OS blocks delivery (BUG-001); Help & privacy adds "Ad privacy choices" only when UMP requires it (no design frame, see P13) and opens on its own from Health Connect's privacy link)* *(Help & privacy: "Terms of service" link, D26)*
 - [~] 7a Achievements list *(device ✓; card line heights fixed)*: In progress (progress + reward chip), Earned (date + reward); badge flip — *gap: the "Equip" chip is shown for 7 days but is a label, not a shortcut into Customise*
 ### Share (`feature/share`)
 - [x] 8a Composer *(device ✓, D18)*: preview, Tower/Skyline toggle, Story 9:16 / Square 1:1, "Show step stats" switch, Download, "Share image" (share sheet + caption); 150ms crossfade; save result snackbar (BUG-003)
 - [x] *(device ✓, exported PNGs)* 8b Story cards tower / skyline (1080×1920, safe zones top 14% / bottom 10%)
 - [x] *(device ✓, exported PNGs)* 8c Square cards tower / skyline no stats (1080×1080); brand mark
 ### Paywall (`feature/paywall`)
-- [x] 9a *(device: error state ✓; plan cards need Play products, TECH-004 — screenshot test only)*: close + Restore, dusk hero with 3 towers, title, body, 3 benefits, Yearly (trial, Save 58%) / Monthly / Lifetime, CTA follows plan, legal copy with trial end date; loading/error/purchased states
+- [x] 9a *(device: error state ✓; plan cards need Play products, TECH-004 — screenshot test only)*: close + Restore, dusk hero with 3 towers, title, body, 3 benefits, Yearly (trial, Save 58%) / Monthly / Lifetime, CTA follows plan, legal copy with trial end date; loading/error/purchased states — *2026-11-21: terms and privacy links under the purchase terms (D26)*
 ### Help (`feature/me` step-source route)
 - [x] 10a *(device ✓; step-card heights fixed)*: "Steps not arriving?", last-data card + status, 3 numbered steps (reordered for Samsung), deep links, "Check again" inline result, "Still stuck? Send a diagnostic"
 - [x] HC not installed / needs update / permission revoked / sensor fallback states

@@ -454,6 +454,9 @@ fun PrivacyScreen(
                 Modifier.fillMaxWidth(),
             )
         }
+        if (platform.hasTermsOfService) {
+            SsTextButton(stringResource(R.string.privacy_terms), platform::openTermsOfService, Modifier.fillMaxWidth())
+        }
     }
 }
 

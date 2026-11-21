@@ -54,6 +54,11 @@ interface PlatformActions {
 
     fun openPrivacyPolicy()
 
+    /** False when no hosted terms-of-service URL is configured for this build. */
+    val hasTermsOfService: Boolean
+
+    fun openTermsOfService()
+
     /** Opens an email draft containing sync times only (never step data). */
     fun sendDiagnostic(report: String)
 
@@ -89,6 +94,10 @@ object PreviewPlatformActions : PlatformActions {
     override val hasPrivacyPolicy: Boolean = true
 
     override fun openPrivacyPolicy() = Unit
+
+    override val hasTermsOfService: Boolean = true
+
+    override fun openTermsOfService() = Unit
 
     override fun sendDiagnostic(report: String) = Unit
 

@@ -360,8 +360,13 @@ Bug cards are in [BUGS.md](BUGS.md).
   [play-console-checklist.md](play-console-checklist.md); `verifyReleasePrivacyPolicy` makes `bundleRelease` fail
   until `PRIVACY_POLICY_URL` is an https URL; the Health Connect rationale intents now open Help & privacy
   ([BUG-018](BUGS.md#bug-018)). Hosted 2026-11-21 at https://idraakai.org/step-skyscraper/privacy/ (terms at `/terms/`) and set as
-  `PRIVACY_POLICY_URL` in `~/.gradle/gradle.properties` (`verifyReleasePrivacyPolicy` passes). Outstanding: legal
-  review, the Play Console forms, then criteria 1–3 on a device and in Play Console.
+  `PRIVACY_POLICY_URL` in `~/.gradle/gradle.properties` (`verifyReleasePrivacyPolicy` passes). Later on 2026-11-21 both
+  URLs moved into the repo's `gradle.properties` (`PRIVACY_POLICY_URL`, new `TERMS_URL`) so every build machine gets
+  them, and a terms link was added: Help & privacy › "Terms of service" and "Terms of service · Privacy policy" under
+  the paywall's purchase terms (each hidden when its URL is blank; `PlatformActions.hasTermsOfService` /
+  `openTermsOfService`). Verified: `PaywallLegalLinksTest`, `MeTest.helpAndPrivacyLinksTheHostedTerms`, re-recorded
+  `paywall_9a.png`; Pixel 6a debug: Help & privacy shows both links, each opens the live idraakai.org page in Chrome
+  (criterion 1 met). Outstanding: legal review, the Play Console forms, then criteria 2–3.
 
 <a id="tech-013"></a>
 ### TECH-013 — Play release readiness review
