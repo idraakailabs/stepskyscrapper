@@ -12,9 +12,9 @@
 | | |
 |---|---|
 | **Live baseline** | Phase 1, version 1.0.0 (versionCode 1), commit `a8d9d51` on `main` (not published). Release-prep work is merged into `develop` (`aa95425`), not yet into `main` |
-| **Active phase** | Phase 2, Release blockers: every code-side item is done; what remains are your console and key actions (see [RELEASE-READINESS.md](RELEASE-READINESS.md)) |
+| **Active phase** | Phase 2, Release blockers: closed-testing release 1.0.0 sent for Google review 2026-11-22 ([store-listing.md](store-listing.md)); remaining items are console and device actions (see [RELEASE-READINESS.md](RELEASE-READINESS.md)) |
 | **In progress** | [TECH-002](#tech-002) (Firebase configured; device checks), [TECH-014](#tech-014) (RevenueCat; Play service account), [TECH-005](#tech-005) (upload key), [TECH-003](#tech-003) (live AdMob ids, UMP messages), [TECH-011](#tech-011) (host the policy, declarations), [TECH-012](#tech-012) (on-device checks that need your phone settings) |
-| **Recommended next task** | You: create the upload key and AdMob app, connect the Play service account to RevenueCat, host [privacy-policy.md](privacy-policy.md), then build the AAB and upload it to internal testing ([play-console-checklist.md](play-console-checklist.md)). Then [TECH-004](#tech-004) billing products and [TECH-007](#tech-007) release smoke test. |
+| **Recommended next task** | You: wait for the closed-test review, set the per-asset AI labels, then create the billing products and license testers ([TECH-004](#tech-004)) and connect the Play service account to RevenueCat ([TECH-014](#tech-014)); publish the AdMob consent messages ([TECH-003](#tech-003)); get 12+ testers opted in for 14 days. Then [TECH-007](#tech-007) release smoke test from the testing track. |
 
 Update this table whenever a task starts, finishes or the active phase changes.
 
@@ -62,7 +62,7 @@ testing track with crash reports, analytics, real ads and working purchases.
 | [TECH-003](#tech-003) | Real AdMob ids and UMP consent message | Technical task | P0 | In Progress (code done; ids and console pending you) | AdMob console |
 | [TECH-004](#tech-004) | Create Play billing products and test purchases | Technical task | P0 | Planned | Play Console |
 | [TECH-005](#tech-005) | Release signing | Technical task | P0 | In Progress | Upload key |
-| [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | In Progress (drafts done; hosting and console pending you) | Hosted policy, Play Console |
+| [TECH-011](#tech-011) | Privacy policy, Health apps declaration, Data safety | Technical task | P0 | In Progress (forms submitted 2026-11-22; review and legal review pending) | Play review |
 | [TECH-013](#tech-013) | Play release readiness review | Technical task | P0 | Done | — |
 | [TECH-014](#tech-014) | Architect Pass purchases through RevenueCat | Technical task | P0 | In Progress | Play service account, TECH-004 |
 | [TECH-015](#tech-015) | Device smoke test, crash fixes, pressed-state polish, paywall speed | Technical task | P0 | In Progress | — |
@@ -116,7 +116,7 @@ Goal: learn from real users. **Exit criteria:** funnel dashboards live and the s
 | ID | Title | Type | Priority | Status | Depends on |
 |---|---|---|---|---|---|
 | [GROW-001](#grow-001) | Activation and retention dashboards | Growth task | P2 | Planned | TECH-002 |
-| [GROW-002](#grow-002) | Store listing from share cards | Growth task | P2 | Planned | TECH-007 |
+| [GROW-002](#grow-002) | Store listing from share cards | Growth task | P2 | In Progress (listing submitted; review pending) | Play review |
 | [GROW-003](#grow-003) | Paywall price and trial experiments | Product idea (optional) | P3 | Planned | TECH-004, GROW-001 |
 | [GROW-004](#grow-004) | Policy-safe interstitial ad (post-launch, optional) | Product idea (optional) | P3 | Planned | TECH-003, GROW-001 |
 
@@ -256,6 +256,8 @@ Bug cards are in [BUGS.md](BUGS.md).
   as PKCS12 requires). The build now also reads the `STEPSKY_*` keys from `local.properties` (git-ignored), where they
   are set on the dev machine. `verifyReleaseSigning` passes and the release APK's certificate matches the alias
   (SHA-256 `7B:07:5B:00:…:9B:1E`). Outstanding: Play App Signing enrolment and the first upload (criterion 2).
+- **Progress (2026-11-22):** first upload done: `app-release.aab` 1 (1.0.0) accepted on the closed-testing track and
+  sent for review. Play App Signing status wasn't checked in the console; confirm under Test and release › App integrity.
 
 <a id="tech-006"></a>
 ### TECH-006 — Generate the baseline profile and measure startup
@@ -374,6 +376,12 @@ Bug cards are in [BUGS.md](BUGS.md).
   `openTermsOfService`). Verified: `PaywallLegalLinksTest`, `MeTest.helpAndPrivacyLinksTheHostedTerms`, re-recorded
   `paywall_9a.png`; Pixel 6a debug: Help & privacy shows both links, each opens the live idraakai.org page in Chrome
   (criterion 1 met). Outstanding: legal review, the Play Console forms, then criteria 2–3.
+- **Progress (2026-11-22):** Play Console App content completed and sent for review with the closed-test release:
+  privacy policy URL, ads, sign-in details, content rating, target audience 13+, Data safety, advertising ID,
+  government apps, financial features, Health apps (with Health Connect permission justifications) and trader status
+  (by the user). Exact answers: [store-listing.md](store-listing.md). Outstanding: Google's review (criterion 3),
+  the Health Connect privacy-link check from the Play-installed build (criterion 2 was checked on the debug build),
+  legal review of the texts.
 
 <a id="tech-013"></a>
 ### TECH-013 — Play release readiness review
@@ -564,7 +572,7 @@ Bug cards are in [BUGS.md](BUGS.md).
 
 <a id="grow-002"></a>
 ### GROW-002 — Store listing from share cards
-- **Type:** Growth task · **Priority:** P2 · **Status:** Planned · **Effort:** S
+- **Type:** Growth task · **Priority:** P2 · **Status:** In Progress · **Effort:** S
 - **Opportunity:** the share cards and screenshot tests already produce outcome-focused images.
 - **Solution:** listing screenshots (tower growing, ceremony, skyline, widget), feature graphic, description
   that explains Health Connect use plainly.
@@ -572,6 +580,11 @@ Bug cards are in [BUGS.md](BUGS.md).
 - **Dependencies / risks:** [TECH-007](#tech-007).
 - **Acceptance criteria:**
   1. The listing is published on the closed-testing track with at least 5 screenshots.
+- **Progress (2026-11-22):** ASO listing written from the shipped features (title "Step Skyscraper: Step Counter",
+  80-character short description, 2,594-character full description; keyword strategy in
+  [store-listing.md](store-listing.md)); Night Tower icon, feature graphic and 6 phone screenshots (Claude Design)
+  uploaded and sent for review with the closed-test release. Outstanding: review approval (criterion 1), per-asset AI
+  labels, "Activity tracker" tag.
 
 <a id="grow-003"></a>
 ### GROW-003 — Paywall price and trial experiments

@@ -17,6 +17,7 @@ MVI, Hilt, Room, DataStore, WorkManager, Glance, RevenueCat (on Play Billing), A
 | [docs/design-deviations.md](docs/design-deviations.md) | Every intentional difference from the design and why |
 | [docs/RELEASE-READINESS.md](docs/RELEASE-READINESS.md) | Release Readiness Sheet: every pre-upload check with its status and what the user still has to do |
 | [docs/play-console-checklist.md](docs/play-console-checklist.md) | Release steps, signed AAB, Health apps declaration, Data safety answers |
+| [docs/store-listing.md](docs/store-listing.md) | Play Store listing text, ASO keywords and the current Play Console state (track, testers, declarations) |
 | [docs/privacy-policy.md](docs/privacy-policy.md) | Privacy policy draft to host (keep in step with the Data safety answers) |
 | [docs/terms-of-service.md](docs/terms-of-service.md) | Terms of Service draft to host (keep in step with the paywall and Pass plans) |
 

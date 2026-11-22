@@ -19,6 +19,10 @@ Console forms.
 ## What's done
 Everything below is finished and on `develop`. Evidence is in the numbered sections and the linked cards.
 
+**Play Console (2026-11-22)** — closed-testing release 1 (1.0.0) with the store listing, graphics, testers (LaterBox),
+178 countries and every App content declaration was **sent for Google review**. Details and the exact answers:
+[store-listing.md](store-listing.md).
+
 **Services configured**
 - [x] Firebase project `skyscrapper-a675f`: release and debug apps, `app/google-services.json` on the dev machine
   (git-ignored); Analytics, Crashlytics and Remote Config initialise on the Pixel 6a.
@@ -134,8 +138,9 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
   `jarsigner -verify` earlier ([TECH-005](ROADMAP.md#tech-005)).
 - [x] **Done** (2026-11-21) — upload key: alias `stepskyscrapper`, `STEPSKY_*` in `local.properties`; release APK
   signed with it. Live AdMob ids are in `~/.gradle/gradle.properties`.
-- [ ] **Pending – user** — enrol in Play App Signing; build with
-  `./gradlew clean :app:bundleRelease` ([play-console-checklist.md §2](play-console-checklist.md#2-build-the-signed-aab)).
+- [x] **Done** (2026-11-22) — `./gradlew clean :app:bundleRelease` built the signed AAB from `develop` (`c3a9954`); uploaded
+  to closed testing and accepted as 1 (1.0.0).
+- [ ] **Manual verification** — Play App Signing shows as enabled under Test and release › App integrity.
 
 ## 9. Target API and compatibility
 - [x] **Done** — targetSdk 37, compileSdk 37.2, minSdk 26. Play requires API 36+ for new apps and updates since
@@ -165,10 +170,11 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
 - [x] **Done** (2026-11-21) — `PRIVACY_POLICY_URL=https://idraakai.org/step-skyscraper/privacy/` in
   `~/.gradle/gradle.properties`; `:app:verifyReleasePrivacyPolicy` passes.
 - [ ] **Manual verification** — Help & privacy shows "Read the full privacy policy" and it opens (next build).
-- [ ] **Pending – user** — Data safety form and Health apps declaration in Play Console.
+- [x] **Done** (2026-11-22) — Data safety form and Health apps declaration (incl. Health Connect permission
+  justifications) submitted; answers in [store-listing.md](store-listing.md).
 
 ## 11. Ads declaration and consent
-- [ ] **Pending – user** — Play Console: "Contains ads" = Yes; advertising ID = Yes (Advertising or marketing).
+- [x] **Done** (2026-11-22) — Play Console: "Contains ads" = Yes; advertising ID = Yes (advertising, fraud prevention).
 - [ ] **Pending – user** — AdMob › Privacy & messaging: publish the GDPR and US-state messages; link the app to
   Play; host `app-ads.txt`.
 
@@ -179,13 +185,13 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
 - [ ] **Manual verification** — pre-launch report on the internal-testing upload has no crashes.
 
 ## 13. Store listing, screenshots and declarations
-- [ ] **Pending – user** — name, short and full description (explain Health Connect use plainly), 512 px icon,
-  1024×500 feature graphic, contact email, category Health & Fitness.
-- [ ] **Pending – user** — phone screenshots: long side ≤ 2× short side, so Pixel 6a captures (1080×2400) and the
+- [x] **Done** (2026-11-22) — name, short and full description, 512 px icon, 1024×500 feature graphic, contact email,
+  category Health & Fitness ([store-listing.md](store-listing.md)). Per-asset AI labels and tags still to set.
+- [x] **Done** (2026-11-22) — six 1080×1920 phone screenshots from Claude Design (demo data). Original note: long side ≤ 2× short side, so Pixel 6a captures (1080×2400) and the
   Roborazzi images (720×1600) need cropping, or use a 1080×1920 emulator; demo data only, never your own history.
   Share cards (1080×1920) work as promo images ([GROW-002](ROADMAP.md#grow-002)).
-- [ ] **Pending – user** — content rating (IARC questionnaire), target audience 13+ (no under-13 groups, so the
-  Families policy doesn't apply), news / COVID / government / financial: No.
+- [x] **Done** (2026-11-22) — content rating (ESRB Everyone, PEGI 3), target audience 13+ (Families policy doesn't
+  apply), government apps and financial features: No.
 - [ ] **Pending – user** — billing products `architect_pass` (`monthly`, `annual` + 7-day trial) and
   `architect_pass_lifetime` in Play Console (already set up in RevenueCat), license testers
   ([TECH-004](ROADMAP.md#tech-004)).
@@ -195,10 +201,10 @@ Everything below is finished and on `develop`. Evidence is in the numbered secti
 - [x] **Done** — no login or account; declare "All functionality is available without special access".
 
 ## 15. Final pre-upload verification
-- [ ] `./gradlew :app:verifyReleaseSigning :app:verifyReleaseAdMob :app:verifyReleasePrivacyPolicy` passes.
-- [ ] `./gradlew clean :app:bundleRelease` succeeds with no `w: AdMob: … ads disabled` line; `jarsigner -verify` OK.
+- [x] `./gradlew :app:verifyReleaseSigning :app:verifyReleaseAdMob :app:verifyReleasePrivacyPolicy :app:verifyReleaseRevenueCat` passes (2026-11-21).
+- [x] `./gradlew clean :app:bundleRelease` succeeds with no `w: AdMob: … ads disabled` line; `jarsigner -verify` OK (2026-11-21).
 - [x] `google-services.json` present (dev machine, 2026-11-21).
-- [ ] Crashlytics mapping upload ran in the release build log.
+- [x] Crashlytics mapping upload ran in the release build log (2026-11-21).
 - [ ] Install from internal testing; onboarding with Health Connect, Build sync, Skyline, Share, paywall prices load.
 - [ ] `ads_enabled` still false until AdMob approval and UMP messages are live.
 - [ ] Play Console › Dashboard shows no outstanding declarations; Data safety matches the hosted policy.
